@@ -1,6 +1,5 @@
 package org.thinkbigthings.zdd.server;
 
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
@@ -9,6 +8,8 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -24,21 +25,18 @@ public class UserService {
 
     public UserDTO updateUser(String username, UserDTO userDto) {
 
-
-        // TODO on update should not create new entity since that's an unnecessary instantiation and mapping
-
-        var userData = fromDto(userDto);
         var user = userRepo.findByUsername(username);
 
-        user.setEmail(userData.getEmail());
-        user.setDisplayName(userData.getDisplayName());
-        user.setPhoneNumber(userData.getPhoneNumber());
-        user.setHeightCm(userData.getHeightCm());
+        user.setEmail(userDto.email);
+        user.setDisplayName(userDto.displayName);
+        user.setPhoneNumber(userDto.phoneNumber);
+        user.setHeightCm(userDto.heightCm);
 
         user.getAddresses().forEach(a -> a.setUser(null));
         user.getAddresses().clear();
 
-        user.getAddresses().addAll(userData.getAddresses());
+        List<Address> newAddressEntities = userDto.addresses.stream().map(this::fromDto).collect(toList());
+        user.getAddresses().addAll(newAddressEntities);
         user.getAddresses().forEach(a -> a.setUser(user));
 
         return toDto(userRepo.save(user));
@@ -55,8 +53,7 @@ public class UserService {
 
     public List<UserDTO> getUsers() {
 
-        return userRepo.findRecent().stream().map(this::toDto).collect(Collectors.toList());
-
+        return userRepo.findRecent().stream().map(this::toDto).collect(toList());
     }
 
     public UserDTO getUser(String username) {
