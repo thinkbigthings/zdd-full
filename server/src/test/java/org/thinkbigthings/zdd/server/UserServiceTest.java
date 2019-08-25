@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.thinkbigthings.zdd.dto.UserDTO;
 
 import java.util.UUID;
 
@@ -30,13 +31,14 @@ public class UserServiceTest {
     public void createUser() {
 
         String name = "newuserhere";
-        User newUser = new User(name);
+        UserDTO newUser = new UserDTO();
 
-        newUser.setEmail(name+"@email.com");
+        newUser.username = name;
+        newUser.email = name + "@email.com";
 
-        User created = service.saveNewUser(newUser);
+        UserDTO created = service.saveNewUser(newUser);
 
-        assertEquals(name, created.getUsername());
+        assertEquals(name, created.username);
     }
 
 }
