@@ -1,7 +1,19 @@
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.10'
+    }
+}
+
 subprojects {
 
     apply plugin: 'java' // core plugin provided by gradle
+    apply plugin: 'idea'
+    apply plugin: 'com.google.protobuf'
+
     
     group = 'org.thinkbigthings.zdd'
     version = '1.0-SNAPSHOT'
@@ -13,6 +25,7 @@ subprojects {
     }
 
     dependencies {
+        implementation 'com.google.protobuf:protobuf-java:3.9.1'
         testImplementation 'org.junit.jupiter:junit-jupiter:5.4.1'
         testImplementation 'org.mockito:mockito-junit-jupiter:2.27.0'
     }
@@ -34,3 +47,5 @@ project(':server') {
         implementation project(':dto')
     }
 }
+
+

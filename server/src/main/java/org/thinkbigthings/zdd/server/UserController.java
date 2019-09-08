@@ -1,12 +1,17 @@
 package org.thinkbigthings.zdd.server;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
+import org.thinkbigthings.zdd.pb.ListUserPB;
+import org.thinkbigthings.zdd.pb.UserPB;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.thinkbigthings.zdd.dto.MediaType.APPLICATION_PROTOBUF_VALUE;
 
 
 @RestController
@@ -46,4 +51,19 @@ public class UserController {
 
         return service.getUser(username);
     }
+
+    @RequestMapping(value="/user", method= RequestMethod.GET, produces=APPLICATION_PROTOBUF_VALUE)
+    @ResponseBody
+    public ListUserPB getUsersPb() {
+
+        return service.getUsersPb();
+    }
+
+    @RequestMapping(value="/user/{username}", method= RequestMethod.GET, produces=APPLICATION_PROTOBUF_VALUE)
+    @ResponseBody
+    public UserPB getUserPb(@PathVariable String username) {
+
+        return service.getUserPb(username);
+    }
+
 }

@@ -6,7 +6,9 @@ import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressDTO;
+import org.thinkbigthings.zdd.dto.MediaType;
 import org.thinkbigthings.zdd.dto.UserDTO;
+import org.thinkbigthings.zdd.pb.UserPB;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -27,10 +29,6 @@ import java.util.stream.IntStream;
 
 @Component
 public class LoadTester {
-
-    public static final class MediaType {
-        public static final String APPLICATION_JSON_VALUE = "application/json";
-    }
 
     private HttpClient client;
     private Duration duration;

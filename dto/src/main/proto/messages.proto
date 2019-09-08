@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package zdd;
+
+option optimize_for = CODE_SIZE;
+
+option java_package = "org.thinkbigthings.zdd.pb";
+option java_multiple_files = true;
+
+
+message ListUserPB {
+    repeated UserPB users = 1;
+}
+
+message UserPB {
+    string username = 1;
+    string email = 2;
+    string display_name = 3;
+    string phone_number = 4;
+    string registration_time = 5;
+    int32 height_cm = 6;
+    repeated AddressPB addresses = 7;
+}
+
+message AddressPB {
+    string line1 = 1;
+    string city = 2;
+    string state = 3;
+    string zip = 4;
+}
