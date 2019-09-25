@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,6 +26,9 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.IntStream;
+
+import static java.util.UUID.randomUUID;
+import static java.util.stream.IntStream.range;
 
 @Component
 public class LoadTester {
@@ -88,11 +93,12 @@ public class LoadTester {
                     .build();
         }
         catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    public void run() throws Exception {
+    public void run() {
 
 
         Instant end = Instant.now().plus(duration);
@@ -117,6 +123,7 @@ public class LoadTester {
             Thread.sleep(sleepDuration.toMillis());
         }
         catch(InterruptedException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -131,59 +138,56 @@ public class LoadTester {
         executor.submit(() -> makeCalls());
     }
 
+    private void doInserts() {
+        range(0, 1000).forEach(i -> post(users, randomUser()));
+    }
+
     private void doCRUD() {
 
-        UserDTO user = userSupplier(UUID.randomUUID().toString());
+        UserDTO user = randomUser();
         URI userUrl = URI.create(users.toString() + "/" + user.username);
 
-        try {
-            post(users, user);
+        post(users, user);
 
-            get(userUrl);
+        UserDTO firstUserSave = get(userUrl, UserDTO.class);
 
-            user.displayName = user.displayName+"-updated";
-            user.phoneNumber = faker.phoneNumber().phoneNumber();
-            user.email = faker.internet().emailAddress();
-            user.heightCm = user.heightCm + 1;
-            user.addresses.clear();
-            user.addresses.add(randomAddress());
-            put(userUrl, user);
 
-            get(userUrl);
+        UserDTO updatedUser = randomUser(user.username);
+        updatedUser.registrationTime = firstUserSave.registrationTime;
+        put(userUrl, updatedUser);
 
-            get(info);
+        UserDTO secondUserSave = get(userUrl, UserDTO.class);
 
-            get(health);
-
-            get(users);
+        if( ! updatedUser.equals(secondUserSave)) {
+            String message = "user updates were not all persisted: " + updatedUser + " vs " + secondUserSave;
+            System.out.println(message);
+            // could be test assertion
+            // throw new RuntimeException();
         }
-        catch(Exception e) {
-            throw new RuntimeException(e);
-        }
+
+        get(info);
+
+        get(health);
+
+        get(users);
     }
 
-    private void doInserts() {
+    private UserDTO randomUser() {
 
-        IntStream.range(0, 1000).forEach(i -> {
-            try {
-                post(users, userSupplier(UUID.randomUUID().toString()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        return randomUser("user-" + randomUUID());
     }
+    private UserDTO randomUser(String username) {
 
-    private UserDTO userSupplier(String suffix) {
-        String name = "user" + suffix;
         UserDTO newUser = new UserDTO();
-        newUser.username = name;
-        newUser.displayName = name;
+        newUser.username = username;
+        newUser.displayName = faker.name().name();
         newUser.phoneNumber = faker.phoneNumber().phoneNumber();
         newUser.heightCm = 150 + random.nextInt(40);
         newUser.email = faker.internet().emailAddress();
         newUser.addresses.add(randomAddress());
         return newUser;
     }
+
 
     private AddressDTO randomAddress() {
 
@@ -198,7 +202,9 @@ public class LoadTester {
         return address;
     }
 
-    public void put(URI uri, UserDTO newUser) throws Exception {
+
+
+    public void put(URI uri, UserDTO newUser) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -206,14 +212,10 @@ public class LoadTester {
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        sleep(latency);
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        sleep(latency);
-
-        processResponse(response);
+        sendWithLatency(request);
     }
 
-    public void post(URI uri, UserDTO newUser) throws Exception {
+    public void post(URI uri, UserDTO newUser) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
@@ -221,28 +223,36 @@ public class LoadTester {
                 .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        sleep(latency);
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        sleep(latency);
-
-        processResponse(response);
+        sendWithLatency(request);
     }
 
-    public String get(URI uri) throws Exception {
+    public String get(URI uri) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .GET()
                 .build();
 
-        sleep(latency);
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        sleep(latency);
 
-        processResponse(response);
+        HttpResponse<String> response = sendWithLatency(request);
 
         return response.body();
     }
+
+    public <T> T get(URI uri, Class<T> jsonResponse) {
+
+        return parse(get(uri), jsonResponse);
+    }
+
+    public <T> T parse(String json, Class<T> type) {
+        try {
+            return mapper.readValue(json, type);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public HttpRequest.BodyPublisher jsonFor(Object object) {
 
@@ -250,20 +260,41 @@ public class LoadTester {
         try {
             json = mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
         return HttpRequest.BodyPublishers.ofString(json);
     }
 
-    public void processResponse(HttpResponse<String> response) {
+
+    public HttpResponse<String> sendWithLatency(HttpRequest request) {
+
+        try {
+
+            // more on body handlers here https://openjdk.java.net/groups/net/httpclient/recipes.html
+            // might be fun to have direct-to-json-object body handler
+
+            sleep(latency);
+            HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
+            sleep(latency);
+            return response;
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public HttpResponse<String> throwOnError(HttpResponse<String> response) {
 
         if(response.statusCode() != 200) {
             String message = "Return status code was " + response.statusCode();
-            System.out.println(message);
             throw new RuntimeException(message);
         }
+        else {
+            return response;
+        }
     }
-
 
 }
