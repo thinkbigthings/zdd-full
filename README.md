@@ -24,11 +24,15 @@ For example:
 
 #### Showing Blue Green Deployment
 
-To override the port so we can run multiple servers at once
-e.g. 
+Override the port so we can run multiple servers at once. e.g. 
 `gradlew :server:flywayMigrate -i`
 `gradlew :server:bootRun --args='--server.port=9001'`
 `gradlew :perf:bootRun --args='--connect.port=9001'`
+
+To make this easier, see the commands file with the aliases.
+Use `blueDeploy` and `blueClient` alternate with `greenDeploy` and `greenClient`.
+Just put ./commands on your PATH
+
 
 
 ### Running from IDE
@@ -66,3 +70,19 @@ We can do this from the base folder with
 
 Do a squash merge so master contains a single commit per issue
 
+## Troubleshooting
+
+### Stack trace about a postgres deadlock
+This has so far only been on the very last step. Have not done a lot of investigation into this.
+MIGHT be able to swap environments again? Or just shutdown and restart server? 
+Or just stop and restart the client? Do we need to restart postgres?
+
+### Client and server are running but client isn’t making requests
+At one point a software update for iterm2 on my laptop was messing things up
+Can just restart client and it’ll work
+
+### Migration hangs
+A connection can block another connection for the migration, make sure the IntelliJ DB Browser, 
+any psql clients, VisualVM JDBC profilers, or previous servers, are disconnected.
+
+If something goes terribly wrong, you may need to even drop the docker instance and rebuild everything.

@@ -108,7 +108,7 @@ public class LoadTester {
         }
 
         while(Instant.now().isBefore(end)) {
-            sleep(Duration.ofMillis(1000));
+            sleep(Duration.ofSeconds(1));
         }
         executor.shutdown();
 
