@@ -13,8 +13,8 @@ subprojects {
     }
 
     dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.4.1'
-        testImplementation 'org.mockito:mockito-junit-jupiter:2.27.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+        testImplementation 'org.mockito:mockito-junit-jupiter:3.0.0'
     }
 
     test {
