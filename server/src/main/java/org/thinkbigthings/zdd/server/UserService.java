@@ -1,10 +1,10 @@
 package org.thinkbigthings.zdd.server;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.toList;
 
 
 @Service
-@Transactional
 public class UserService {
 
 
@@ -23,6 +22,7 @@ public class UserService {
         userRepo = repo;
     }
 
+    @Transactional
     public UserDTO updateUser(String username, UserDTO userDto) {
 
         var user = userRepo.findByUsername(username);
@@ -42,6 +42,7 @@ public class UserService {
         return toDto(userRepo.save(user));
     }
 
+    @Transactional
     public UserDTO saveNewUser(UserDTO userDto) {
 
         var user = fromDto(userDto);
@@ -51,11 +52,13 @@ public class UserService {
         return toDto(userRepo.save(user));
     }
 
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsers() {
 
         return userRepo.findRecent().stream().map(this::toDto).collect(toList());
     }
 
+    @Transactional(readOnly = true)
     public UserDTO getUser(String username) {
 
         return toDto(userRepo.findByUsername(username));
