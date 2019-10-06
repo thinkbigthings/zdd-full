@@ -37,8 +37,17 @@ Just put ./commands on your PATH
 
 ### Running from IDE
 
-TODO show how to run from IDE
-TODO show how to run in debugger
+
+To run the server and client from IntelliJ IDEA:
+
+- Create a Run Configuration, using the Application class as main, and
+  just set the working folder to the `server` folder
+- Create a Run Configuration, using the Application class as main, and
+  just set the working folder to the `perf` folder
+- Run either Configuration from the Run menu
+- Without creating a Debug Configuration, can also debug a Run Config.
+
+
 
 ### Monitoring
 
