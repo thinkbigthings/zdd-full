@@ -21,13 +21,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
 import static java.util.UUID.randomUUID;
+import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 @Component
@@ -52,34 +57,9 @@ public class LoadTester {
     private ObjectMapper mapper = new ObjectMapper();
     private Faker faker = new Faker(Locale.US, new Random());
 
-    private ScheduledThreadPoolExecutor executor;
+    private final Instant end;
 
     public LoadTester(AppProperties config) {
-
-        baseUrl = "https://" + config.getHost() + ":" + config.getPort();
-
-        users = URI.create(baseUrl + "/user");
-        info = URI.create(baseUrl + "/actuator/info");
-        health = URI.create(baseUrl + "/actuator/health");
-
-        duration = config.getTestDuration();
-        insertOnly = config.isInsertOnly();
-        numThreads = config.getThreads();
-        latency = config.getLatency();
-
-        executor = new ScheduledThreadPoolExecutor(numThreads);
-
-        System.out.println("Number Threads: " + numThreads);
-        System.out.println("Insert only: " + insertOnly);
-        System.out.println("Latency: " + latency.toMillis()+"ms");
-
-        String hms = String.format("%d:%02d:%02d",
-                duration.toHoursPart(),
-                duration.toMinutesPart(),
-                duration.toSecondsPart());
-
-        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
-
 
         try {
             // clients are immutable and thread safe
@@ -93,49 +73,77 @@ public class LoadTester {
                     .build();
         }
         catch (NoSuchAlgorithmException | KeyManagementException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        baseUrl = "https://" + config.getHost() + ":" + config.getPort();
+
+        users = URI.create(baseUrl + "/user");
+        info = URI.create(baseUrl + "/actuator/info");
+        health = URI.create(baseUrl + "/actuator/health");
+
+        duration = config.getTestDuration();
+        insertOnly = config.isInsertOnly();
+        numThreads = config.getThreads();
+        latency = config.getLatency();
+
+        System.out.println("Number Threads: " + numThreads);
+        System.out.println("Insert only: " + insertOnly);
+        System.out.println("Latency: " + latency.toMillis()+"ms");
+
+        String hms = String.format("%d:%02d:%02d",
+                duration.toHoursPart(),
+                duration.toMinutesPart(),
+                duration.toSecondsPart());
+
+        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
+
+        end = Instant.now().plus(duration);
+    }
+
+    public static CompletableFuture<?> allOf(List<CompletableFuture<Void>> futures) {
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
     }
 
     public void run() {
 
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(numThreads);
 
-        Instant end = Instant.now().plus(duration);
+        try {
 
-        for(int i = 0; i < numThreads; i++) {
-            executor.submit(() -> makeCalls());
+            List<CompletableFuture<Void>> futures = IntStream.rangeClosed(1, numThreads)
+                    .mapToObj(i -> runAsync(() -> makeCalls(), executor))
+                    .collect(toList());
+
+            allOf(futures).join();
+        }
+        catch(CompletionException e) {
+            e.printStackTrace();
         }
 
-        while(Instant.now().isBefore(end)) {
-            sleep(Duration.ofSeconds(1));
-        }
+        // this needs to be called or the program won't terminate
         executor.shutdown();
-
-        System.out.println("Users summary: " + get(info));
     }
 
-    private void sleep(Duration sleepDuration) {
-        if(sleepDuration.isZero()) {
-            return;
-        }
-        try {
-            Thread.sleep(sleepDuration.toMillis());
-        }
-        catch(InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    private boolean isDurationActive() {
+        return Instant.now().isBefore(end);
     }
 
     private void makeCalls() {
-        if(insertOnly) {
-            doInserts();
+
+        try {
+            while(isDurationActive()) {
+                if(insertOnly) {
+                    doInserts();
+                }
+                else {
+                    doCRUD();
+                }
+            }
         }
-        else {
-            doCRUD();
+        catch(Exception e) {
+            throw new CompletionException(e);
         }
-        executor.submit(() -> makeCalls());
     }
 
     private void doInserts() {
@@ -145,12 +153,10 @@ public class LoadTester {
     private void doCRUD() {
 
         UserDTO user = randomUser();
-        URI userUrl = URI.create(users.toString() + "/" + user.username);
-
         post(users, user);
 
+        URI userUrl = URI.create(users.toString() + "/" + user.username);
         UserDTO firstUserSave = get(userUrl, UserDTO.class);
-
 
         UserDTO updatedUser = randomUser(user.username);
         updatedUser.registrationTime = firstUserSave.registrationTime;
@@ -160,9 +166,7 @@ public class LoadTester {
 
         if( ! updatedUser.equals(secondUserSave)) {
             String message = "user updates were not all persisted: " + updatedUser + " vs " + secondUserSave;
-            System.out.println(message);
-            // could be test assertion
-            // throw new RuntimeException();
+            throw new RuntimeException(message);
         }
 
         get(info);
@@ -176,6 +180,7 @@ public class LoadTester {
 
         return randomUser("user-" + randomUUID());
     }
+
     private UserDTO randomUser(String username) {
 
         UserDTO newUser = new UserDTO();
@@ -187,7 +192,6 @@ public class LoadTester {
         newUser.addresses.add(randomAddress());
         return newUser;
     }
-
 
     private AddressDTO randomAddress() {
 
@@ -201,8 +205,6 @@ public class LoadTester {
 
         return address;
     }
-
-
 
     public void put(URI uri, UserDTO newUser) {
 
@@ -233,7 +235,6 @@ public class LoadTester {
                 .GET()
                 .build();
 
-
         HttpResponse<String> response = sendWithLatency(request);
 
         return response.body();
@@ -253,7 +254,6 @@ public class LoadTester {
         }
     }
 
-
     public HttpRequest.BodyPublisher jsonFor(Object object) {
 
         String json;
@@ -267,6 +267,18 @@ public class LoadTester {
         return HttpRequest.BodyPublishers.ofString(json);
     }
 
+    private void sleep(Duration sleepDuration) {
+        if(sleepDuration.isZero()) {
+            return;
+        }
+        try {
+            Thread.sleep(sleepDuration.toMillis());
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
     public HttpResponse<String> sendWithLatency(HttpRequest request) {
 
@@ -280,7 +292,6 @@ public class LoadTester {
             sleep(latency);
             return response;
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
