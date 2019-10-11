@@ -45,6 +45,10 @@ public class UserService {
     @Transactional
     public UserDTO saveNewUser(UserDTO userDto) {
 
+        if(userRepo.existsByUsername(userDto.username)) {
+            throw new IllegalArgumentException("user already exists " + userDto.username);
+        }
+
         var user = fromDto(userDto);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);

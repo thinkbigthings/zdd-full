@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    boolean existsByUsername(String name);
+
     User findByUsername(String name);
 
     default Page<User> findRecent() {
