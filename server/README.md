@@ -117,17 +117,25 @@ Then see output in build/reports/jacoco/html/index.html
 
 curl quick guide: https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
-Run the server, then from another command line run `curl -k https://localhost:8080/user`
+Run the server, then from another command line run `curl -k https://localhost:9000/user`
 
 post:
-`curl -k -X POST -H "Content-Type: application/json" -d '{"username":"user1", "displayName":"user1", "email":"us@r.com"}' https://localhost:8080/user`
+`curl -k -X POST -H "Content-Type: application/json" -d '{"username":"user1", "displayName":"user1", "email":"us@r.com"}' https://localhost:9000/user`
 or if the json is in a file:
-`curl -k -X POST -H "Content-Type: application/json" -d @data-file.json https://localhost:8080/user`
+`curl -k -X POST -H "Content-Type: application/json" -d @data-file.json https://localhost:9000/user`
 
 Actuator (admin/management endpoints) enpoints are listed at
-`https://localhost:8080/actuator`
+`https://localhost:9000/actuator`
 
 For example, try /actuator/health
+
+### Web
+
+Base URL is at https://localhost:9000/index.html
+
+Static content (built JS, etc) should go into src/main/resources/static
+
+
 
 
 ## Cloud (Heroku)
