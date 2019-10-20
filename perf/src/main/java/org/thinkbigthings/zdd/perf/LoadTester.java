@@ -76,7 +76,7 @@ public class LoadTester {
             throw new RuntimeException(e);
         }
 
-        baseUrl = "https://" + config.getHost() + ":" + config.getPort() + "/api" ;
+        baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
         users = URI.create(baseUrl + "/user");
         info = URI.create(baseUrl + "/actuator/info");
