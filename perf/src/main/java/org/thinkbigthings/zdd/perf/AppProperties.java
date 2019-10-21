@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.perf;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
 import java.time.Duration;
 
@@ -15,6 +16,15 @@ public class AppProperties {
     protected Integer threads = 2;
     protected Duration testDuration = Duration.ofMinutes(60);
 
+    @ConstructorBinding
+    public AppProperties(String host, Integer port, boolean insertOnly, Duration latency, Integer threads, Duration testDuration) {
+        this.host = host;
+        this.port = port;
+        this.insertOnly = insertOnly;
+        this.latency = latency;
+        this.threads = threads;
+        this.testDuration = testDuration;
+    }
 
     public String getHost() {
         return host;
@@ -24,43 +34,19 @@ public class AppProperties {
         return port;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
     public boolean isInsertOnly() {
         return insertOnly;
-    }
-
-    public void setInsertOnly(boolean insertOnly) {
-        this.insertOnly = insertOnly;
     }
 
     public Duration getLatency() {
         return latency;
     }
 
-    public void setLatency(Duration latency) {
-        this.latency = latency;
-    }
-
     public Integer getThreads() {
         return threads;
     }
 
-    public void setThreads(Integer threads) {
-        this.threads = threads;
-    }
-
     public Duration getTestDuration() {
         return testDuration;
-    }
-
-    public void setTestDuration(Duration testDuration) {
-        this.testDuration = testDuration;
     }
 }
