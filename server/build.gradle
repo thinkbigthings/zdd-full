@@ -44,6 +44,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.2.0.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-web:2.2.0.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.2.0.RELEASE'
+
+// needed for when running as a standalone jar ?
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
 }
  
 // clear the database, rebuild, and run with fresh database

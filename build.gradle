@@ -1,4 +1,5 @@
 
+// TODO this isn't appropriate for all subprojects, just the Java ones (not React)
 subprojects {
 
     apply plugin: 'java' // core plugin provided by gradle
@@ -22,6 +23,26 @@ subprojects {
     }
 }
 
+task copyWebApp(type: Copy) {
+
+    description 'copies built files from reactjs to the server'
+
+    dependsOn ':reactjs:build'
+    dependsOn ':server:classes'
+
+    from 'reactjs/build'
+    into 'server/build/resources/main/static'
+}
+
+task runAll () {
+    dependsOn('copyWebApp')
+    dependsOn(':server:bootRun')
+}
+
+task buildAll () {
+    dependsOn('copyWebApp')
+    dependsOn(':server:bootJar')
+}
 
 project(':perf') {
     dependencies {
