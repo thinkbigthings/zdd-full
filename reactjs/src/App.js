@@ -7,11 +7,13 @@ function App() {
 
     const [info, setInfo] = useState("");
 
-    useEffect(() => {
+    let callForInfo = () => {
         fetch('/actuator/info')
             .then(response => response.text())
             .then(message =>  setInfo(message));
-    });
+    };
+
+    useEffect(callForInfo);
 
     return (
         <div className="App">
@@ -19,6 +21,11 @@ function App() {
                 <img src={logo} className="App-logo" alt="logo"/>
                 <h1 className="App-title">{info}</h1>
             </header>
+
+            <button onClick={callForInfo}>
+            Click me
+            </button>
+
         </div>
     );
 }
