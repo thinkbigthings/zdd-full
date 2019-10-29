@@ -1,15 +1,24 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 function UserList(props) {
 
-    let users = props.users;
+    const [userList, setUserList] = useState([]);
+
+    let fetchRecentUsers = () => {
+        fetch('/user')
+            .then(httpResponse => httpResponse.json())
+            .then(u => setUserList(u));
+    };
+
+    // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
+    useEffect(fetchRecentUsers, [setUserList]);
 
     return (
         <ListGroup>
-            {users.map(user =>
+            {userList.map(user =>
                 <ListGroup.Item key={user.username}>{user.displayName}</ListGroup.Item>)
             }
         </ListGroup>
