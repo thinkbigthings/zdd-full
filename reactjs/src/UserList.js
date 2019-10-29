@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import ListGroup from 'react-bootstrap/ListGroup';
+import { Link } from 'react-router-dom';
 
 function UserList(props) {
 
@@ -19,7 +20,10 @@ function UserList(props) {
     return (
         <ListGroup>
             {userList.map(user =>
-                <ListGroup.Item key={user.username}>{user.displayName}</ListGroup.Item>)
+                <ListGroup.Item key={user.username}>
+                    {user.displayName}
+                    <Link to={"/users/"+ user.username} >Details</Link>
+                </ListGroup.Item>)
             }
         </ListGroup>
     );

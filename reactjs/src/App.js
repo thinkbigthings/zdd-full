@@ -10,6 +10,7 @@ import { HashRouter, Route } from 'react-router-dom';
 import Home from './Home.js';
 import UserList from './UserList.js';
 import About from './About.js';
+import UserDetail from './UserDetail.js';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                 <Route exact path="/" render={() => <Home />} />
                 <Route exact path="/about" render={() => <About />} />
                 <Route exact path="/users" render={() => <UserList />} />
+                <Route exact path="/users/:username" component={UserDetail} />
             </HashRouter>
         </div>
     );

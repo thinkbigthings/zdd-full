@@ -65,6 +65,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDTO getUser(String username) {
 
+        // TODO return 404 if username isn't here
+
         return toDto(userRepo.findByUsername(username));
     }
 
