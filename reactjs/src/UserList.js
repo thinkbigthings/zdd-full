@@ -4,7 +4,7 @@ import React, {useEffect, useState} from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { Link } from 'react-router-dom';
 
-function UserList(props) {
+function UserList() {
 
     const [userList, setUserList] = useState([]);
 
@@ -18,14 +18,17 @@ function UserList(props) {
     useEffect(fetchRecentUsers, [setUserList]);
 
     return (
-        <ListGroup>
-            {userList.map(user =>
-                <ListGroup.Item key={user.username}>
-                    {user.displayName}
-                    <Link to={"/users/"+ user.username} >Details</Link>
-                </ListGroup.Item>)
-            }
-        </ListGroup>
+        <div>
+            <Link to={"/users/create"} className="btn btn-primary" >Create User</Link>
+            <ListGroup>
+                {userList.map(user =>
+                    <ListGroup.Item key={user.username}>
+                        {user.displayName}
+                        <Link to={"/users/detail/"+ user.username} className="btn btn-primary">Details</Link>
+                    </ListGroup.Item>)
+                }
+            </ListGroup>
+        </div>
     );
 }
 

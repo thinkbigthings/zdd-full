@@ -33,7 +33,7 @@ function Home() {
                 There are {info.users.count} users in the system.
             </p>
             <p>
-                <Button variant="primary"  onClick={fetchData2}>Refresh User Count</Button>
+                <Button variant="primary" onClick={fetchData2}>Refresh User Count</Button>
             </p>
         </Jumbotron>
     );

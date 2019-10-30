@@ -11,7 +11,7 @@ import Home from './Home.js';
 import UserList from './UserList.js';
 import About from './About.js';
 import UserDetail from './UserDetail.js';
-
+import CreateUser from './CreateUser.js';
 
 function App() {
 
@@ -29,7 +29,8 @@ function App() {
                 <Route exact path="/" render={() => <Home />} />
                 <Route exact path="/about" render={() => <About />} />
                 <Route exact path="/users" render={() => <UserList />} />
-                <Route exact path="/users/:username" component={UserDetail} />
+                <Route exact path="/users/detail/:username" component={UserDetail} />
+                <Route exact path="/users/create" component={CreateUser} />
             </HashRouter>
         </div>
     );
