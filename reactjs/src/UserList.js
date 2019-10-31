@@ -24,7 +24,7 @@ function UserList() {
                 {userList.map(user =>
                     <ListGroup.Item key={user.username}>
                         {user.displayName}
-                        <Link to={"/users/detail/"+ user.username} className="btn btn-primary">Details</Link>
+                        <Link to={"/users/" + user.username + "/details" } className="btn btn-primary">Details</Link>
                     </ListGroup.Item>)
                 }
             </ListGroup>

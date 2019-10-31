@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import Button from "react-bootstrap/Button";
 
 
-function CreateUser() {
+function CreateUser({history}) {
 
     const [username, setUsername] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -24,16 +24,15 @@ function CreateUser() {
     }
 
     let saveForm = () => {
-
         const userData = buildUserData();
-
-        console.log(userData);
-
         fetch('/user', {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
-        }).then(r => alert("SUCCESS!!!"));
+        }).then(r => {
+            alert("SUCCESS!!!");
+            history.push("/users");
+        });
     }
 
     return (

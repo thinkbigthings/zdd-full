@@ -29,8 +29,9 @@ function App() {
                 <Route exact path="/" render={() => <Home />} />
                 <Route exact path="/about" render={() => <About />} />
                 <Route exact path="/users" render={() => <UserList />} />
-                <Route exact path="/users/detail/:username" component={UserDetail} />
                 <Route exact path="/users/create" component={CreateUser} />
+                <Route exact path="/users/:username/details" component={UserDetail} />
+                <Route exact path="/users/:username/edit" component={UserDetail} />
             </HashRouter>
         </div>
     );
