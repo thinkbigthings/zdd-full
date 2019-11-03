@@ -7,15 +7,17 @@ import UserForm from './UserForm.js';
 
 function CreateUser({history}) {
 
-    const initialUser = {
-        username: '',
-        displayName: '',
-        email: '',
-        heightCm: 0,
-        phoneNumber: '',
-    }
+    const promiseLoadUser = new Promise(function(resolve, reject) {
+        resolve({
+            username: 'Fetched Username!',
+            displayName: '',
+            email: '',
+            heightCm: 160,
+            phoneNumber: '',
+        });
+    });
 
-    let onSave = (userData) => {
+    const onSave = (userData) => {
         fetch('/user', {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
@@ -27,7 +29,7 @@ function CreateUser({history}) {
     }
 
     return (
-        <UserForm initialUser={initialUser} onSave={onSave}/>
+        <UserForm promiseLoadUser={promiseLoadUser} onSave={onSave} usernameEditable={true}/>
     );
 }
 

@@ -25,6 +25,7 @@ function UserList() {
                     <ListGroup.Item key={user.username}>
                         {user.displayName}
                         <Link to={"/users/" + user.username + "/details" } className="btn btn-primary">Details</Link>
+                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">Edit</Link>
                     </ListGroup.Item>)
                 }
             </ListGroup>
