@@ -2,19 +2,12 @@ import React, {useState} from 'react';
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from "react-bootstrap/Button";
-import UserForm from './UserForm.js';
-
+import {UserForm, blankUser} from './UserForm.js';
 
 function CreateUser({history}) {
 
-    const promiseLoadUser = new Promise(function(resolve, reject) {
-        resolve({
-            username: 'Fetched Username!',
-            displayName: '',
-            email: '',
-            heightCm: 160,
-            phoneNumber: '',
-        });
+    const loadUserPromise = new Promise(function(resolve, reject) {
+        resolve(blankUser);
     });
 
     const onSave = (userData) => {
@@ -23,13 +16,12 @@ function CreateUser({history}) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
         }).then(r => {
-            alert("SUCCESS!!!");
             history.push("/users");
         });
     }
 
     return (
-        <UserForm promiseLoadUser={promiseLoadUser} onSave={onSave} usernameEditable={true}/>
+        <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={true}/>
     );
 }
 

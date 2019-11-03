@@ -2,37 +2,31 @@ import React, {useEffect, useState} from 'react';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from "react-bootstrap/Button";
 
+const blankUser = {
+    username: '',
+    displayName: '',
+    email: '',
+    heightCm: 0,
+    phoneNumber: '',
+}
+
+const copy = (obj) => {
+    return JSON.parse(JSON.stringify(obj)); // deep copy but not methods
+}
 
 function UserForm(props) {
 
-    const {promiseLoadUser, onSave, usernameEditable} = props;
+    const {loadUserPromise, onSave, isUsernameEditable} = props;
 
-    const [username, setUsername] = useState('');
-    const [displayName, setDisplayName] = useState('');
-    const [email, setEmail] = useState('');
-    const [heightCm, setHeightCm] = useState(0);
-    const [phoneNumber, setPhoneNumber] = useState('');
-
-    const onUserLoaded = (userData) => {
-        setUsername(userData.username);
-        setDisplayName(userData.displayName);
-        setEmail(userData.email);
-        setHeightCm(userData.heightCm);
-        setPhoneNumber(userData.phoneNumber);
-    }
+    const [user, setUser] = useState(blankUser);
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
-    useEffect(() => { promiseLoadUser.then(u => onUserLoaded(u)) },
-        [setUsername, setDisplayName, setEmail, setHeightCm, setPhoneNumber]);
+    useEffect(() => { loadUserPromise.then(u => setUser(u)) },[setUser]);
 
-    const onClickSave = () => {
-        onSave({
-            username: username,
-            displayName: displayName,
-            email: email,
-            heightCm: heightCm,
-            phoneNumber: phoneNumber,
-        });
+    function setUserValue(fieldName, fieldValue) {
+        let userCopy = copy(user);
+        userCopy[ fieldName ] = fieldValue;
+        setUser(userCopy);
     }
 
     return (
@@ -42,24 +36,24 @@ function UserForm(props) {
                 <div className="form-group">
                     <label htmlFor="inputUserName">User Name</label>
                     <input type="text" className="form-control" id="inputUserName" placeholder="User Name"
-                           disabled = {usernameEditable ? "" : "disabled"}
-                           value={username}
-                           onChange={e => setUsername(e.target.value)}/>
+                           disabled = {isUsernameEditable ? "" : "disabled"}
+                           value={user.username}
+                           onChange={e => setUserValue("username", e.target.value) }/>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="inputDisplayName">Display Name</label>
                     <input type="text" className="form-control" id="inputDisplayName" placeholder="Display Name"
-                           value={displayName}
-                           onChange={e => setDisplayName(e.target.value)}/>
+                           value={user.displayName}
+                           onChange={e => { setUserValue("displayName", e.target.value) }}/>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="exampleInputEmail1">Email address</label>
                     <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
                            placeholder="Enter email"
-                           value={email}
-                           onChange={e => setEmail(e.target.value)} />
+                           value={user.email}
+                           onChange={e => setUserValue("email", e.target.value) }/>
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
                         else.</small>
                 </div>
@@ -67,18 +61,18 @@ function UserForm(props) {
                 <div className="form-group">
                     <label htmlFor="inputHeight">Height (cm)</label>
                     <input type="number" className="form-control" id="inputHeight" placeholder="Height"
-                           value={heightCm}
-                           onChange={e => setHeightCm(e.target.value)}/>
+                           value={user.heightCm}
+                           onChange={e => setUserValue("heightCm", e.target.value) }/>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="inputPhone">Phone Number</label>
                     <input type="text" className="form-control" id="inputPhone" placeholder="Phone Number"
-                           value={phoneNumber}
-                           onChange={e => setPhoneNumber(e.target.value)}/>
+                           value={user.phoneNumber}
+                           onChange={e => setUserValue("phoneNumber", e.target.value) }/>
                 </div>
 
-                <Button variant="primary" onClick={onClickSave}>Save</Button>
+                <Button variant="primary" onClick={() => { onSave(user); }}>Save</Button>
 
             </form>
         </div>
@@ -86,4 +80,4 @@ function UserForm(props) {
     );
 }
 
-export default UserForm;
+export {UserForm, blankUser};
