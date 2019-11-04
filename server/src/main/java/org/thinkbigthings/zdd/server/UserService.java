@@ -1,10 +1,13 @@
 package org.thinkbigthings.zdd.server;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
+import javax.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,21 +42,31 @@ public class UserService {
         user.getAddresses().addAll(newAddressEntities);
         user.getAddresses().forEach(a -> a.setUser(user));
 
-        return toDto(userRepo.save(user));
+        try {
+            return toDto(userRepo.save(user));
+        }
+        catch(ConstraintViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
+        }
     }
 
     @Transactional
     public UserDTO saveNewUser(UserDTO userDto) {
 
         if(userRepo.existsByUsername(userDto.username)) {
-            throw new IllegalArgumentException("user already exists " + userDto.username);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists " + userDto.username);
         }
 
         var user = fromDto(userDto);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
 
-        return toDto(userRepo.save(user));
+        try {
+            return toDto(userRepo.save(user));
+        }
+        catch(ConstraintViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
