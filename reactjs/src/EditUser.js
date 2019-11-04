@@ -30,18 +30,18 @@ function EditUser({history, match}) {
 
     return (
         <div>
-                <Toast show={saveSuccess} onClose={toggleSuccessToast} animation={true} autohide={true} delay={3000}
-                       style={{
-                           position: 'absolute',
-                           top: 60,
-                           right: 0,
-                           width: 250
-                       }}>
-                    <Toast.Header>
-                        <strong className="mr-auto text-success">Info</strong>
-                    </Toast.Header>
-                    <Toast.Body>Save Successful for {username}</Toast.Body>
-                </Toast>
+            <Toast show={saveSuccess} onClose={toggleSuccessToast} animation={true} autohide={true} delay={3000}
+                   style={{
+                       position: 'absolute',
+                       top: 60,
+                       right: 0,
+                       width: 250
+                   }}>
+                <Toast.Header>
+                    <strong className="mr-auto text-success">Info</strong>
+                </Toast.Header>
+                <Toast.Body>Save Successful for {username}</Toast.Body>
+            </Toast>
             <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={false}/>
         </div>
     );
