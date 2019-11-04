@@ -15,7 +15,8 @@ function CreateUser({history}) {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
-        }).then(r => {
+        })
+        .then(r => {
             history.push("/users");
         });
     }
