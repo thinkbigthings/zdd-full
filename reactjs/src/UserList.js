@@ -3,6 +3,9 @@ import React, {useEffect, useState} from 'react';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { Link } from 'react-router-dom';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function UserList() {
 
@@ -20,14 +23,14 @@ function UserList() {
     return (
         <div className="container mt-3">
             <Link to={"/users/create"} className="btn btn-success" >Create User</Link>
-            <ListGroup className="container mt-3">
+            <Container className="container mt-3">
                 {userList.map(user =>
-                    <ListGroup.Item key={user.username}>
-                        {user.displayName}
-                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary ml-5">Edit</Link>
-                    </ListGroup.Item>)
-                }
-            </ListGroup>
+                    <Row className="pt-3 pb-3 border-bottom border-top ">
+                        <Col >{user.displayName}</Col>
+                        <Col xs={2}><Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">Edit</Link></Col>
+                    </Row>
+                )}
+            </Container>
         </div>
     );
 }

@@ -34,7 +34,7 @@ function CreateUser({history}) {
 
     return (
         <div>
-            <Toast show={saveError} onClose={toggleErrorToast} animation={true} autohide={true} delay={4000}
+            <Toast show={saveError} onClose={toggleErrorToast} animation={true} autohide={true} delay={3000}
                    style={{
                        position: 'absolute',
                        top: 60,

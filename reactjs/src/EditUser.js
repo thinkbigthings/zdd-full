@@ -30,7 +30,7 @@ function EditUser({history, match}) {
 
     return (
         <div>
-                <Toast show={saveSuccess} onClose={toggleSuccessToast} animation={true} autohide={true} delay={4000}
+                <Toast show={saveSuccess} onClose={toggleSuccessToast} animation={true} autohide={true} delay={3000}
                        style={{
                            position: 'absolute',
                            top: 60,
