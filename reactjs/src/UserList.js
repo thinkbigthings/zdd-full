@@ -18,14 +18,13 @@ function UserList() {
     useEffect(fetchRecentUsers, [setUserList]);
 
     return (
-        <div>
-            <Link to={"/users/create"} className="btn btn-primary" >Create User</Link>
-            <ListGroup>
+        <div className="container mt-3">
+            <Link to={"/users/create"} className="btn btn-success" >Create User</Link>
+            <ListGroup className="container mt-3">
                 {userList.map(user =>
                     <ListGroup.Item key={user.username}>
                         {user.displayName}
-                        <Link to={"/users/" + user.username + "/details" } className="btn btn-primary">Details</Link>
-                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">Edit</Link>
+                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary ml-5">Edit</Link>
                     </ListGroup.Item>)
                 }
             </ListGroup>

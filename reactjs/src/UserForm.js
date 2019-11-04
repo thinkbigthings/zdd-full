@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from "react-bootstrap/Button";
+import {Link} from "react-router-dom";
 
 const blankUser = {
     username: '',
@@ -72,8 +73,8 @@ function UserForm(props) {
                            onChange={e => setUserValue("phoneNumber", e.target.value) }/>
                 </div>
 
-                <Button variant="primary" onClick={() => { onSave(user); }}>Save</Button>
-
+                <Button variant="outline-success" onClick={() => { onSave(user); }}>Save</Button>
+                <Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>
             </form>
         </div>
 
