@@ -38,7 +38,6 @@ function EditUser({history, match}) {
                            width: 250
                        }}>
                     <Toast.Header>
-                        <img src="holder.js/20x20?text=%20" className="rounded mr-2" alt="" />
                         <strong className="mr-auto text-success">Info</strong>
                     </Toast.Header>
                     <Toast.Body>Save Successful for {username}</Toast.Body>
