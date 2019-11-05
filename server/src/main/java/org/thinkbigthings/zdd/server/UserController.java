@@ -1,5 +1,9 @@
 package org.thinkbigthings.zdd.server;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.AddressDTO;
@@ -21,9 +25,9 @@ public class UserController {
 
     @RequestMapping(value="/user", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<UserDTO> getUsers() {
+    public Page<UserDTO> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction= Sort.Direction.DESC) Pageable page) {
 
-        return service.getUsers();
+        return service.getUsers(page);
     }
 
     @RequestMapping(value="/user", method= RequestMethod.POST, produces= MediaType.APPLICATION_JSON_VALUE)

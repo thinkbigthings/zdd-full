@@ -14,6 +14,7 @@ function UserList() {
     let fetchRecentUsers = () => {
         fetch('/user')
             .then(httpResponse => httpResponse.json())
+            .then(page => page.content)
             .then(u => setUserList(u));
     };
 
@@ -25,7 +26,7 @@ function UserList() {
             <Link to={"/users/create"} className="btn btn-success" >Create User</Link>
             <Container className="container mt-3">
                 {userList.map(user =>
-                    <Row key={user.displayName} className="pt-3 pb-3 border-bottom border-top ">
+                    <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
                         <Col >{user.displayName}</Col>
                         <Col xs={2}><Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">Edit</Link></Col>
                     </Row>

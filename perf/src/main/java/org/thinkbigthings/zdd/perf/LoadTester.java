@@ -173,7 +173,7 @@ public class LoadTester {
 
         get(health);
 
-        get(users);
+        String page = get(users);
     }
 
     private UserDTO randomUser() {
