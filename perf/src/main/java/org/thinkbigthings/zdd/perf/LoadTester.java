@@ -13,21 +13,21 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.CompletableFuture.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -155,7 +155,7 @@ public class LoadTester {
         UserDTO user = randomUser();
         post(users, user);
 
-        URI userUrl = URI.create(users.toString() + "/" + user.username);
+        URI userUrl = URI.create(users.toString() + "/" + URLEncoder.encode(user.username, UTF_8));
         UserDTO firstUserSave = get(userUrl, UserDTO.class);
 
         UserDTO updatedUser = randomUser(user.username);
@@ -177,8 +177,14 @@ public class LoadTester {
     }
 
     private UserDTO randomUser() {
+        return randomUser("user-" + toBase64(randomUUID()));
+    }
 
-        return randomUser("user-" + randomUUID());
+    public static String toBase64(UUID uuid) {
+        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+        bb.putLong(uuid.getMostSignificantBits());
+        bb.putLong(uuid.getLeastSignificantBits());
+        return Base64.getEncoder().encodeToString(bb.array());
     }
 
     private UserDTO randomUser(String username) {

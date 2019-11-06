@@ -25,7 +25,7 @@ public class UserController {
 
     @RequestMapping(value="/user", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Page<UserDTO> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction= Sort.Direction.DESC) Pageable page) {
+    public Page<UserDTO> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
 
         return service.getUsers(page);
     }

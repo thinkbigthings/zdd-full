@@ -119,8 +119,8 @@ curl quick guide: https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
 
-Paging:
-`curl -k "https://localhost:9000/user?page=0&size=2&sort=username"`
+See most recent users:
+`curl -k "https://localhost:9000/user?page=0&size=2&sort=registrationTime,desc"`
 
 post:
 `curl -k -X POST -H "Content-Type: application/json" -d '{"username":"user1", "displayName":"user1", "email":"us@r.com"}' https://localhost:9000/user`
