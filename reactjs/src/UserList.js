@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Jumbotron from "react-bootstrap/Jumbotron";
 
 function UserList() {
 
@@ -23,7 +24,7 @@ function UserList() {
 
     return (
         <div className="container mt-3">
-            <Link to={"/users/create"} className="btn btn-success" >Create User</Link>
+            <Link to={"/users/create"} className="btn btn-success" ><i className="mr-2 fas fa-user-plus"></i>Create User</Link>
             <Container className="container mt-3">
                 {userList.map(user =>
                     <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
