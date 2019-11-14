@@ -24,12 +24,18 @@ function UserList() {
 
     return (
         <div className="container mt-3">
-            <Link to={"/users/create"} className="btn btn-success" ><i className="mr-2 fas fa-user-plus"></i>Create User</Link>
+            <h1>User Management</h1>
+
+            <Link to={"/users/create"} className="btn btn-success" ><i className="mr-2 fas fa-user-plus" />Create User</Link>
             <Container className="container mt-3">
                 {userList.map(user =>
                     <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
                         <Col >{user.displayName}</Col>
-                        <Col xs={2}><Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">Edit</Link></Col>
+                        <Col xs={2}>
+                            <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
+                                <i className="mr-2 fas fa-user-edit" />Edit
+                            </Link>
+                        </Col>
                     </Row>
                 )}
             </Container>
