@@ -15,7 +15,7 @@ function About() {
     let fetchData = () => {
         fetch('/actuator/health')
             .then(function(httpResponse) {
-                if(httpResponse.status != 200) {
+                if(httpResponse.status !== 200) {
                     console.log(httpResponse);
                     setServerStatus("DOWN");
                 }
@@ -39,11 +39,6 @@ function About() {
         </Jumbotron>
     );
 
-    return (
-        <div className="container mt-5">
-            This is a demo app for zero downtime deployment.
-        </div>
-    );
 }
 
 export default About;

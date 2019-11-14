@@ -1,7 +1,5 @@
 import React, {useState} from 'react';
 
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import Button from "react-bootstrap/Button";
 import {UserForm, blankUser} from './UserForm.js';
 import Toast from "react-bootstrap/Toast";
 
@@ -22,7 +20,7 @@ function CreateUser({history}) {
             body: JSON.stringify(userData),
         })
         .then(function(result) {
-            if(result.status != 200) {
+            if(result.status !== 200) {
                 console.log(result);
                 setSaveError(true);
             }

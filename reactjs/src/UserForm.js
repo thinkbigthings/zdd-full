@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-// import 'bootstrap/dist/css/bootstrap.min.css';
+
 import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
 
@@ -22,7 +22,7 @@ function UserForm(props) {
     const [user, setUser] = useState(blankUser);
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
-    useEffect(() => { loadUserPromise.then(u => setUser(u)) },[setUser]);
+    useEffect(() => { loadUserPromise.then(u => setUser(u)) },[loadUserPromise, setUser]);
 
     function setUserValue(fieldName, fieldValue) {
         let userCopy = copy(user);
