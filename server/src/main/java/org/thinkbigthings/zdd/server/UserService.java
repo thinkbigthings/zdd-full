@@ -58,11 +58,11 @@ public class UserService {
     public UserDTO saveNewUser(UserDTO userDto) {
 
         if( ! URLEncoder.encode(userDto.username, UTF_8).equals(userDto.username)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be url-safe");
+            throw new IllegalArgumentException("Username must be url-safe");
         }
 
         if(userRepo.existsByUsername(userDto.username)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists " + userDto.username);
+            throw new IllegalArgumentException("Username already exists " + userDto.username);
         }
 
         var user = fromDto(userDto);
@@ -86,7 +86,7 @@ public class UserService {
     public UserDTO getUser(String username) {
 
         if( ! userRepo.existsByUsername(username)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Username does not exist" + username);
+            throw new IllegalArgumentException("Username does not exist" + username);
         }
 
         return toDto(userRepo.findByUsername(username));
