@@ -9,6 +9,7 @@ const blankUser = {
     email: '',
     heightCm: 0,
     phoneNumber: '',
+    registrationTime: '',
 }
 
 const copy = (obj) => {
@@ -30,6 +31,8 @@ function UserForm(props) {
         setUser(userCopy);
     }
 
+    const displayRegistrationStyle = user.registrationTime === '' ? "d-none" : "";
+
     return (
         <div className="container mt-5">
             <form>
@@ -40,6 +43,13 @@ function UserForm(props) {
                            disabled = {isUsernameEditable ? "" : "disabled"}
                            value={user.username}
                            onChange={e => setUserValue("username", e.target.value) }/>
+                </div>
+
+                <div className={"form-group " + displayRegistrationStyle}>
+                    <label htmlFor="registrationTime">Registration Time</label>
+                    <input type="text" className="form-control" id="inputRegistrationTime" placeholder="Registration Time"
+                           disabled = "disabled"
+                           value={user.registrationTime}/>
                 </div>
 
                 <div className="form-group">
