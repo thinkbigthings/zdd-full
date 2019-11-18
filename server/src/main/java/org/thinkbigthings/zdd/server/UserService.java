@@ -10,10 +10,12 @@ import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
 import javax.validation.ConstraintViolationException;
+import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 
 
@@ -54,6 +56,10 @@ public class UserService {
 
     @Transactional
     public UserDTO saveNewUser(UserDTO userDto) {
+
+        if( ! URLEncoder.encode(userDto.username, UTF_8).equals(userDto.username)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be url-safe");
+        }
 
         if(userRepo.existsByUsername(userDto.username)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists " + userDto.username);

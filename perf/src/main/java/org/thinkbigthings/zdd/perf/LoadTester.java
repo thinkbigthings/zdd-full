@@ -155,7 +155,7 @@ public class LoadTester {
         UserDTO user = randomUser();
         post(users, user);
 
-        URI userUrl = URI.create(users.toString() + "/" + URLEncoder.encode(user.username, UTF_8));
+        URI userUrl = URI.create(users.toString() + "/" + user.username);
         UserDTO firstUserSave = get(userUrl, UserDTO.class);
 
         UserDTO updatedUser = randomUser(user.username);
@@ -177,14 +177,7 @@ public class LoadTester {
     }
 
     private UserDTO randomUser() {
-        return randomUser("user-" + toBase64(randomUUID()));
-    }
-
-    public static String toBase64(UUID uuid) {
-        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-        bb.putLong(uuid.getMostSignificantBits());
-        bb.putLong(uuid.getLeastSignificantBits());
-        return Base64.getEncoder().encodeToString(bb.array());
+        return randomUser("user-" + randomUUID());
     }
 
     private UserDTO randomUser(String username) {
