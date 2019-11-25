@@ -5,6 +5,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import copy from 'Copier'
+
 const blankPage = {
     content: [],
     first: true,
@@ -16,11 +18,6 @@ const blankPage = {
         pageSize: 10,
     },
     numberOfElements: 0,
-}
-
-// TODO refactor this out
-const copy = (obj) => {
-    return JSON.parse(JSON.stringify(obj)); // deep copy but not methods
 }
 
 const consoleLog = (p) => {

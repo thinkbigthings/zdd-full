@@ -3,6 +3,8 @@ import React, {useEffect, useState} from 'react';
 import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
 
+import copy from 'Copier'
+
 const blankUser = {
     username: '',
     displayName: '',
@@ -10,10 +12,6 @@ const blankUser = {
     heightCm: 0,
     phoneNumber: '',
     registrationTime: '',
-}
-
-const copy = (obj) => {
-    return JSON.parse(JSON.stringify(obj)); // deep copy but not methods
 }
 
 function UserForm(props) {
