@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import copy from 'Copier'
+import copy from './Copier.js';
 
 const blankPage = {
     content: [],
@@ -18,11 +18,6 @@ const blankPage = {
         pageSize: 10,
     },
     numberOfElements: 0,
-}
-
-const consoleLog = (p) => {
-    console.log(p);
-    return p;
 }
 
 function UserList() {
@@ -46,8 +41,13 @@ function UserList() {
             .then(page => setUserPage(page));
     };
 
+    // useEffect didn't seem to like this being defined inline
+    let getCurrentList = () => {
+        fetchRecentUsers(userPage.pageable);
+    }
+
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
-    useEffect(() => fetchRecentUsers(userPage.pageable), [setUserPage]);
+    useEffect(getCurrentList, [setUserPage]);
 
     const styleFirst = userPage.first ? "disabled" : "";
     const styleLast = userPage.last ? "disabled" : "";
@@ -74,11 +74,11 @@ function UserList() {
                 <nav aria-label="Page navigation">
                     <ul className="pagination">
                         <li onClick={()=>movePage(-1)} className="page-item ">
-                            <Link className={"btn btn-primary " + styleFirst} ><i className="mr-2 fas fa-caret-left" />Previous</Link>
+                            <span className={"btn btn-primary " + styleFirst} ><i className="mr-2 fas fa-caret-left" />Previous</span>
                         </li>
-                        <li className="page-item disabled"><a className="page-link">{currentPage}</a></li>
+                        <li className="page-item disabled"><span className="page-link">{currentPage}</span></li>
                         <li onClick={()=>movePage(1)} className="page-item ">
-                            <Link className={"btn btn-primary " + styleLast} ><i className="mr-2 fas fa-caret-right" />Next</Link>
+                            <span className={"btn btn-primary " + styleLast} ><i className="mr-2 fas fa-caret-right" />Next</span>
                         </li>
                     </ul>
                 </nav>

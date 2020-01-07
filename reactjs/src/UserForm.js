@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
 
-import copy from 'Copier'
+import copy from './Copier.js';
 
 const blankUser = {
     username: '',
@@ -12,6 +13,11 @@ const blankUser = {
     heightCm: 0,
     phoneNumber: '',
     registrationTime: '',
+    addresses: []
+}
+
+const addressToString = (address) => {
+    return address.line1 + ', ' + address.city ; // + ' ' + address.state + ' ' + address.zip;
 }
 
 function UserForm(props) {
@@ -31,8 +37,11 @@ function UserForm(props) {
 
     const displayRegistrationStyle = user.registrationTime === '' ? "d-none" : "";
 
+    const [show, setShow] = useState(false);
+
     return (
         <div className="container mt-5">
+
             <form>
 
                 <div className="form-group">
@@ -81,9 +90,38 @@ function UserForm(props) {
                            onChange={e => setUserValue("phoneNumber", e.target.value) }/>
                 </div>
 
+                <div className="form-group">
+
+                    {user.addresses.map(a => addressToString(a))}
+                    <Button variant="primary" onClick={() => setShow(true)}>
+                        Edit Address
+                    </Button>
+
+                    <Modal show={show} onHide={() => setShow(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Edit Address</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+
+                            <div className="form-group">
+                                <label htmlFor="line1">Street Address</label>
+                                <input type="text" className="form-control" id="line1" placeholder="Street Address"
+                                       value={ "address goes here" }
+                                       onChange={e => setUserValue("phoneNumber", e.target.value) }/>
+                            </div>
+
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShow(false)}>Cancel</Button>
+                            <Button variant="primary" onClick={() => setShow(false)}>OK</Button>
+                        </Modal.Footer>
+                    </Modal>
+                </div>
+
                 <Button variant="outline-success" onClick={() => { onSave(user); }}>Save</Button>
                 <Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>
             </form>
+
         </div>
 
     );
