@@ -1,3 +1,14 @@
+
+
+
+
+## Prerequisites
+
+This project was built with Node 12.14.0
+
+
+## Intro
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

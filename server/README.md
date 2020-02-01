@@ -6,7 +6,7 @@ This is a project to illustrate zero downtime deployments.
 
 Software that needs to be installed:
 
-* Java 12
+* Java 13
 * PostgreSQL 11 (via docker, see below)
 * Gradle (via gradle wrapper, see below)
 

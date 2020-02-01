@@ -9,9 +9,10 @@ plugins {
 apply plugin: 'base'
 apply plugin: "com.moowork.node"
 
+// node needs to have been downloaded and be available on the path
 node {
-    version = "8.16.0"
-    download = true
+    version = "12.14.0"
+    download = false
 }
 
 task bundle(type: NpmTask, dependsOn: npmInstall) {

@@ -2,6 +2,14 @@
 
 This is a project to illustrate zero downtime deployments.
 
+## Quickstart Commands
+
+Server should have been started with `./gradlew :server:bootRun`
+(may need to have running docker daemon, docker postgres image, created database, and cleaned/migrated database)
+
+From reactjs folder run `npm start`
+(may need to ensure node is on the path)
+
 ## Setup
 
 [Setup for server project](server/README.md)
