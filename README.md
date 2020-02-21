@@ -24,6 +24,7 @@ From reactjs folder run `npm start`
 The Web project is in `reactjs`. From that folder
 we can run all `npm` commands like normal.
 
+The IDE can set up a run configuration to run npm as well.
 
 ### Server
 
@@ -71,6 +72,8 @@ Just put ./commands on your PATH
 
 ### Running from IDE
 
+Run configuration may need to have its JRE set to the appropriate version
+Also: IntelliJ > Preferences > Build > Build Tools > Gradle > Gradle JVM may need to be set to the appropriate version.
 
 To run the server and perf from IntelliJ IDEA:
 
@@ -122,7 +125,7 @@ Or just stop and restart the client? Do we need to restart postgres?
 
 ### Client and server are running but client isn't making requests
 At one point a software update for iterm2 on my laptop was messing things up
-Can just restart client and it’ll work
+Can just restart client and it'll work
 
 ### Migration hangs
 A connection can block another connection for the migration, make sure the IntelliJ DB Browser, 
