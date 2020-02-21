@@ -67,7 +67,7 @@ Blow away the whole database and start from scratch
 `docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres`
 `docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
 
---scripts-prepend-node-path ~/opt/node-v12.14.0-darwin-x64/bin
+
 ## Migrations
 
 We use Flyway: https://flywaydb.org/getstarted/firststeps/gradle
