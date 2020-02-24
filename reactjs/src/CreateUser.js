@@ -13,13 +13,14 @@ function CreateUser({history}) {
 
     const toggleErrorToast = () => setSaveError(!saveError);
 
+
     const onSave = (userData) => {
         fetch('/user', {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
         })
-        .then(function(result) {
+        .then(result => {
             if(result.status !== 200) {
                 console.log(result);
                 setSaveError(true);

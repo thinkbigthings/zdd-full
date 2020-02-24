@@ -8,22 +8,28 @@ function EditUser({history, match}) {
 
     const { params: { username } } = match;
 
-    const userApi = '/user/' + username;
+    const userEndpoint = '/user/' + username;
 
-    const loadUserPromise = fetch(userApi).then(httpResponse => httpResponse.json());
+    const loadUserPromise = fetch(userEndpoint).then(httpResponse => httpResponse.json());
 
     const [saveSuccess, setSaveSuccess] = useState(false);
 
     const toggleSuccessToast = () => setSaveSuccess(!saveSuccess);
 
     const onSave = (userData) => {
-        fetch(userApi, {
+        fetch(userEndpoint, {
             method: 'PUT',
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(userData),
-        }).then(
-            r => {setSaveSuccess(true);}
-        );
+        }).then(result => {
+                if(result.status !== 200) {
+                    console.log("ERROR EDITING USER");
+                    console.log(result);
+                }
+                else {
+                    history.push('/users');
+                }
+            });
     }
 
     return (

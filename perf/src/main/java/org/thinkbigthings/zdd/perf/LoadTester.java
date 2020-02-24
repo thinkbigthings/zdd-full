@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
@@ -13,11 +12,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.ByteBuffer;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -27,11 +24,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.CompletableFuture.*;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
@@ -147,18 +141,18 @@ public class LoadTester {
     }
 
     private void doInserts() {
-        range(0, 1000).forEach(i -> post(users, randomUser()));
+        range(0, 1000).forEach(i -> post(users, createRandomUser()));
     }
 
     private void doCRUD() {
 
-        UserDTO user = randomUser();
+        UserDTO user = createRandomUser();
         post(users, user);
 
         URI userUrl = URI.create(users.toString() + "/" + user.username);
         UserDTO firstUserSave = get(userUrl, UserDTO.class);
 
-        UserDTO updatedUser = randomUser(user.username);
+        UserDTO updatedUser = createRandomUserWithName(user.username);
         updatedUser.registrationTime = firstUserSave.registrationTime;
         put(userUrl, updatedUser);
 
@@ -176,11 +170,11 @@ public class LoadTester {
         String page = get(users);
     }
 
-    private UserDTO randomUser() {
-        return randomUser("user-" + randomUUID());
+    private UserDTO createRandomUser() {
+        return createRandomUserWithName("user-" + randomUUID());
     }
 
-    private UserDTO randomUser(String username) {
+    private UserDTO createRandomUserWithName(String username) {
 
         UserDTO newUser = new UserDTO();
         newUser.username = username;

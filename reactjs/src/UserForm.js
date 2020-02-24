@@ -5,6 +5,9 @@ import Button from "react-bootstrap/Button";
 import {Link} from "react-router-dom";
 
 import copy from './Copier.js';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const blankUser = {
     username: '',
@@ -13,11 +16,19 @@ const blankUser = {
     heightCm: 0,
     phoneNumber: '',
     registrationTime: '',
-    addresses: []
+    addresses: [],
+    editAddressIndex: -1
+}
+
+const blankAddress = {
+    line1: '',
+    city: '',
+    state: '',
+    zip: ''
 }
 
 const addressToString = (address) => {
-    return address.line1 + ', ' + address.city ; // + ' ' + address.state + ' ' + address.zip;
+    return address.line1 + ', ' + address.city + ' ' + address.state + ' ' + address.zip;
 }
 
 function UserForm(props) {
@@ -35,9 +46,40 @@ function UserForm(props) {
         setUser(userCopy);
     }
 
-    const displayRegistrationStyle = user.registrationTime === '' ? "d-none" : "";
+    const [addressIndex, setAddressIndex] = useState(-1);
+    const[address, setAddress] = useState(blankAddress);
 
-    const [show, setShow] = useState(false);
+    function setAddressValue(fieldName, fieldValue) {
+        let addressCopy = copy(address);
+        addressCopy[ fieldName ] = fieldValue;
+        setAddress(addressCopy);
+    }
+
+    // https://stackoverflow.com/questions/33613728/what-happens-when-using-this-setstate-multiple-times-in-react-component
+    function setUserAddress(address, index) {
+        let userCopy = copy(user);
+        userCopy.addresses[index] = address;
+        setUser(userCopy);
+        clearAddressForm();
+    }
+
+    function deleteAddress(index) {
+        let userCopy = copy(user);
+        userCopy.addresses.splice(index, 1);
+        setUser(userCopy);
+        clearAddressForm();
+    }
+
+    function clearAddressForm() {
+        resetAddressForm(blankAddress, -1);
+    }
+
+    function resetAddressForm(addressValues, index) {
+        setAddress(addressValues);
+        setAddressIndex(index);
+    }
+
+    const displayRegistrationStyle = user.registrationTime === '' ? "d-none" : "";
 
     return (
         <div className="container mt-5">
@@ -90,14 +132,38 @@ function UserForm(props) {
                            onChange={e => setUserValue("phoneNumber", e.target.value) }/>
                 </div>
 
-                <div className="form-group">
+                <hr />
 
-                    {user.addresses.map(a => addressToString(a))}
-                    <Button variant="primary" onClick={() => setShow(true)}>
-                        Edit Address
+                <div className="container mt-3">
+
+                    <span className="font-weight-bold mr-2">Addresses</span>
+
+                    <Button variant="success"  onClick={() => setAddressIndex(user.addresses.length)}>
+                        <i className="mr-2 fas fa-plus-circle" />Add Address
                     </Button>
 
-                    <Modal show={show} onHide={() => setShow(false)}>
+                    <Container className="container mt-3">
+                        {user.addresses.map( (currentAddress, index) =>
+                            <Row key={addressToString(currentAddress)} className="pt-2 pb-2 border-bottom border-top ">
+                                <Col xs="9">
+                                    {addressToString(currentAddress)}
+                                </Col>
+                                <Col xs="3">
+                                    <Button variant="primary" className="mr-2" onClick={() => resetAddressForm(currentAddress, index)}>
+                                        <i className="mr-2 fas fa-edit" />Edit
+                                    </Button>
+                                    <Button variant="danger"  onClick={() => deleteAddress(index)}>
+                                        <i className="mr-2 fas fa-trash" />Delete
+                                    </Button>
+                                </Col>
+                            </Row>
+                        )}
+                    </Container>
+                </div>
+
+                <div className="form-group">
+
+                    <Modal show={addressIndex >= 0} onHide={() => clearAddressForm()}>
                         <Modal.Header closeButton>
                             <Modal.Title>Edit Address</Modal.Title>
                         </Modal.Header>
@@ -106,19 +172,37 @@ function UserForm(props) {
                             <div className="form-group">
                                 <label htmlFor="line1">Street Address</label>
                                 <input type="text" className="form-control" id="line1" placeholder="Street Address"
-                                       value={ "address goes here" }
-                                       onChange={e => setUserValue("phoneNumber", e.target.value) }/>
+                                       value={address.line1}
+                                       onChange={e => setAddressValue('line1', e.target.value)}  />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="city">City</label>
+                                <input type="text" className="form-control" id="city" placeholder="City"
+                                       value={address.city}
+                                       onChange={e => setAddressValue('city', e.target.value)}  />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="state">State</label>
+                                <input type="text" className="form-control" id="state" placeholder="State"
+                                       value={address.state}
+                                       onChange={e => setAddressValue('state', e.target.value)}  />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="zip">Zip</label>
+                                <input type="text" className="form-control" id="zip" placeholder="Zip"
+                                       value={address.zip}
+                                       onChange={e => setAddressValue('zip', e.target.value)}  />
                             </div>
 
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShow(false)}>Cancel</Button>
-                            <Button variant="primary" onClick={() => setShow(false)}>OK</Button>
+                            <Button variant="secondary" onClick={ () => clearAddressForm()} >Cancel</Button>
+                            <Button variant="primary" onClick={ () => setUserAddress(address, addressIndex)}>OK</Button>
                         </Modal.Footer>
                     </Modal>
                 </div>
 
-                <Button variant="outline-success" onClick={() => { onSave(user); }}>Save</Button>
+                <Button variant="success" onClick={() => { onSave(user); }}>Save</Button>
                 <Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>
             </form>
 
