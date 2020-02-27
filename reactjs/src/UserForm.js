@@ -6,8 +6,8 @@ import {Link} from "react-router-dom";
 
 import copy from './Copier.js';
 import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+
+import AddressRow from './AddressRow.js';
 
 const blankUser = {
     username: '',
@@ -25,10 +25,6 @@ const blankAddress = {
     city: '',
     state: '',
     zip: ''
-}
-
-const addressToString = (address) => {
-    return address.line1 + ', ' + address.city + ' ' + address.state + ' ' + address.zip;
 }
 
 function UserForm(props) {
@@ -143,20 +139,10 @@ function UserForm(props) {
                     </Button>
 
                     <Container className="container mt-3">
-                        {user.addresses.map( (currentAddress, index) =>
-                            <Row key={addressToString(currentAddress)} className="pt-2 pb-2 border-bottom border-top ">
-                                <Col xs="9">
-                                    {addressToString(currentAddress)}
-                                </Col>
-                                <Col xs="3">
-                                    <Button variant="primary" className="mr-2" onClick={() => resetAddressForm(currentAddress, index)}>
-                                        <i className="mr-2 fas fa-edit" />Edit
-                                    </Button>
-                                    <Button variant="danger"  onClick={() => deleteAddress(index)}>
-                                        <i className="mr-2 fas fa-trash" />Delete
-                                    </Button>
-                                </Col>
-                            </Row>
+                        {user.addresses.map( (address, index) =>
+                            <AddressRow currentAddress={address}
+                                        onEdit={() => resetAddressForm(address, index)}
+                                        onDelete={() => deleteAddress(index)} />
                         )}
                     </Container>
                 </div>
