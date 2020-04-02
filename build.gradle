@@ -7,7 +7,8 @@ subprojects {
     group = 'org.thinkbigthings.zdd'
     version = '1.0-SNAPSHOT'
 
-    sourceCompatibility = 13
+    sourceCompatibility = 14
+    // sourceCompatibility = JavaVersion.VERSION_14
 
     repositories {
         mavenCentral()
@@ -20,6 +21,15 @@ subprojects {
 
     test {
         useJUnitPlatform()
+    }
+
+
+    // use preview features
+    test {
+        jvmArgs(['--enable-preview'])
+    }
+    tasks.withType(JavaCompile).each {
+        it.options.compilerArgs.add('--enable-preview')
     }
 }
 
