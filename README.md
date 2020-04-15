@@ -49,12 +49,13 @@ against any server we want.
 
 To run the server and have it serve the front end (as opposed to `npm start`)
 use the command `gradlew runAll`. 
+Then go to `https://localhost:9000`
 
 To build a JAR file that can be deployed and run as in production,
 use the command `gradlew buildAll` from the base project folder.
 
 To run a built JAR file, after using `buildAll`, cd to the server folder
-and run e.g. `java -jar build/libs/server-1.0-SNAPSHOT.jar `
+and run e.g. `java --enable-preview -jar build/libs/server-1.0-SNAPSHOT.jar`
 Then go to `https://localhost:9000`
 
 ### Showing Blue Green Deployment (Server)
