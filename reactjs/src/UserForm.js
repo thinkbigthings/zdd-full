@@ -140,7 +140,7 @@ function UserForm(props) {
 
                     <Container className="container mt-3">
                         {user.addresses.map( (address, index) =>
-                            <AddressRow currentAddress={address}
+                            <AddressRow key={index} currentAddress={address}
                                         onEdit={() => resetAddressForm(address, index)}
                                         onDelete={() => deleteAddress(index)} />
                         )}
