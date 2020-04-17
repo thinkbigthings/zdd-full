@@ -6,6 +6,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 import copy from './Copier.js';
+import Button from "react-bootstrap/Button";
 
 const blankPage = {
     content: [],
@@ -74,11 +75,15 @@ function UserList() {
                 <nav aria-label="Page navigation">
                     <ul className="pagination">
                         <li onClick={ () => movePage(-1) } className="page-item ">
-                            <span className={"btn btn-primary " + styleFirst} ><i className="mr-2 fas fa-caret-left" />Previous</span>
+                            <Link className={"btn btn-primary " + styleFirst} >
+                                <i className="mr-2 fas fa-caret-left" />Previous
+                            </Link>
                         </li>
                         <li className="page-item disabled"><span className="page-link">{currentPage}</span></li>
                         <li onClick={ () => movePage(1) } className="page-item ">
-                            <span className={"btn btn-primary " + styleLast} ><i className="mr-2 fas fa-caret-right" />Next</span>
+                            <Link className={"btn btn-primary " + styleLast} >
+                                <i className="mr-2 fas fa-caret-right" />Next
+                            </Link>
                         </li>
                     </ul>
                 </nav>
