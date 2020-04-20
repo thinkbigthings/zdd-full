@@ -83,7 +83,7 @@ Drop and run all migrations: `gradlew flywayClean; gradlew flywayMigrate -i`
 We run the migration standalone (not on startup of the application)
 So that we have more control over the migration process.
 
-
+## Security
 
 ## HTTPS
 
