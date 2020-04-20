@@ -6,8 +6,8 @@ import javax.annotation.PreDestroy;
 import javax.servlet.*;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +20,7 @@ import static java.time.Instant.now;
 public class LoggingFilterRps implements Filter {
 
     private final String legend = " reqs, avg-ms, max-ms: [";
-    private final Runnable logger = () -> log(concurrentCopyAndClear());
+    private final Runnable logger = () -> log(getAndResetStatistics());
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
     private final ConcurrentHashMap<Long, AtomicLong> timeToRequestCount = new ConcurrentHashMap();
 
@@ -48,42 +48,48 @@ public class LoggingFilterRps implements Filter {
         timeToRequestCount.get(elapsed).incrementAndGet();
     }
 
-    private void log(Map<Long,Long> timeToRequestCountCopy) {
+    private void log(List<RequestDurationCount> histogram) {
 
         Instant logTime = now();
 
-        var maxTimeMs = timeToRequestCountCopy.entrySet().stream()
-                .filter(e -> e.getValue() != 0L)
-                .mapToLong(e -> e.getKey())
+        var maxTimeMs = histogram.stream()
+                .mapToLong(RequestDurationCount::requestDurationMs)
                 .max()
                 .orElse(0L);
 
-        var numRequests = timeToRequestCountCopy.values().stream()
-                .mapToLong(Long::valueOf)
+        var totalRequests = histogram.stream()
+                .mapToLong(RequestDurationCount::requestCount)
                 .sum();
 
-        var totalTime = timeToRequestCountCopy.entrySet().stream()
-                .map(e -> e.getKey() * e.getValue())
-                .mapToLong(Long::valueOf)
+        var totalTime = histogram.stream()
+                .mapToLong(RequestDurationCount::getTimeSpent)
                 .sum();
 
-        var avgResponseTime = Math.round((double)totalTime / (double)numRequests);
+        var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
 
-        System.out.println(logTime + legend + numRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]");
+        System.out.println(logTime + legend + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]");
     }
 
     // copy and clear values atomically without locking the map
     // then can work on the copy without synchronization
-    private Map<Long,Long> concurrentCopyAndClear() {
+    private List<RequestDurationCount> getAndResetStatistics() {
 
-        Map<Long,Long> copy = new HashMap<>();
+        List<RequestDurationCount> durations = new ArrayList<>();
+
         timeToRequestCount.forEachEntry(1024, entry -> {
             long requestCount = entry.getValue().getAndSet(0L);
-            long timeBin = entry.getKey();
-            copy.put(timeBin, requestCount);
+            long requestDuration = entry.getKey();
+            if(requestCount != 0L) {
+                durations.add(new RequestDurationCount(requestDuration, requestCount));
+            }
         });
 
-        return copy;
+        return durations;
     }
 
+    record RequestDurationCount(long requestDurationMs, long requestCount) {
+        public long getTimeSpent() {
+            return requestDurationMs() * requestCount();
+        }
+    }
 }
