@@ -52,7 +52,7 @@ task runAll () {
     dependsOn(':server:bootRun')
 }
 
-task buildAll () {
+task build () {
     dependsOn('copyWebApp')
     dependsOn(':server:bootJar')
 }

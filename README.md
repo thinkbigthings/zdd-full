@@ -52,9 +52,10 @@ use the command `gradlew runAll`.
 Then go to `https://localhost:9000`
 
 To build a JAR file that can be deployed and run as in production,
-use the command `gradlew buildAll` from the base project folder.
+use the command `gradlew build` from the base project folder.
 
-To run a built JAR file, after using `buildAll`, cd to the server folder
+To run a built JAR file, after using the root project `build`, 
+cd to the server folder (so you can access properties)
 and run e.g. `java --enable-preview -jar build/libs/server-1.0-SNAPSHOT.jar`
 Then go to `https://localhost:9000`
 

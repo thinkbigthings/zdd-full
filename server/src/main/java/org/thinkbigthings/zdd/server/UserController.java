@@ -5,10 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,17 @@ public class UserController {
     // if there's only one constructor, can omit Autowired and Inject
     public UserController(UserService s) {
         service = s;
+    }
+
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @RequestMapping(value="/protected", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Page<UserDTO> getUsersProtected(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page,
+                                           @AuthenticationPrincipal User user)
+    {
+        System.out.println(user.getUsername());
+        return Page.empty();
     }
 
     @RequestMapping(value="/user", method= RequestMethod.GET, produces= MediaType.APPLICATION_JSON_VALUE)

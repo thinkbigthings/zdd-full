@@ -117,6 +117,15 @@ Then see output in build/reports/jacoco/html/index.html
 
 curl quick guide: https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 
+WITH SECURITY
+
+(this one should fail)
+curl -k --user user:password "https://localhost:9000/protected"
+
+(this one should pass)
+curl -k --user admin:admin "https://localhost:9000/protected"
+
+
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
 
 See most recent users:

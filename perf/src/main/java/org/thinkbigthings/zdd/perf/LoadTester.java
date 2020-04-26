@@ -43,6 +43,7 @@ public class LoadTester {
     private boolean insertOnly;
     private String baseUrl;
 
+    private URI protectedUsers;
     private URI users;
     private URI info;
     private URI health;
@@ -72,6 +73,7 @@ public class LoadTester {
 
         baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
+        protectedUsers = URI.create(baseUrl + "/protected");
         users = URI.create(baseUrl + "/user");
         info = URI.create(baseUrl + "/actuator/info");
         health = URI.create(baseUrl + "/actuator/health");
@@ -145,6 +147,8 @@ public class LoadTester {
     }
 
     private void doCRUD() {
+
+        get(protectedUsers, "admin", "admin");
 
         UserDTO user = createRandomUser();
         post(users, user);
@@ -221,6 +225,29 @@ public class LoadTester {
         sendWithLatency(request);
     }
 
+    record Header(String name, String value) {}
+
+    public Header createBasicAuth(String username, String password) {
+        String basic = username + ":" + password;
+        String encoded = Base64.getEncoder().encodeToString(basic.getBytes());
+        return new Header("Authorization", "Basic " + encoded);
+    }
+
+    public String get(URI uri, String username, String password) {
+
+        Header basicAuth = createBasicAuth(username, password);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .GET()
+                .setHeader(basicAuth.name(), basicAuth.value())
+                .build();
+
+        HttpResponse<String> response = sendWithLatency(request);
+
+        return response.body();
+    }
+
     public String get(URI uri) {
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -294,6 +321,7 @@ public class LoadTester {
 
         if(response.statusCode() != 200) {
             String message = "Return status code was " + response.statusCode();
+            message += " in call to " + response.request().uri();
             throw new RuntimeException(message);
         }
         else {
