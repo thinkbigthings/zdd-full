@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 
@@ -70,6 +71,7 @@ public class UserService {
         var user = fromDto(userDto);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
+        user.getRoles().add(User.Role.USER);
 
         try {
             return toDto(userRepo.save(user));
@@ -103,7 +105,7 @@ public class UserService {
         userData.addresses.stream()
                 .map(this::fromDto)
                 .peek(a -> a.setUser(user))
-                .collect(Collectors.toCollection(() -> user.getAddresses()));
+                .collect(toCollection(() -> user.getAddresses()));
 
         return user;
     }
@@ -123,7 +125,11 @@ public class UserService {
 
         user.getAddresses().stream()
                 .map(this::toDto)
-                .collect(Collectors.toCollection(() -> userData.addresses));
+                .collect(toCollection(() -> userData.addresses));
+
+        user.getRoles().stream()
+                .map(User.Role::name)
+                .collect(toCollection(() -> userData.roles));
 
         return userData;
     }

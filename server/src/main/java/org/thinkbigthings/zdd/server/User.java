@@ -8,9 +8,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.stream.Collectors.toList;
+
 @Entity
 @Table(name = "app_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
 public class User {
+
+    public enum Role {
+        // these are stored by ordinal in the database, so don't change the order!
+        ADMIN, USER
+    }
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -37,6 +44,12 @@ public class User {
 
     @Basic
     private boolean enabled = false;
+
+    @ElementCollection(targetClass=Role.class)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role_id")
+    @Enumerated(EnumType.ORDINAL)
+    private Set<Role> roles = new HashSet<>();
 
     @Basic
     @NotNull
@@ -108,6 +121,25 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
+
+    public String[] mapRoleNames() {
+        return getRoles().stream()
+                .map(Role::name)
+                .collect(toList())
+                .toArray(new String[]{});
     }
 
     public Instant getRegistrationTime() {
