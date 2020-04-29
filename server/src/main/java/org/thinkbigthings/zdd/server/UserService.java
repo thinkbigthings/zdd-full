@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.time.Instant;
@@ -32,7 +33,8 @@ public class UserService {
     @Transactional
     public UserDTO updateUser(String username, UserDTO userDto) {
 
-        var user = userRepo.findByUsername(username);
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
 
         user.setEmail(userDto.email);
         user.setDisplayName(userDto.displayName);
@@ -85,11 +87,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDTO getUser(String username) {
 
-        if( ! userRepo.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username does not exist" + username);
-        }
-
-        return toDto(userRepo.findByUsername(username));
+        return userRepo.findByUsername(username)
+                .map(this::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
     public User fromDto(UserDTO userData) {

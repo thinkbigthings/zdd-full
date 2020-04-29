@@ -34,7 +34,6 @@ public class UserController {
     public Page<UserDTO> getUsersProtected(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page,
                                            @AuthenticationPrincipal User user)
     {
-        System.out.println(user.getUsername());
         return Page.empty();
     }
 
