@@ -7,10 +7,13 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.UUID;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserServiceTest {
 
@@ -40,6 +43,18 @@ public class UserServiceTest {
         UserDTO created = service.saveNewUser(newUser);
 
         assertEquals(name, created.username);
+    }
+
+    @Test
+    public void createUserWithBadName() {
+
+        String name = "first last";
+        UserDTO newUser = new UserDTO();
+
+        newUser.username = name;
+        newUser.email = name + "@email.com";
+
+        assertThrows(IllegalArgumentException.class, () -> service.saveNewUser(newUser));
     }
 
 }

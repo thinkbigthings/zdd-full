@@ -17,7 +17,8 @@ const blankUser = {
     phoneNumber: '',
     registrationTime: '',
     addresses: [],
-    editAddressIndex: -1
+    editAddressIndex: -1,
+    roles: []
 }
 
 const blankAddress = {
@@ -95,6 +96,13 @@ function UserForm(props) {
                     <input type="text" className="form-control" id="inputRegistrationTime" placeholder="Registration Time"
                            disabled = "disabled"
                            value={user.registrationTime}/>
+                </div>
+
+                <div className={"form-group " + displayRegistrationStyle}>
+                    <label htmlFor="roles">Roles</label>
+                    <input type="text" className="form-control" id="roles" placeholder="Roles"
+                           disabled = "disabled"
+                           value={user.roles}/>
                 </div>
 
                 <div className="form-group">
