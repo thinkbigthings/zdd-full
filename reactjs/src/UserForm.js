@@ -44,7 +44,7 @@ function UserForm(props) {
     }
 
     const [addressIndex, setAddressIndex] = useState(-1);
-    const[address, setAddress] = useState(blankAddress);
+    const [address, setAddress] = useState(blankAddress);
 
     function setAddressValue(fieldName, fieldValue) {
         let addressCopy = copy(address);

@@ -187,6 +187,7 @@ public class LoadTester {
         newUser.heightCm = 150 + random.nextInt(40);
         newUser.email = faker.internet().emailAddress();
         newUser.addresses.add(randomAddress());
+        newUser.plainTextPassword = UUID.randomUUID().toString();
         return newUser;
     }
 

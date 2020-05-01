@@ -3,6 +3,7 @@ package org.thinkbigthings.zdd.server;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,7 +15,6 @@ import javax.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toCollection;
@@ -24,11 +24,12 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class UserService {
 
-
     private final UserRepository userRepo;
+    private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repo) {
-        userRepo = repo;
+    public UserService(UserRepository repo, PasswordEncoder passwordEncoder) {
+        this.userRepo = repo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -71,6 +72,7 @@ public class UserService {
         var user = fromDto(userDto);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
+        user.setPassword(passwordEncoder.encode(userDto.plainTextPassword));
         user.getRoles().add(User.Role.USER);
 
         try {

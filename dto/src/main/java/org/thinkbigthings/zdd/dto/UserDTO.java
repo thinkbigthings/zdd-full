@@ -17,6 +17,7 @@ public class UserDTO {
     public String phoneNumber = "";
     public String registrationTime = "";
     public int heightCm = 0;
+    public String plainTextPassword = "";
     public Set<AddressDTO> addresses = new HashSet<>();
     public Set<String> roles = new HashSet<>();
 
@@ -31,8 +32,7 @@ public class UserDTO {
                 displayName.equals(userDTO.displayName) &&
                 phoneNumber.equals(userDTO.phoneNumber) &&
                 registrationTime.equals(userDTO.registrationTime) &&
-                addresses.equals(userDTO.addresses) &&
-                roles.equals(userDTO.roles);
+                addresses.equals(userDTO.addresses);
     }
 
     @Override
@@ -49,8 +49,6 @@ public class UserDTO {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", registrationTime='" + registrationTime + '\'' +
                 ", heightCm=" + heightCm +
-                ", addresses=" + addresses +
-                ", roles=" + roles +
-                '}';
+                ", addresses=" + addresses;
     }
 }

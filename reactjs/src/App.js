@@ -12,6 +12,7 @@ import UserList from './UserList.js';
 import About from './About.js';
 import CreateUser from './CreateUser.js';
 import EditUser from './EditUser.js';
+import Login from './Login.js';
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
                 <Route exact path="/" render={() => <Home />} />
                 <Route exact path="/about" render={() => <About />} />
                 <Route exact path="/users" render={() => <UserList />} />
+                <Route exact path="/login" component={Login} />
                 <Route exact path="/users/create" component={CreateUser} />
                 <Route exact path="/users/:username/edit" component={EditUser} />
             </HashRouter>

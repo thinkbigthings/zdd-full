@@ -5,26 +5,22 @@ import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
-import java.net.URLEncoder;
-import java.util.Base64;
-import java.util.UUID;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserServiceTest {
 
-
     private UserRepository userRepo = Mockito.mock(UserRepository.class);
+    private PasswordEncoder pwEncoder = Mockito.mock(PasswordEncoder.class);
 
     private UserService service;
 
     @BeforeEach
     public void setup() {
-        service = new UserService(userRepo);
+        service = new UserService(userRepo, pwEncoder);
 
         Mockito.when(userRepo.save(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(userRepo.saveAndFlush(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
