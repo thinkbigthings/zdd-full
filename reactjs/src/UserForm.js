@@ -37,20 +37,18 @@ function UserForm(props) {
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
     useEffect(() => { loadUserPromise.then(u => setUser(u)) },[loadUserPromise, setUser]);
 
-    function setUserValue(fieldName, fieldValue) {
-        let userCopy = copy(user);
-        userCopy[ fieldName ] = fieldValue;
-        setUser(userCopy);
+
+    function updateUser(updateValues) {
+        setUser( {...user, ...updateValues});
+    }
+
+    function updateAddress(updateValues) {
+        setAddress( {...address, ...updateValues});
     }
 
     const [addressIndex, setAddressIndex] = useState(-1);
     const [address, setAddress] = useState(blankAddress);
 
-    function setAddressValue(fieldName, fieldValue) {
-        let addressCopy = copy(address);
-        addressCopy[ fieldName ] = fieldValue;
-        setAddress(addressCopy);
-    }
 
     // https://stackoverflow.com/questions/33613728/what-happens-when-using-this-setstate-multiple-times-in-react-component
     function setUserAddress(address, index) {
@@ -88,7 +86,7 @@ function UserForm(props) {
                     <input type="text" className="form-control" id="inputUserName" placeholder="User Name"
                            disabled = {isUsernameEditable ? "" : "disabled"}
                            value={user.username}
-                           onChange={e => setUserValue("username", e.target.value) }/>
+                           onChange={e => updateUser({username : e.target.value })} />
                 </div>
 
                 <div className={"form-group " + displayRegistrationStyle}>
@@ -109,7 +107,7 @@ function UserForm(props) {
                     <label htmlFor="inputDisplayName">Display Name</label>
                     <input type="text" className="form-control" id="inputDisplayName" placeholder="Display Name"
                            value={user.displayName}
-                           onChange={e => { setUserValue("displayName", e.target.value) }}/>
+                           onChange={e => updateUser({displayName : e.target.value })} />
                 </div>
 
                 <div className="form-group">
@@ -117,7 +115,7 @@ function UserForm(props) {
                     <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
                            placeholder="Enter email"
                            value={user.email}
-                           onChange={e => setUserValue("email", e.target.value) }/>
+                           onChange={e => updateUser({email : e.target.value })} />
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
                         else.</small>
                 </div>
@@ -126,14 +124,14 @@ function UserForm(props) {
                     <label htmlFor="inputHeight">Height (cm)</label>
                     <input type="number" className="form-control" id="inputHeight" placeholder="Height"
                            value={user.heightCm}
-                           onChange={e => setUserValue("heightCm", e.target.value) }/>
+                           onChange={e => updateUser({heightCm : e.target.value })} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="inputPhone">Phone Number</label>
                     <input type="text" className="form-control" id="inputPhone" placeholder="Phone Number"
                            value={user.phoneNumber}
-                           onChange={e => setUserValue("phoneNumber", e.target.value) }/>
+                           onChange={e => updateUser({phoneNumber : e.target.value })} />
                 </div>
 
                 <hr />
@@ -167,25 +165,25 @@ function UserForm(props) {
                                 <label htmlFor="line1">Street Address</label>
                                 <input type="text" className="form-control" id="line1" placeholder="Street Address"
                                        value={address.line1}
-                                       onChange={e => setAddressValue('line1', e.target.value)}  />
+                                       onChange={e => updateAddress({line1 : e.target.value })} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="city">City</label>
                                 <input type="text" className="form-control" id="city" placeholder="City"
                                        value={address.city}
-                                       onChange={e => setAddressValue('city', e.target.value)}  />
+                                       onChange={e => updateAddress({city : e.target.value })} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="state">State</label>
                                 <input type="text" className="form-control" id="state" placeholder="State"
                                        value={address.state}
-                                       onChange={e => setAddressValue('state', e.target.value)}  />
+                                       onChange={e => updateAddress({state : e.target.value })} />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="zip">Zip</label>
                                 <input type="text" className="form-control" id="zip" placeholder="Zip"
                                        value={address.zip}
-                                       onChange={e => setAddressValue('zip', e.target.value)}  />
+                                       onChange={e => updateAddress({zip : e.target.value })} />
                             </div>
 
                         </Modal.Body>

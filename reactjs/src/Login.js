@@ -1,5 +1,19 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Button from "react-bootstrap/Button";
+
+import {defaultUserContext, UserContext} from './UserContext.js';
+import {fetchWithAuth} from './BasicAuth.js';
+
+function logout() {
+    localStorage.removeItem('username');
+    localStorage.removeItem('password');
+}
+
+function login(username, password) {
+    localStorage.setItem('username', username);
+    localStorage.setItem('password', password);
+}
+
 
 // login needs to be a component in the router for history to be passed here
 function Login({history}) {
@@ -7,21 +21,34 @@ function Login({history}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
+    const currentUserContext = useContext(UserContext);
+
     // call the callback function if the enter key was pressed in the event
     function callOnEnter(event, callback) {
         if(event.key === 'Enter') {
-            console.log("calling callback");
             callback();
         }
     }
 
     const onLogin = () => {
-        // later this will be a call to /authenticate and we'll store a token
-        localStorage.setItem("username", username);
-        localStorage.setItem("password", password);
-        localStorage.setItem('authToken', '');
-        console.log("saving to localStorage " + username + " " + password);
-        history.push("/");
+
+        // TODO read from local storage to initialize the top level context on page load
+
+        // TODO maybe pass in response handlers: map of response code to callbacks
+        // and a default callback (so one for 200 and one for other errors as you can fill it in)
+
+        login(username, password);
+
+        fetchWithAuth('/user/' + username)
+            .then(user => {
+
+                    // TODO retrieve a real user to assign to the context
+                    // user is being retrieved but can't be assigned
+                    // need to learn more about context, maybe reducer hook?
+
+                    // currentUserContext.login(user);
+                    history.push("/");
+                });
     }
 
     return (

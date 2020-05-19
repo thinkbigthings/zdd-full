@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 
 import {UserForm, blankUser} from './UserForm.js';
 import Toast from "react-bootstrap/Toast";
+import {postWithAuth} from "./BasicAuth";
 
 function CreateUser({history}) {
 
@@ -15,20 +16,25 @@ function CreateUser({history}) {
 
 
     const onSave = (userData) => {
-        fetch('/user', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
-        })
-        .then(result => {
-            if(result.status !== 200) {
+
+        // TODO create user doesn't set the password
+        // password will always be ""
+
+        // TODO could pass in success/failure callbacks?
+        // then fetch/post would work more similarly
+        // and we could share the toast around
+
+        postWithAuth('/user', userData)
+            .then(result => {
                 console.log(result);
-                setSaveError(true);
-            }
-            else {
-                history.push("/users");
-            }
-        });
+                if(result.status !== 200) {
+                    console.log(result);
+                    setSaveError(true);
+                }
+                else {
+                    history.push("/users");
+                }
+            });
     }
 
     return (

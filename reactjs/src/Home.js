@@ -2,17 +2,10 @@ import React, {useEffect, useState} from 'react';
 
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Button from "react-bootstrap/Button";
-import fetchWithAuth from './BasicAuth.js';
 
 function Home() {
 
     const [info, setInfo] = useState({users:{count:0}});
-
-    const logResponse = response => console.log(response);
-    const protectedUrl = '/protected';
-
-    fetchWithAuth(protectedUrl)
-        .then(logResponse);
 
     let fetchData2 = () => {
         fetch('/actuator/info')

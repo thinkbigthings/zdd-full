@@ -4,6 +4,41 @@ function basicAuthHeader(username, password) {
     return {'Authorization': 'Basic ' + encoded };
 }
 
+
+function putWithAuth(url, userData) {
+
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+
+    let requestHeaders = basicAuthHeader(username, password);
+    requestHeaders["Content-Type"] = "application/json";
+
+    const requestMeta = {
+        headers: requestHeaders,
+        method: 'PUT',
+        body: JSON.stringify(userData),
+    };
+
+    return fetch(url, requestMeta);
+}
+
+function postWithAuth(url, userData) {
+
+    const username = localStorage.getItem('username');
+    const password = localStorage.getItem('password');
+
+    let requestHeaders = basicAuthHeader(username, password);
+    requestHeaders["Content-Type"] = "application/json";
+
+    const requestMeta = {
+        headers: requestHeaders,
+        method: 'POST',
+        body: JSON.stringify(userData),
+    };
+
+    return fetch(url, requestMeta);
+}
+
 function fetchWithAuth(url) {
 
     const username = localStorage.getItem('username');
@@ -26,4 +61,4 @@ function fetchWithAuth(url) {
         .then(httpResponse => httpResponse.json());
 }
 
-export default fetchWithAuth;
+export {fetchWithAuth, postWithAuth, putWithAuth}

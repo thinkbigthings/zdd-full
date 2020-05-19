@@ -8,6 +8,8 @@ import Col from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import Button from "react-bootstrap/Button";
 
+import {fetchWithAuth} from './BasicAuth.js';
+
 const blankPage = {
     content: [],
     first: true,
@@ -37,8 +39,7 @@ function UserList() {
     }
 
     let fetchRecentUsers = (pageable) => {
-        fetch('/user?' + pageQuery(pageable))
-            .then(httpResponse => httpResponse.json())
+        fetchWithAuth('/user?' + pageQuery(pageable))
             .then(page => setUserPage(page));
     };
 

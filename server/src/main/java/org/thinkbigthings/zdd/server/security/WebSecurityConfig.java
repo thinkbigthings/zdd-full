@@ -12,11 +12,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private static final String[] OPEN_ENDPOINTS = new String[]{
+            "/", "/static/**", "/*.png", "/favicon.ico", "/manifest.json", "/actuator/**"
+    };
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/", "/static/**", "/*.png", "/favicon.ico", "/manifest.json", "/actuator/**", "/user/**")
+                    .antMatchers(OPEN_ENDPOINTS)
                         .permitAll()
                     .anyRequest()
                         .authenticated()
