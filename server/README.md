@@ -43,15 +43,10 @@ After starting the container run create-db.sql
 Flyway connects to an existing database in a transaction,
 and creating a database is outside a transaction, so db creation should be part of setup.
 
-If you have PG on the host: `psql -h localhost -U postgres -d app -p 5555`
-
-So you can just call from the host:
+If you have PG on the host, you can just call from the host:
 `psql -h localhost -p 5555 -U postgres -f db/create-db.sql`
 
-Or, you should be able to access the database from within docker:
-`docker exec -it pg-docker psql -U postgres`
-
-So you can just call from the host:
+If you do NOT have PG on the host, you should be able to access the database from within docker:
 `docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
 
 ### Blow away and rebuild DB

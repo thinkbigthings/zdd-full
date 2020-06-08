@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useReducer} from 'react';
 
 import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
@@ -28,8 +28,7 @@ function UserList() {
     const [userPage, setUserPage] = useState(blankPage);
 
     const pageQuery = (pageable) => {
-        return 'page='+pageable.pageNumber + "&"
-            + 'size='+pageable.pageSize;
+        return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
     }
 
     function movePage(amount) {

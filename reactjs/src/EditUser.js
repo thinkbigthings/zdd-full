@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 
-import {UserForm} from './UserForm.js';
+import {UserForm} from './UserFormReducer.js';
 import Toast from "react-bootstrap/Toast";
 
 import {fetchWithAuth, putWithAuth} from './BasicAuth.js';

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -17,7 +17,6 @@ const blankUser = {
     phoneNumber: '',
     registrationTime: '',
     addresses: [],
-    editAddressIndex: -1,
     roles: []
 }
 
@@ -36,7 +35,6 @@ function UserForm(props) {
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
     useEffect(() => { loadUserPromise.then(u => setUser(u)) },[loadUserPromise, setUser]);
-
 
     function updateUser(updateValues) {
         setUser( {...user, ...updateValues});

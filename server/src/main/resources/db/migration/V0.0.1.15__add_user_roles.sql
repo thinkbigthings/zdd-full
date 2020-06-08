@@ -3,7 +3,7 @@ set search_path TO public;
 
 CREATE TABLE role (
     id   INT4           NOT NULL PRIMARY KEY,
-    name VARCHAR(255)   NOT NULL
+    name VARCHAR(255)   NOT NULL -- this is more so we can tell by looking at the database which one is which
 );
 
 INSERT INTO role (id, name) VALUES (0, 'ADMIN');
@@ -11,7 +11,7 @@ INSERT INTO role (id, name) VALUES (1, 'USER');
 
 CREATE TABLE user_role (
     user_id     INT8        NOT NULL    REFERENCES app_user (id),
-    role_id     INT4    NOT NULL    REFERENCES role (id),
+    role_id     INT4        NOT NULL    REFERENCES role (id),
     PRIMARY KEY (user_id, role_id)
 );
 
