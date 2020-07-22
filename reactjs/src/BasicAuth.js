@@ -10,26 +10,18 @@ function basicAuthHeader(username, password) {
     };
 }
 
-function useCredentials() {
+function useAuthHeader() {
 
     // context shared from the top level
     const [user, setUser] = useContext(UserContext);
-
-    const [username, setUsername] = useState(user.username);
-    const [password, setPassword] = useState(user.password);
-
-    return {username, password};
-}
-
-function usePutWithAuth(url, userData) {
-
-    const [user, setUser] = useContext(UserContext);
-
     if( ! user.isLoggedIn) {
         throw 'user is not logged in';
     }
 
-    let requestHeaders = basicAuthHeader(user.username, user.password);
+    return basicAuthHeader(user.username, user.password);
+}
+
+function put(url, userData, requestHeaders) {
 
     const requestMeta = {
         headers: requestHeaders,
@@ -40,15 +32,7 @@ function usePutWithAuth(url, userData) {
     return fetch(url, requestMeta);
 }
 
-function usePostWithAuth(url, userData) {
-
-    const [user, setUser] = useContext(UserContext);
-
-    if( ! user.isLoggedIn) {
-        throw 'user is not logged in';
-    }
-
-    let requestHeaders = basicAuthHeader(user.username, user.password);
+function post(url, userData, requestHeaders) {
 
     const requestMeta = {
         headers: requestHeaders,
@@ -59,15 +43,7 @@ function usePostWithAuth(url, userData) {
     return fetch(url, requestMeta);
 }
 
-function useGetWithAuth(url) {
-
-    const [user, setUser] = useContext(UserContext);
-
-    if( ! user.isLoggedIn) {
-        throw 'user is not logged in';
-    }
-
-    let requestHeaders = basicAuthHeader(user.username, user.password);
+function get(url, requestHeaders) {
 
     const requestMeta = {
         headers: requestHeaders
@@ -84,48 +60,6 @@ function useGetWithAuth(url) {
             return httpResponse;
         })
         .then(httpResponse => httpResponse.json());
-}
-
-function putWithAuth(url, userData) {
-
-    const username = localStorage.getItem('username');
-    const password = localStorage.getItem('password');
-
-    let requestHeaders = basicAuthHeader(username, password);
-
-    const requestMeta = {
-        headers: requestHeaders,
-        method: 'PUT',
-        body: JSON.stringify(userData),
-    };
-
-    return fetch(url, requestMeta);
-}
-
-function postWithAuth(url, userData) {
-
-    const username = localStorage.getItem('username');
-    const password = localStorage.getItem('password');
-
-    let requestHeaders = basicAuthHeader(username, password);
-
-    const requestMeta = {
-        headers: requestHeaders,
-        method: 'POST',
-        body: JSON.stringify(userData),
-    };
-
-    return fetch(url, requestMeta);
-}
-
-function fetchWithAuth(url) {
-
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if( ! currentUser.isLoggedIn) {
-        throw 'user is not logged in';
-    }
-
-    return fetchWithCreds(url, currentUser);
 }
 
 function fetchWithCreds(url, credentials) {
@@ -147,4 +81,4 @@ function fetchWithCreds(url, credentials) {
         .then(httpResponse => httpResponse.json());
 }
 
-export {fetchWithAuth, postWithAuth, putWithAuth, fetchWithCreds, usePutWithAuth, usePostWithAuth, useGetWithAuth}
+export {fetchWithCreds, put, post, get, useAuthHeader}

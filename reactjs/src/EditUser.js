@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {UserForm} from './UserFormReducer.js';
 import Toast from "react-bootstrap/Toast";
 
-import {fetchWithAuth, putWithAuth} from './BasicAuth.js';
+import {put, get, useAuthHeader} from './BasicAuth.js';
 
 function EditUser({history, match}) {
 
@@ -11,14 +11,16 @@ function EditUser({history, match}) {
 
     const userEndpoint = '/user/' + username;
 
-    const loadUserPromise = fetchWithAuth(userEndpoint);
+    const headers = useAuthHeader();
+
+    const loadUserPromise = get(userEndpoint, headers);
 
     const [saveSuccess, setSaveSuccess] = useState(false);
 
     const toggleSuccessToast = () => setSaveSuccess(!saveSuccess);
 
     const onSave = (userData) => {
-        putWithAuth(userEndpoint, userData)
+        put(userEndpoint, userData, headers)
             .then(result => {
                 if(result.status !== 200) {
                     console.log("ERROR EDITING USER");

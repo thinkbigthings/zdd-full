@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 
 import {UserForm, blankUser} from './UserForm.js';
 import Toast from "react-bootstrap/Toast";
-import {postWithAuth} from "./BasicAuth";
+import {post, useAuthHeader} from "./BasicAuth";
 
 function CreateUser({history}) {
 
@@ -14,6 +14,7 @@ function CreateUser({history}) {
 
     const toggleErrorToast = () => setSaveError(!saveError);
 
+    const headers = useAuthHeader();
 
     const onSave = (userData) => {
 
@@ -21,7 +22,7 @@ function CreateUser({history}) {
         // then fetch/post would work more similarly
         // and we could share the toast around
 
-        postWithAuth('/user', userData)
+        post('/user', userData, headers)
             .then(result => {
                 console.log(result);
                 if(result.status !== 200) {

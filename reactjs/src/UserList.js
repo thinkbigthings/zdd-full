@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import Button from "react-bootstrap/Button";
 
-import {fetchWithAuth} from './BasicAuth.js';
+import {useAuthHeader, get} from "./BasicAuth";
 
 const blankPage = {
     content: [],
@@ -37,8 +37,10 @@ function UserList() {
         fetchRecentUsers(pageable);
     }
 
+    const headers = useAuthHeader();
+
     let fetchRecentUsers = (pageable) => {
-        fetchWithAuth('/user?' + pageQuery(pageable))
+        get('/user?' + pageQuery(pageable), headers)
             .then(page => setUserPage(page));
     };
 
