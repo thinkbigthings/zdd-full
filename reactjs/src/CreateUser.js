@@ -17,9 +17,6 @@ function CreateUser({history}) {
 
     const onSave = (userData) => {
 
-        // TODO create user doesn't set the password
-        // password will always be ""
-
         // TODO could pass in success/failure callbacks?
         // then fetch/post would work more similarly
         // and we could share the toast around

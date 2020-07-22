@@ -1,27 +1,22 @@
 import React, {useContext, useState} from 'react';
 import Button from "react-bootstrap/Button";
 
-import {defaultUserContext, UserContext} from './UserContext.js';
-import {fetchWithAuth} from './BasicAuth.js';
-
-function logout() {
-    localStorage.removeItem('username');
-    localStorage.removeItem('password');
-}
-
-function login(username, password) {
-    localStorage.setItem('username', username);
-    localStorage.setItem('password', password);
-}
+import {UserContext} from './UserContext.js';
+import {fetchWithCreds} from './BasicAuth.js';
 
 
 // login needs to be a component in the router for history to be passed here
 function Login({history}) {
 
+    // local form state
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const currentUserContext = useContext(UserContext);
+    // context shared from the top level
+    const [user, setUser] = useContext(UserContext);
+
+    console.log(user);
+
 
     // call the callback function if the enter key was pressed in the event
     function callOnEnter(event, callback) {
@@ -32,23 +27,27 @@ function Login({history}) {
 
     const onLogin = () => {
 
-        // TODO read from local storage to initialize the top level context on page load
+        const credentials = {
+            username: username,
+            password: password
+        }
 
         // TODO maybe pass in response handlers: map of response code to callbacks
         // and a default callback (so one for 200 and one for other errors as you can fill it in)
+        const userUrl = '/user/' + username;
+        fetchWithCreds(userUrl, credentials)
+            .then(retrievedUser => {
 
-        login(username, password);
+                const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
 
-        fetchWithAuth('/user/' + username)
-            .then(user => {
+                console.log('setting user context');
+                console.log(loggedInUser);
 
-                    // TODO retrieve a real user to assign to the context
-                    // user is being retrieved but can't be assigned
-                    // need to learn more about context, maybe reducer hook?
+                localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
+                setUser(loggedInUser);
 
-                    // currentUserContext.login(user);
-                    history.push("/");
-                });
+                history.push("/");
+            });
     }
 
     return (

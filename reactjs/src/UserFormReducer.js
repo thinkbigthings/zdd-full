@@ -98,7 +98,7 @@ function UserForm(props) {
     const [formState, dispatch] = useReducer(formReducer, blankFormState);
 
     // TODO do we need the deps when using the reducer? Seems to function the same with/without the dispatch dependency
-    // TODO braces around the method body seem to be necessary for using promise, not sure why
+    // TODO braces around the method body of the effect seem to be necessary when it's a promise, not sure why
     // TODO could the load function be the third parameter to the reducer hook? to lazy initialize the full state
     useEffect(() => { loadUserPromise.then(u => dispatch({type:'LOAD_USER', payload: u}))}, [loadUserPromise, dispatch]);
 
