@@ -41,7 +41,7 @@ const blankFormState = {
 
 function UserForm(props) {
 
-    const {loadUserPromise, onSave, isUsernameEditable} = props;
+    const {loadUserPromise, onSave, isUsernameEditable, onCancel} = props;
 
     // return new state based on current state and action
     // reducer itself should not cause side effects, it should be called FROM a side effect
@@ -226,7 +226,8 @@ function UserForm(props) {
                 </div>
 
                 <Button variant="success" onClick={() => { onSave(formState.user); }}>Save</Button>
-                <Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>
+                {/*<Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>*/}
+                <Button variant="light" onClick={onCancel}>Cancel</Button>
             </form>
 
         </div>

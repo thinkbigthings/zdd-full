@@ -46,7 +46,7 @@ function EditUser({history, match}) {
                 </Toast.Header>
                 <Toast.Body>Save Successful for {username}</Toast.Body>
             </Toast>
-            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={false}/>
+            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={false} onCancel={history.goBack}/>
         </div>
     );
 }

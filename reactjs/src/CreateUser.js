@@ -49,7 +49,7 @@ function CreateUser({history}) {
                 </Toast.Header>
                 <Toast.Body>Save Failed</Toast.Body>
             </Toast>
-            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={true}/>
+            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={true} />
         </div>
     );
 }
