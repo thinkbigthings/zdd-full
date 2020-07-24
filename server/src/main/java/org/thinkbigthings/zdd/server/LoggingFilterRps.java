@@ -67,7 +67,7 @@ public class LoggingFilterRps implements Filter {
 
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
 
-        System.out.println(logTime + legend + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]");
+        //System.out.println(logTime + legend + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]");
     }
 
     // copy and clear values atomically without locking the map
