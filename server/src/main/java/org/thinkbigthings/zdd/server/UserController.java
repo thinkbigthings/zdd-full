@@ -45,7 +45,7 @@ public class UserController {
         return service.saveNewUser(newUser);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
     @RequestMapping(value="/user/{username}", method= RequestMethod.PUT, produces= MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public UserDTO updateUser(@RequestBody UserDTO newUser, @PathVariable String username) {
