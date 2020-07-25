@@ -126,15 +126,26 @@ public class LoadTester {
         adminClient.post(users, user);
 
         URI userUrl = URI.create(users.toString() + "/" + user.username);
+        URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username + "/password/update");
+
         UserDTO firstUserSave = adminClient.get(userUrl, UserDTO.class);
 
-        // test retrieving user with own credentials
+        // test user with own credentials
         ApiClient userClient = new ApiClient(user.username, user.plainTextPassword);
-        UserDTO userWithOwnCreds = userClient.get(userUrl, UserDTO.class);
+        userClient.get(userUrl, UserDTO.class);
+
+        String newPassword = "";
+        userClient.post(updatePasswordUrl, newPassword);
+        userClient = new ApiClient(user.username, newPassword);
+
 
         UserDTO updatedUser = createRandomUserWithName(user.username);
+        userClient.put(userUrl, updatedUser);
+
+        // TODO shouldn't have to track registration time here
+        // but we set it so we can do the comparison test later
+        // might be better to have a separate object for user settable data?
         updatedUser.registrationTime = firstUserSave.registrationTime;
-        adminClient.put(userUrl, updatedUser);
 
         UserDTO secondUserSave = adminClient.get(userUrl, UserDTO.class);
 
@@ -163,7 +174,7 @@ public class LoadTester {
         newUser.heightCm = 150 + random.nextInt(40);
         newUser.email = faker.internet().emailAddress();
         newUser.addresses.add(randomAddress());
-        newUser.plainTextPassword = ""; // UUID.randomUUID().toString();
+        newUser.plainTextPassword = UUID.randomUUID().toString();
         return newUser;
     }
 

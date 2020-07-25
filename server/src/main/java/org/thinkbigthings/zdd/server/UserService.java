@@ -33,6 +33,21 @@ public class UserService {
     }
 
     @Transactional
+    public void updatePassword(String username, String newPassword) {
+
+        // TODO consider returning entity not optional
+        // so I don't have to check existence all the time myself
+        // Spring Data throws the same exception, right?
+
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepo.save(user);
+    }
+
+    @Transactional
     public UserDTO updateUser(String username, UserDTO userDto) {
 
         var user = userRepo.findByUsername(username)
