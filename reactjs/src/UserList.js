@@ -53,11 +53,11 @@ function UserList() {
 
     const onSave = (userData) => {
 
-        setShowCreateUser(false);
-
         // TODO could pass in success/failure callbacks?
         // then fetch/post would work more similarly
         // and we could share the toast around
+
+        setShowCreateUser(false);
 
         post('/user', userData, headers)
             .then(result => {
@@ -87,7 +87,7 @@ function UserList() {
 
 
             <Button variant="primary" onClick={() => setShowCreateUser(true)}>Create User</Button>
-            <CreateUserModal open={showCreateUser} onConfirm={onSave} onCancel={() => setShowCreateUser(false)} />
+            <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
 
             <Container className="container mt-3">
                 {userPage.content.map(user =>
