@@ -3,6 +3,11 @@ package org.thinkbigthings.zdd.server;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +29,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class UserService {
 
-    private final UserRepository userRepo;
+    private UserRepository userRepo;
     private PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository repo, PasswordEncoder passwordEncoder) {
@@ -34,10 +39,6 @@ public class UserService {
 
     @Transactional
     public void updatePassword(String username, String newPassword) {
-
-        // TODO consider returning entity not optional
-        // so I don't have to check existence all the time myself
-        // Spring Data throws the same exception, right?
 
         var user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
@@ -174,6 +175,5 @@ public class UserService {
 
         return addressData;
     }
-
 
 }

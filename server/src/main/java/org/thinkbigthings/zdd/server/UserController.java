@@ -28,7 +28,6 @@ public class UserController {
 
         return service.getUsers(page);
     }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

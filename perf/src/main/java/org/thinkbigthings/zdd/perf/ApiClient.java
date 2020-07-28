@@ -65,7 +65,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .PUT(jsonFor(newUser))
+                .PUT(publisher(newUser))
                 .setHeader(JSON_CONTENT.name(), JSON_CONTENT.value())
                 .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
                 .build();
@@ -77,7 +77,7 @@ public class ApiClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .POST(jsonFor(body))
+                .POST(publisher(body))
                 .setHeader(JSON_CONTENT.name(), JSON_CONTENT.value())
                 .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
                 .build();
@@ -129,12 +129,15 @@ public class ApiClient {
         }
     }
 
-    public HttpRequest.BodyPublisher jsonFor(Object object) {
+    public HttpRequest.BodyPublisher publisher(Object object) {
 
         String json;
         try {
-            json = mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+            json = object instanceof String
+                    ? object.toString()
+                    : mapper.writeValueAsString(object);
+        }
+        catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

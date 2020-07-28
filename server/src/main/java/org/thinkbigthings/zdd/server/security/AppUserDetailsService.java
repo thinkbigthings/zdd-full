@@ -22,10 +22,13 @@ public class AppUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return userRepository.findByUsername(username)
+        // if not found, UserDetailsService is supposed to throw UsernameNotFoundException instead of return null
+        UserDetails userDetails = userRepository.findByUsername(username)
                 .map(userDetailsMapper::apply)
                 .filter(user -> ! user.getAuthorities().isEmpty())
                 .orElseThrow(() -> new UsernameNotFoundException("No User with authorities were found: " + username));
+
+        return userDetails;
     }
 
 }

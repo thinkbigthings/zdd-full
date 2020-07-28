@@ -128,29 +128,23 @@ public class LoadTester {
         URI userUrl = URI.create(users.toString() + "/" + user.username);
         URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username + "/password/update");
 
-        UserDTO firstUserSave = adminClient.get(userUrl, UserDTO.class);
+        UserDTO userData = adminClient.get(userUrl, UserDTO.class);
 
         // test user with own credentials
         ApiClient userClient = new ApiClient(user.username, user.plainTextPassword);
         userClient.get(userUrl, UserDTO.class);
 
-        String newPassword = "";
+        String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
         userClient = new ApiClient(user.username, newPassword);
 
+        updateUserEditableData(userData);
+        userClient.put(userUrl, userData);
 
-        UserDTO updatedUser = createRandomUserWithName(user.username);
-        userClient.put(userUrl, updatedUser);
+        UserDTO updatedUser = adminClient.get(userUrl, UserDTO.class);
 
-        // TODO shouldn't have to track registration time here
-        // but we set it so we can do the comparison test later
-        // might be better to have a separate object for user settable data?
-        updatedUser.registrationTime = firstUserSave.registrationTime;
-
-        UserDTO secondUserSave = adminClient.get(userUrl, UserDTO.class);
-
-        if( ! updatedUser.equals(secondUserSave)) {
-            String message = "user updates were not all persisted: " + updatedUser + " vs " + secondUserSave;
+        if( ! userData.equals(updatedUser)) {
+            String message = "user updates were not all persisted: " + userData + " vs " + updatedUser;
             throw new RuntimeException(message);
         }
 
@@ -161,20 +155,20 @@ public class LoadTester {
         String page = adminClient.get(users);
     }
 
-    private UserDTO createRandomUser() {
-        return createRandomUserWithName("user-" + randomUUID());
+    private void updateUserEditableData(UserDTO user) {
+        user.displayName = faker.name().name();
+        user.phoneNumber = faker.phoneNumber().phoneNumber();
+        user.heightCm = 150 + random.nextInt(40);
+        user.email = faker.internet().emailAddress();
+        user.addresses.add(randomAddress());
     }
 
-    private UserDTO createRandomUserWithName(String username) {
+    private UserDTO createRandomUser() {
 
         UserDTO newUser = new UserDTO();
-        newUser.username = username;
-        newUser.displayName = faker.name().name();
-        newUser.phoneNumber = faker.phoneNumber().phoneNumber();
-        newUser.heightCm = 150 + random.nextInt(40);
-        newUser.email = faker.internet().emailAddress();
-        newUser.addresses.add(randomAddress());
-        newUser.plainTextPassword = UUID.randomUUID().toString();
+        newUser.username = "user-" + randomUUID();
+        newUser.plainTextPassword = "password";
+        updateUserEditableData(newUser);
         return newUser;
     }
 
