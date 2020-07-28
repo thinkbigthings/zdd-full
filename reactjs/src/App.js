@@ -14,7 +14,6 @@ import About from './About.js';
 import CreateUser from './CreateUser.js';
 import EditUser from './EditUser.js';
 import Login from './Login.js';
-import {UserForm} from './UserFormReducer.js';
 
 import {UserProvider, UserContext, defaultUser} from './UserContext.js';
 

@@ -8,7 +8,8 @@ import Col from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import Button from "react-bootstrap/Button";
 
-import {useAuthHeader, get} from "./BasicAuth";
+import {useAuthHeader, get, post} from "./BasicAuth";
+import CreateUserModal from "./CreateUserModal";
 
 const blankPage = {
     content: [],
@@ -26,6 +27,7 @@ const blankPage = {
 function UserList() {
 
     const [userPage, setUserPage] = useState(blankPage);
+    const[showCreateUser, setShowCreateUser] = useState(false);
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -49,6 +51,27 @@ function UserList() {
         fetchRecentUsers(userPage.pageable);
     }
 
+    const onSave = (userData) => {
+
+        setShowCreateUser(false);
+
+        // TODO could pass in success/failure callbacks?
+        // then fetch/post would work more similarly
+        // and we could share the toast around
+
+        post('/user', userData, headers)
+            .then(result => {
+                console.log(result);
+                if(result.status !== 200) {
+                    console.log(result);
+                    // setSaveError(true);
+                }
+                else {
+                    fetchRecentUsers(blankPage.pageable);
+                }
+            });
+    }
+
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
     useEffect(getCurrentList, [setUserPage]);
 
@@ -62,7 +85,10 @@ function UserList() {
         <div className="container mt-3">
             <h1>User Management</h1>
 
-            <Link to={"/users/create"} className="btn btn-success" ><i className="mr-2 fas fa-user-plus" />Create User</Link>
+
+            <Button variant="primary" onClick={() => setShowCreateUser(true)}>Create User</Button>
+            <CreateUserModal open={showCreateUser} onConfirm={onSave} onCancel={() => setShowCreateUser(false)} />
+
             <Container className="container mt-3">
                 {userPage.content.map(user =>
                     <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">

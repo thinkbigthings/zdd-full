@@ -95,6 +95,7 @@ public class UserService {
             return toDto(userRepo.save(user));
         }
         catch(ConstraintViolationException e) {
+            e.getConstraintViolations().forEach(System.out::println);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
         }
     }

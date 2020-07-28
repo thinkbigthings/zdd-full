@@ -27,6 +27,10 @@ const blankAddress = {
     zip: ''
 }
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// USE USERFORMREDUCER INSTEAD
+
 function UserForm(props) {
 
     const {loadUserPromise, onSave, isUsernameEditable} = props;
@@ -201,4 +205,3 @@ function UserForm(props) {
     );
 }
 
-export {UserForm, blankUser};
