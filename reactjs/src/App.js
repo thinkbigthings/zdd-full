@@ -11,7 +11,6 @@ import { HashRouter, Route } from 'react-router-dom';
 import Home from './Home.js';
 import UserList from './UserList.js';
 import About from './About.js';
-import CreateUser from './CreateUser.js';
 import EditUser from './EditUser.js';
 import Login from './Login.js';
 
@@ -81,7 +80,6 @@ function AuthenticatedApp() {
                 <Route exact path="/" render={() => <Home/>}/>
                 <Route exact path="/about" render={() => <About/>}/>
                 <Route exact path="/users" render={() => <UserList/>}/>
-                <Route exact path="/users/create" component={CreateUser}/>
                 <Route exact path="/users/:username/edit" component={EditUser}/>
             </HashRouter>
         );

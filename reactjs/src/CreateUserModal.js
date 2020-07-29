@@ -11,6 +11,7 @@ const blankFormData = {
 }
 
 // expected props: show, onHide, onConfirm
+// https://react-bootstrap.github.io/components/modal/
 function CreateUserModal(props) {
 
     const [user, setUser] = useState(blankFormData);
@@ -28,8 +29,6 @@ function CreateUserModal(props) {
         setUser(blankFormData);
         props.onConfirm({...user, displayName: user.username});
     }
-
-    // https://react-bootstrap.github.io/components/modal/
 
     const passwordReady = user.password === user.confirmPassword && user.password !== '';
 

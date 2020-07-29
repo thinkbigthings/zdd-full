@@ -15,26 +15,32 @@ function EditUser({history, match}) {
 
     const loadUserPromise = get(userEndpoint, headers);
 
+    const [toast, setToast] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
-
-    const toggleSuccessToast = () => setSaveSuccess(!saveSuccess);
 
     const onSave = (userData) => {
         put(userEndpoint, userData, headers)
             .then(result => {
                 if(result.status !== 200) {
-                    console.log("ERROR EDITING USER");
+                    console.log("ERROR SAVING USER");
                     console.log(result);
+                    setSaveSuccess(false);
+                    setToast(true);
                 }
                 else {
-                    history.push('/users');
+                    history.goBack();
                 }
             });
     }
 
+    // onClose={toggleSuccessToast}
+    const toastMessage = saveSuccess ? "Save Successful" : "Save Failed";
+    const toastStyle = saveSuccess ? "text-success" : "text-danger";
+    const toastHeader = saveSuccess ? "Info" : "Error";
+
     return (
         <div>
-            <Toast show={saveSuccess} onClose={toggleSuccessToast} animation={true} autohide={true} delay={3000}
+            <Toast show={toast} animation={true} autohide={true} onClose={() => setToast(false)} delay={3000}
                    style={{
                        position: 'absolute',
                        top: 60,
@@ -42,11 +48,12 @@ function EditUser({history, match}) {
                        width: 250
                    }}>
                 <Toast.Header>
-                    <strong className="mr-auto text-success">Info</strong>
+                    <strong className={"mr-auto " + toastStyle}>{toastHeader}</strong>
                 </Toast.Header>
-                <Toast.Body>Save Successful for {username}</Toast.Body>
+
+                <Toast.Body>{toastMessage}</Toast.Body>
             </Toast>
-            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} isUsernameEditable={false} onCancel={history.goBack}/>
+            <UserForm loadUserPromise={loadUserPromise} onSave={onSave} onCancel={history.goBack}/>
         </div>
     );
 }

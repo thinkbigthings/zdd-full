@@ -41,7 +41,7 @@ const blankFormState = {
 
 function UserForm(props) {
 
-    const {loadUserPromise, onSave, isUsernameEditable, onCancel} = props;
+    const {loadUserPromise, onSave, onCancel} = props;
 
     // return new state based on current state and action
     // reducer itself should not cause side effects, it should be called FROM a side effect
@@ -102,8 +102,6 @@ function UserForm(props) {
     // TODO could the load function be the third parameter to the reducer hook? to lazy initialize the full state
     useEffect(() => { loadUserPromise.then(u => dispatch({type:'LOAD_USER', payload: u}))}, [loadUserPromise, dispatch]);
 
-    const displayRegistrationStyle = formState.user.registrationTime === '' ? "d-none" : "";
-
     const address = formState.editableAddress.address;
 
     return (
@@ -114,19 +112,18 @@ function UserForm(props) {
                 <div className="form-group">
                     <label htmlFor="inputUserName">User Name</label>
                     <input type="text" className="form-control" id="inputUserName" placeholder="User Name"
-                           disabled = {isUsernameEditable ? "" : "disabled"}
-                           value={formState.user.username}
-                           onChange={e => dispatch({type:'UPDATE_USER', payload: {username: e.target.value }})}/>
+                           disabled = "disabled"
+                           value={formState.user.username}/>
                 </div>
 
-                <div className={"form-group " + displayRegistrationStyle}>
+                <div className={"form-group "}>
                     <label htmlFor="registrationTime">Registration Time</label>
                     <input type="text" className="form-control" id="inputRegistrationTime" placeholder="Registration Time"
                            disabled = "disabled"
                            value={formState.user.registrationTime}/>
                 </div>
 
-                <div className={"form-group " + displayRegistrationStyle}>
+                <div className={"form-group "}>
                     <label htmlFor="roles">Roles</label>
                     <input type="text" className="form-control" id="roles" placeholder="Roles"
                            disabled = "disabled"

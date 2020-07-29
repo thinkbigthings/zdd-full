@@ -15,9 +15,6 @@ function Login({history}) {
     // context shared from the top level
     const [user, setUser] = useContext(UserContext);
 
-    console.log(user);
-
-
     // call the callback function if the enter key was pressed in the event
     function callOnEnter(event, callback) {
         if(event.key === 'Enter') {
