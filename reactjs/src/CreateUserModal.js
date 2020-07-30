@@ -34,7 +34,7 @@ function CreateUserModal(props) {
 
     return (
 
-        <Modal show={props.show} onHide={props.onHide} >
+        <Modal show={props.show} onHide={onHide} >
             <Modal.Header closeButton>
                 <Modal.Title>Create User</Modal.Title>
             </Modal.Header>

@@ -86,7 +86,7 @@ function UserList() {
             <h1>User Management</h1>
 
 
-            <Button variant="primary" onClick={() => setShowCreateUser(true)}>Create User</Button>
+            <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
             <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
 
             <Container className="container mt-3">

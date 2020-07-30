@@ -8,11 +8,7 @@ const defaultUser = {
     isLoggedIn: false,
 }
 
-// usage:
-// const [user, setUser] = useContext(UserContext);
-
 const UserContext = React.createContext([{}, ({}) => {}]);
-
 UserContext.displayName = 'UserContext';
 
 const UserProvider = (props) => {
@@ -30,9 +26,8 @@ const UserProvider = (props) => {
         <UserContext.Provider value={[state, setState]}>
             {props.children}
         </UserContext.Provider>
-    // <AuthContext.Provider value={{data, login, logout, register}} {...props} />
-
-);
+        // <AuthContext.Provider value={{data, login, logout, register}} {...props} />
+    );
 }
 
 export {UserContext, UserProvider, defaultUser};

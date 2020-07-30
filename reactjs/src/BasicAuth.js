@@ -34,10 +34,14 @@ function put(url, userData, requestHeaders) {
 
 function post(url, userData, requestHeaders) {
 
+    const body = typeof userData === 'string'
+                    ? userData
+                    : JSON.stringify(userData);
+
     const requestMeta = {
         headers: requestHeaders,
         method: 'POST',
-        body: JSON.stringify(userData),
+        body: body
     };
 
     return fetch(url, requestMeta);

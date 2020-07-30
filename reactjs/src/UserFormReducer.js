@@ -2,7 +2,6 @@ import React, {useEffect, useReducer, useState} from 'react';
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import {Link} from "react-router-dom";
 
 import copy from './Copier.js';
 import Container from "react-bootstrap/Container";
@@ -105,7 +104,7 @@ function UserForm(props) {
     const address = formState.editableAddress.address;
 
     return (
-        <div className="container mt-5">
+        <Container className="mt-3 pt-3 pl-0 pr-0 border-top border-light" >
 
             <form>
 
@@ -227,7 +226,7 @@ function UserForm(props) {
                 <Button variant="light" onClick={onCancel}>Cancel</Button>
             </form>
 
-        </div>
+        </Container>
 
     );
 }
