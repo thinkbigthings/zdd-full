@@ -1,13 +1,14 @@
 import React, {useEffect, useState, useReducer} from 'react';
 
 import { Link } from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+
+import ButtonGroup  from 'react-bootstrap/ButtonGroup';
+import Button       from "react-bootstrap/Button";
+import Container    from 'react-bootstrap/Container';
+import Row          from 'react-bootstrap/Row';
+import Col          from 'react-bootstrap/Col';
 
 import copy from './Copier.js';
-import Button from "react-bootstrap/Button";
-
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
 
@@ -85,7 +86,6 @@ function UserList() {
         <div className="container mt-3">
             <h1>User Management</h1>
 
-
             <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
             <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
 
@@ -100,22 +100,17 @@ function UserList() {
                         </Col>
                     </Row>
                 )}
-                <nav aria-label="Page navigation">
-                    <ul className="pagination">
-                        <li onClick={ () => movePage(-1) } className="page-item ">
-                            <Button variant="primary" className={"btn btn-primary " + styleFirst} >
-                                <i className="mr-2 fas fa-caret-left" />Previous
-                            </Button>
-                        </li>
-                        <li className="page-item disabled"><span className="page-link">{currentPage}</span></li>
-                        <li onClick={ () => movePage(1) } className="page-item ">
-                            <Button variant="primary" className={"btn btn-primary " + styleLast} >
-                                <i className="mr-2 fas fa-caret-right" />Next
-                            </Button>
-                        </li>
-                    </ul>
-                </nav>
             </Container>
+
+            <ButtonGroup className="mt-2">
+                <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
+                    <i className="mr-2 fas fa-caret-left" />Previous
+                </Button>
+                <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
+                <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
+                    <i className="mr-2 fas fa-caret-right" />Next
+                </Button>
+            </ButtonGroup>
         </div>
     );
 }

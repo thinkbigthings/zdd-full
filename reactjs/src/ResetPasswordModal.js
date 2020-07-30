@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 
 import Alert from "react-bootstrap/Alert";
-import Card from "react-bootstrap/Card";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
