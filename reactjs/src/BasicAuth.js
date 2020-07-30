@@ -13,7 +13,8 @@ function basicAuthHeader(username, password) {
 function useAuthHeader() {
 
     // context shared from the top level
-    const [user, setUser] = useContext(UserContext);
+    const userContext = useContext(UserContext);
+    const user = userContext.getCurrentUser();
     if( ! user.isLoggedIn) {
         throw 'user is not logged in';
     }

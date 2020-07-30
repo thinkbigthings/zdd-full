@@ -19,6 +19,13 @@ function ResetPasswordModal(props) {
         setConfirmPassword("");
     }
 
+    // call the callback function if the enter key was pressed in the event
+    function callOnEnter(event, callback) {
+        if(event.key === 'Enter') {
+            callback();
+        }
+    }
+
     function onHide() {
         clearForm();
         props.onHide();
@@ -51,7 +58,8 @@ function ResetPasswordModal(props) {
                     <label htmlFor="confirmPassword">Confirm Password</label>
                     <input type="text" className="form-control" id="confirmPassword" placeholder="Confirm Password"
                            value={confirmPassword}
-                           onChange={e => setConfirmPassword(e.target.value)} />
+                           onChange={e => setConfirmPassword(e.target.value)}
+                           onKeyPress={e => callOnEnter(e, onConfirm) }/>
                 </div>
             </Modal.Body>
             <Modal.Footer>

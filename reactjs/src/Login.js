@@ -13,7 +13,7 @@ function Login({history}) {
     const [password, setPassword] = useState('');
 
     // context shared from the top level
-    const [user, setUser] = useContext(UserContext);
+    const userContext = useContext(UserContext);
 
     // call the callback function if the enter key was pressed in the event
     function callOnEnter(event, callback) {
@@ -34,15 +34,8 @@ function Login({history}) {
         const userUrl = '/user/' + username;
         fetchWithCreds(userUrl, credentials)
             .then(retrievedUser => {
-
                 const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
-
-                console.log('setting user context');
-                console.log(loggedInUser);
-
-                localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
-                setUser(loggedInUser);
-
+                userContext.setCurrentUser(loggedInUser);
                 history.push("/");
             });
     }

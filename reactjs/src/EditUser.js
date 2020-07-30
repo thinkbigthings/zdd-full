@@ -17,7 +17,7 @@ function EditUser({history, match}) {
     const userEndpoint = '/user/' + username;
     const updatePasswordEndpoint = userEndpoint + '/password/update'
 
-    const [user, setUser] = useContext(UserContext);
+    const userContext = useContext(UserContext);
 
     const headers = useAuthHeader();
 
@@ -52,10 +52,10 @@ function EditUser({history, match}) {
                     setToast(true);
                 }
                 else {
+                    const user = userContext.getCurrentUser();
                     if(user.username === username) {
                         const updatedUser = {...user, password: plainTextPassword}
-                        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-                        setUser(updatedUser);
+                        userContext.setCurrentUser(updatedUser);
                     }
                     setShowResetPassword(false);
                 }
