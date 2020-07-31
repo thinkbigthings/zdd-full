@@ -1,12 +1,12 @@
 
 plugins {
-   id 'org.springframework.boot' version '2.2.0.RELEASE'
+   id 'org.springframework.boot' version '2.3.2.RELEASE'
 }
 
 dependencies {
 
-    implementation 'org.springframework.boot:spring-boot-starter:2.2.0.RELEASE'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
-    implementation 'com.github.javafaker:javafaker:0.18'
+    implementation 'org.springframework.boot:spring-boot-starter:2.3.2.RELEASE'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1' // sync with spring boot
+    implementation 'com.github.javafaker:javafaker:1.0.2'
 }
 
