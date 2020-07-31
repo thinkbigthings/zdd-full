@@ -15,6 +15,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 This project uses [Font Awesome](https://fontawesome.com) for icons.
 
+## Upgrade Dependencies
+
+Run `npm update` and `npm audit fix` from this folder to automatically update dependency versions.
+
+
 ## Available Scripts
 
 In the project directory, you can run:
