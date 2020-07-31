@@ -6,13 +6,20 @@ import java.util.Set;
 
 public class UserDTO {
 
+    public enum RoleDTO {
+        // these are stored by ordinal in the database, so don't change the order!
+        ADMIN, USER
+    }
+
     public String username = "";
     public String email = "";
     public String displayName = "";
     public String phoneNumber = "";
     public String registrationTime = "";
     public int heightCm = 0;
+    public String plainTextPassword = "";
     public Set<AddressDTO> addresses = new HashSet<>();
+    public Set<String> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -42,7 +49,6 @@ public class UserDTO {
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", registrationTime='" + registrationTime + '\'' +
                 ", heightCm=" + heightCm +
-                ", addresses=" + addresses +
-                '}';
+                ", addresses=" + addresses;
     }
 }

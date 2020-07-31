@@ -9,9 +9,11 @@ public class InsecureTrustManager implements X509TrustManager {
         return null;
     }
 
+    @Override
     public void checkClientTrusted(X509Certificate[] certs, String authType) {
     }
 
+    @Override
     public void checkServerTrusted(X509Certificate[] certs, String authType) {
     }
 }

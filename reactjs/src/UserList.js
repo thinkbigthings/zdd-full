@@ -1,12 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useReducer} from 'react';
 
 import { Link } from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+
+import ButtonGroup  from 'react-bootstrap/ButtonGroup';
+import Button       from "react-bootstrap/Button";
+import Container    from 'react-bootstrap/Container';
+import Row          from 'react-bootstrap/Row';
+import Col          from 'react-bootstrap/Col';
 
 import copy from './Copier.js';
-import Button from "react-bootstrap/Button";
+import {useAuthHeader, get, post} from "./BasicAuth";
+import CreateUserModal from "./CreateUserModal";
 
 const blankPage = {
     content: [],
@@ -24,10 +28,10 @@ const blankPage = {
 function UserList() {
 
     const [userPage, setUserPage] = useState(blankPage);
+    const[showCreateUser, setShowCreateUser] = useState(false);
 
     const pageQuery = (pageable) => {
-        return 'page='+pageable.pageNumber + "&"
-            + 'size='+pageable.pageSize;
+        return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
     }
 
     function movePage(amount) {
@@ -36,15 +40,37 @@ function UserList() {
         fetchRecentUsers(pageable);
     }
 
+    const headers = useAuthHeader();
+
     let fetchRecentUsers = (pageable) => {
-        fetch('/user?' + pageQuery(pageable))
-            .then(httpResponse => httpResponse.json())
+        get('/user?' + pageQuery(pageable), headers)
             .then(page => setUserPage(page));
     };
 
     // useEffect didn't seem to like this being defined inline
     let getCurrentList = () => {
         fetchRecentUsers(userPage.pageable);
+    }
+
+    const onSave = (userData) => {
+
+        // TODO could pass in success/failure callbacks?
+        // then fetch/post would work more similarly
+        // and we could share the toast around
+
+        setShowCreateUser(false);
+
+        post('/user', userData, headers)
+            .then(result => {
+                console.log(result);
+                if(result.status !== 200) {
+                    console.log(result);
+                    // setSaveError(true);
+                }
+                else {
+                    fetchRecentUsers(blankPage.pageable);
+                }
+            });
     }
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
@@ -60,7 +86,9 @@ function UserList() {
         <div className="container mt-3">
             <h1>User Management</h1>
 
-            <Link to={"/users/create"} className="btn btn-success" ><i className="mr-2 fas fa-user-plus" />Create User</Link>
+            <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
+            <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
+
             <Container className="container mt-3">
                 {userPage.content.map(user =>
                     <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
@@ -72,22 +100,17 @@ function UserList() {
                         </Col>
                     </Row>
                 )}
-                <nav aria-label="Page navigation">
-                    <ul className="pagination">
-                        <li onClick={ () => movePage(-1) } className="page-item ">
-                            <Button variant="primary" className={"btn btn-primary " + styleFirst} >
-                                <i className="mr-2 fas fa-caret-left" />Previous
-                            </Button>
-                        </li>
-                        <li className="page-item disabled"><span className="page-link">{currentPage}</span></li>
-                        <li onClick={ () => movePage(1) } className="page-item ">
-                            <Button variant="primary" className={"btn btn-primary " + styleLast} >
-                                <i className="mr-2 fas fa-caret-right" />Next
-                            </Button>
-                        </li>
-                    </ul>
-                </nav>
             </Container>
+
+            <ButtonGroup className="mt-2">
+                <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
+                    <i className="mr-2 fas fa-caret-left" />Previous
+                </Button>
+                <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
+                <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
+                    <i className="mr-2 fas fa-caret-right" />Next
+                </Button>
+            </ButtonGroup>
         </div>
     );
 }

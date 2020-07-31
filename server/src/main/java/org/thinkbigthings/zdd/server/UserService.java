@@ -3,36 +3,56 @@ package org.thinkbigthings.zdd.server;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 
 @Service
 public class UserService {
 
+    private UserRepository userRepo;
+    private PasswordEncoder passwordEncoder;
 
-    private final UserRepository userRepo;
+    public UserService(UserRepository repo, PasswordEncoder passwordEncoder) {
+        this.userRepo = repo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    public UserService(UserRepository repo) {
-        userRepo = repo;
+    @Transactional
+    public void updatePassword(String username, String newPassword) {
+
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepo.save(user);
     }
 
     @Transactional
     public UserDTO updateUser(String username, UserDTO userDto) {
 
-        var user = userRepo.findByUsername(username);
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
 
         user.setEmail(userDto.email);
         user.setDisplayName(userDto.displayName);
@@ -68,11 +88,14 @@ public class UserService {
         var user = fromDto(userDto);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
+        user.setPassword(passwordEncoder.encode(userDto.plainTextPassword));
+        user.getRoles().add(User.Role.USER);
 
         try {
             return toDto(userRepo.save(user));
         }
         catch(ConstraintViolationException e) {
+            e.getConstraintViolations().forEach(System.out::println);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
         }
     }
@@ -85,11 +108,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDTO getUser(String username) {
 
-        if( ! userRepo.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username does not exist" + username);
-        }
-
-        return toDto(userRepo.findByUsername(username));
+        return userRepo.findByUsername(username)
+                .map(this::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
     public User fromDto(UserDTO userData) {
@@ -103,7 +124,7 @@ public class UserService {
         userData.addresses.stream()
                 .map(this::fromDto)
                 .peek(a -> a.setUser(user))
-                .collect(Collectors.toCollection(() -> user.getAddresses()));
+                .collect(toCollection(() -> user.getAddresses()));
 
         return user;
     }
@@ -123,7 +144,11 @@ public class UserService {
 
         user.getAddresses().stream()
                 .map(this::toDto)
-                .collect(Collectors.toCollection(() -> userData.addresses));
+                .collect(toCollection(() -> userData.addresses));
+
+        user.getRoles().stream()
+                .map(User.Role::name)
+                .collect(toCollection(() -> userData.roles));
 
         return userData;
     }
@@ -151,6 +176,5 @@ public class UserService {
 
         return addressData;
     }
-
 
 }

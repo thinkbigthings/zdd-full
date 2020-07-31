@@ -1,42 +1,31 @@
 package org.thinkbigthings.zdd.perf;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressDTO;
 import org.thinkbigthings.zdd.dto.UserDTO;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.IntStream;
 
 import static java.util.UUID.randomUUID;
-import static java.util.concurrent.CompletableFuture.*;
+import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
 
 @Component
 public class LoadTester {
 
-    public static final class MediaType {
-        public static final String APPLICATION_JSON_VALUE = "application/json";
-    }
-
-    private HttpClient client;
     private Duration duration;
     private int numThreads;
     private Duration latency;
@@ -48,27 +37,12 @@ public class LoadTester {
     private URI health;
 
     private Random random = new Random();
-    private ObjectMapper mapper = new ObjectMapper();
     private Faker faker = new Faker(Locale.US, new Random());
+    private ApiClient adminClient;
 
     private final Instant end;
 
     public LoadTester(AppProperties config) {
-
-        try {
-            // clients are immutable and thread safe
-            // don't check certificates (so can use self-signed) and don't verify hostname
-            SSLContext sc = SSLContext.getInstance("TLSv1.3");
-            sc.init(null, new TrustManager[]{new InsecureTrustManager()}, new SecureRandom());
-            System.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
-
-            client = HttpClient.newBuilder()
-                    .sslContext(sc)
-                    .build();
-        }
-        catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException(e);
-        }
 
         baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
@@ -80,6 +54,8 @@ public class LoadTester {
         insertOnly = config.isInsertOnly();
         numThreads = config.getThreads();
         latency = config.getLatency();
+
+        adminClient = new ApiClient("admin", "admin", latency);
 
         System.out.println("Number Threads: " + numThreads);
         System.out.println("Insert only: " + insertOnly);
@@ -141,48 +117,58 @@ public class LoadTester {
     }
 
     private void doInserts() {
-        range(0, 1000).forEach(i -> post(users, createRandomUser()));
+        range(0, 1000).forEach(i -> adminClient.post(users, createRandomUser()));
     }
 
     private void doCRUD() {
 
         UserDTO user = createRandomUser();
-        post(users, user);
+        adminClient.post(users, user);
 
         URI userUrl = URI.create(users.toString() + "/" + user.username);
-        UserDTO firstUserSave = get(userUrl, UserDTO.class);
+        URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username + "/password/update");
 
-        UserDTO updatedUser = createRandomUserWithName(user.username);
-        updatedUser.registrationTime = firstUserSave.registrationTime;
-        put(userUrl, updatedUser);
+        UserDTO userData = adminClient.get(userUrl, UserDTO.class);
 
-        UserDTO secondUserSave = get(userUrl, UserDTO.class);
+        // test user with own credentials
+        ApiClient userClient = new ApiClient(user.username, user.plainTextPassword);
+        userClient.get(userUrl, UserDTO.class);
 
-        if( ! updatedUser.equals(secondUserSave)) {
-            String message = "user updates were not all persisted: " + updatedUser + " vs " + secondUserSave;
+        String newPassword = "password";
+        userClient.post(updatePasswordUrl, newPassword);
+        userClient = new ApiClient(user.username, newPassword);
+
+        updateUserEditableData(userData);
+        userClient.put(userUrl, userData);
+
+        UserDTO updatedUser = adminClient.get(userUrl, UserDTO.class);
+
+        if( ! userData.equals(updatedUser)) {
+            String message = "user updates were not all persisted: " + userData + " vs " + updatedUser;
             throw new RuntimeException(message);
         }
 
-        get(info);
+        adminClient.get(info);
 
-        get(health);
+        adminClient.get(health);
 
-        String page = get(users);
+        String page = adminClient.get(users);
+    }
+
+    private void updateUserEditableData(UserDTO user) {
+        user.displayName = faker.name().name();
+        user.phoneNumber = faker.phoneNumber().phoneNumber();
+        user.heightCm = 150 + random.nextInt(40);
+        user.email = faker.internet().emailAddress();
+        user.addresses.add(randomAddress());
     }
 
     private UserDTO createRandomUser() {
-        return createRandomUserWithName("user-" + randomUUID());
-    }
-
-    private UserDTO createRandomUserWithName(String username) {
 
         UserDTO newUser = new UserDTO();
-        newUser.username = username;
-        newUser.displayName = faker.name().name();
-        newUser.phoneNumber = faker.phoneNumber().phoneNumber();
-        newUser.heightCm = 150 + random.nextInt(40);
-        newUser.email = faker.internet().emailAddress();
-        newUser.addresses.add(randomAddress());
+        newUser.username = "user-" + randomUUID();
+        newUser.plainTextPassword = "password";
+        updateUserEditableData(newUser);
         return newUser;
     }
 
@@ -197,108 +183,6 @@ public class LoadTester {
         address.zip = randomAddress.zipCode();
 
         return address;
-    }
-
-    public void put(URI uri, UserDTO newUser) {
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .PUT(jsonFor(newUser))
-                .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        sendWithLatency(request);
-    }
-
-    public void post(URI uri, UserDTO newUser) {
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .POST(jsonFor(newUser))
-                .setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        sendWithLatency(request);
-    }
-
-    public String get(URI uri) {
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .GET()
-                .build();
-
-        HttpResponse<String> response = sendWithLatency(request);
-
-        return response.body();
-    }
-
-    public <T> T get(URI uri, Class<T> jsonResponse) {
-
-        return parse(get(uri), jsonResponse);
-    }
-
-    public <T> T parse(String json, Class<T> type) {
-        try {
-            return mapper.readValue(json, type);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public HttpRequest.BodyPublisher jsonFor(Object object) {
-
-        String json;
-        try {
-            json = mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
-        return HttpRequest.BodyPublishers.ofString(json);
-    }
-
-    private void sleep(Duration sleepDuration) {
-        if(sleepDuration.isZero()) {
-            return;
-        }
-        try {
-            Thread.sleep(sleepDuration.toMillis());
-        }
-        catch(InterruptedException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public HttpResponse<String> sendWithLatency(HttpRequest request) {
-
-        try {
-
-            // more on body handlers here https://openjdk.java.net/groups/net/httpclient/recipes.html
-            // might be fun to have direct-to-json-object body handler
-
-            sleep(latency);
-            HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
-            sleep(latency);
-            return response;
-        } catch (InterruptedException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public HttpResponse<String> throwOnError(HttpResponse<String> response) {
-
-        if(response.statusCode() != 200) {
-            String message = "Return status code was " + response.statusCode();
-            throw new RuntimeException(message);
-        }
-        else {
-            return response;
-        }
     }
 
 }

@@ -43,15 +43,10 @@ After starting the container run create-db.sql
 Flyway connects to an existing database in a transaction,
 and creating a database is outside a transaction, so db creation should be part of setup.
 
-If you have PG on the host: `psql -h localhost -U postgres -d app -p 5555`
-
-So you can just call from the host:
+If you have PG on the host, you can just call from the host:
 `psql -h localhost -p 5555 -U postgres -f db/create-db.sql`
 
-Or, you should be able to access the database from within docker:
-`docker exec -it pg-docker psql -U postgres`
-
-So you can just call from the host:
+If you do NOT have PG on the host, you should be able to access the database from within docker:
 `docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
 
 ### Blow away and rebuild DB
@@ -83,7 +78,7 @@ Drop and run all migrations: `gradlew flywayClean; gradlew flywayMigrate -i`
 We run the migration standalone (not on startup of the application)
 So that we have more control over the migration process.
 
-
+## Security
 
 ## HTTPS
 
@@ -116,6 +111,15 @@ Then see output in build/reports/jacoco/html/index.html
 ### Manual test
 
 curl quick guide: https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
+
+WITH SECURITY
+
+(this one should fail)
+curl -k --user user:password "https://localhost:9000/protected"
+
+(this one should pass)
+curl -k --user admin:admin "https://localhost:9000/protected"
+
 
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
 
