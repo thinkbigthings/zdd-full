@@ -22,7 +22,7 @@ public class LoggingFilterRps implements Filter {
     private final String legend = " reqs, avg-ms, max-ms: [";
     private final Runnable logger = () -> log(getAndResetStatistics());
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
-    private final ConcurrentHashMap<Long, AtomicLong> timeToRequestCount = new ConcurrentHashMap();
+    private final ConcurrentHashMap<Long, AtomicLong> timeToRequestCount = new ConcurrentHashMap<>();
 
     public LoggingFilterRps() {
         executor.scheduleAtFixedRate(logger, 0, 1, TimeUnit.SECONDS);

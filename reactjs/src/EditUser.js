@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 
-import {UserForm} from './UserFormReducer.js';
+import {UserForm} from './UserForm.js';
 import ResetPasswordModal from "./ResetPasswordModal.js";
 
 import Toast from "react-bootstrap/Toast";

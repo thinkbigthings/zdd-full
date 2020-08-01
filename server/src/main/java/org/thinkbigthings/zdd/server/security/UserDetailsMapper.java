@@ -12,7 +12,7 @@ public class UserDetailsMapper implements Function<User, UserDetails> {
     @Override
     public UserDetails apply(User user) {
 
-        // actual implentation returned is org.springframework.security.core.userdetails.User
+        // actual implementation returned is org.springframework.security.core.userdetails.User
         return builder()
                 .username(user.getUsername())
                 .password(user.getPassword())

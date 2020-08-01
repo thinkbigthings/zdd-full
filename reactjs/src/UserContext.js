@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useState} from 'react';
 
 const defaultUser = {
     displayName: '',
@@ -8,7 +8,7 @@ const defaultUser = {
     isLoggedIn: false,
 }
 
-const UserContext = React.createContext([{}, ({}) => {}]);
+const UserContext = React.createContext(defaultUser);
 UserContext.displayName = 'UserContext';
 
 const UserProvider = (props) => {
@@ -20,6 +20,8 @@ const UserProvider = (props) => {
         ? JSON.parse(currentUserStr)
         : defaultUser;
 
+    // If we start tracking more application state
+    // it would make sense to use a reducer here
     const [user, setUser] = useState(currentUser);
 
     // logout
