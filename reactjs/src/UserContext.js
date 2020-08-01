@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer, useState} from 'react';
+import React, {useState} from 'react';
 
 const defaultUser = {
     displayName: '',
@@ -8,7 +8,7 @@ const defaultUser = {
     isLoggedIn: false,
 }
 
-const UserContext = React.createContext([{}, ({}) => {}]);
+const UserContext = React.createContext(defaultUser);
 UserContext.displayName = 'UserContext';
 
 const UserProvider = (props) => {

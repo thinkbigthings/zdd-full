@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import {useContext} from 'react';
 
 import {UserContext} from './UserContext.js';
 
@@ -16,7 +16,7 @@ function useAuthHeader() {
     const userContext = useContext(UserContext);
     const user = userContext.getCurrentUser();
     if( ! user.isLoggedIn) {
-        throw 'user is not logged in';
+        throw new Error("user is not logged in");
     }
 
     return basicAuthHeader(user.username, user.password);
