@@ -20,6 +20,8 @@ const UserProvider = (props) => {
         ? JSON.parse(currentUserStr)
         : defaultUser;
 
+    // If we start tracking more application state
+    // it would make sense to use a reducer here
     const [user, setUser] = useState(currentUser);
 
     // logout
