@@ -1,11 +1,11 @@
 package org.thinkbigthings.zdd.perf;
 
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 import java.time.Duration;
 
+@ConstructorBinding
 @ConfigurationProperties(prefix="connect")
 public class AppProperties {
 
@@ -16,7 +16,6 @@ public class AppProperties {
     protected Integer threads = 2;
     protected Duration testDuration = Duration.ofMinutes(60);
 
-    @ConstructorBinding
     public AppProperties(String host, Integer port, boolean insertOnly, Duration latency, Integer threads, Duration testDuration) {
         this.host = host;
         this.port = port;

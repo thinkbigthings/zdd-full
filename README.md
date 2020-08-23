@@ -51,13 +51,17 @@ To run the server and have it serve the front end (as opposed to `npm start`)
 use the command `gradlew runAll`. 
 Then go to `https://localhost:9000`
 
-To build a JAR file that can be deployed and run as in production,
+
+### Do a full build
+
+To build a JAR file that can be deployed and run,
 use the command `gradlew build` from the base project folder.
 
-To run a built JAR file, after using the root project `build`, 
+To run the fully built application,
 cd to the server folder (so you can access properties)
 and run e.g. `java --enable-preview -jar build/libs/server-1.0-SNAPSHOT.jar`
-Then go to `https://localhost:9000`
+Then in the browser go to `https://localhost:9000`
+
 
 ### Showing Blue Green Deployment (Server)
 
@@ -69,6 +73,27 @@ Override the port so we can run multiple servers at once. e.g.
 To make this easier, see the commands file with the aliases.
 Use `blueDeploy` and `blueClient` alternate with `greenDeploy` and `greenClient`.
 Just put ./commands on your PATH
+
+### Updating the API Version
+
+We assign an API Version to the software at build time, the version should not be a runtime property.
+The API version we're talking about is not the `software` version, it is a `compatibility` version 
+meaning it indicates whether two pieces of software should expect to be able to interact successfully.
+
+If a client makes a request, and the compatibility version does not match what's on the server,
+the server will return a 406 and the client is expected to refresh itself and try again with the correct version.
+
+#### Server
+We assign an API Version from application.properties in the server's source main resources,
+but it can be overridden per Spring's property config mechanisms.
+To avoid that we'd have to hard-code the api version in code.
+Having a property seems appropriate though because it is a property.
+
+#### Client
+To get the client version into UI, put the value in the project's .env file, then it's accessible from React
+The variable is available in React app from doing a build and also when running from `npm start`
+but .env file is not monitored, so updating that file won't trigger a refresh when running from `npm start`.
+
 
 
 

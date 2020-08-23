@@ -2,6 +2,9 @@ import React, {useEffect, useState} from 'react';
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Button from "react-bootstrap/Button";
 
+// picks up from .env file in build
+const { REACT_APP_API_VERSION } = process.env;
+
 const styleByStatus = {
     "UP" : "text-success",
     "DOWN" : "text-danger",
@@ -30,6 +33,9 @@ function About() {
     return (
         <Jumbotron>
             <h1>About</h1>
+            <p>
+                Client API Compatibility Version {REACT_APP_API_VERSION}
+            </p>
             <p><span className={styleByStatus[serverStatus]}>
                 {"Server is "+ serverStatus}</span>
             </p>
