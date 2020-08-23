@@ -11,6 +11,8 @@ import Col          from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
+import ErrorModal from "./ErrorModal";
+import ResetPasswordModal from "./ResetPasswordModal";
 
 const blankPage = {
     content: [],
@@ -28,7 +30,8 @@ const blankPage = {
 function UserList() {
 
     const [userPage, setUserPage] = useState(blankPage);
-    const[showCreateUser, setShowCreateUser] = useState(false);
+    const [showCreateUser, setShowCreateUser] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -44,7 +47,11 @@ function UserList() {
 
     let fetchRecentUsers = (pageable) => {
         get('/user?' + pageQuery(pageable), headers)
-            .then(page => setUserPage(page));
+            .then(page => setUserPage(page))
+            .catch(error => {
+                console.log(error);
+                setShowErrorModal(true)
+            });
     };
 
     // useEffect didn't seem to like this being defined inline
@@ -83,35 +90,39 @@ function UserList() {
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
 
     return (
-        <div className="container mt-3">
-            <h1>User Management</h1>
+        <>
+            <ErrorModal show={showErrorModal} onHide={() => setShowErrorModal(false)}/>
 
-            <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
-            <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
+            <div className="container mt-3">
+                <h1>User Management</h1>
 
-            <Container className="container mt-3">
-                {userPage.content.map(user =>
-                    <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
-                        <Col >{user.displayName}</Col>
-                        <Col xs={2}>
-                            <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
-                                <i className="mr-2 fas fa-user-edit" />Edit
-                            </Link>
-                        </Col>
-                    </Row>
-                )}
-            </Container>
+                <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
+                <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
 
-            <ButtonGroup className="mt-2">
-                <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
-                    <i className="mr-2 fas fa-caret-left" />Previous
-                </Button>
-                <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
-                <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
-                    <i className="mr-2 fas fa-caret-right" />Next
-                </Button>
-            </ButtonGroup>
-        </div>
+                <Container className="container mt-3">
+                    {userPage.content.map(user =>
+                        <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
+                            <Col >{user.displayName}</Col>
+                            <Col xs={2}>
+                                <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
+                                    <i className="mr-2 fas fa-user-edit" />Edit
+                                </Link>
+                            </Col>
+                        </Row>
+                    )}
+                </Container>
+
+                <ButtonGroup className="mt-2">
+                    <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
+                        <i className="mr-2 fas fa-caret-left" />Previous
+                    </Button>
+                    <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
+                    <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
+                        <i className="mr-2 fas fa-caret-right" />Next
+                    </Button>
+                </ButtonGroup>
+            </div>
+        </>
     );
 }
 

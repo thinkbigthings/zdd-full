@@ -5,8 +5,6 @@ import Button from "react-bootstrap/Button";
 
 function Home() {
 
-    console.log('rendering Home');
-
     const [info, setInfo] = useState({users:{count:0}});
 
     let fetchData2 = () => {

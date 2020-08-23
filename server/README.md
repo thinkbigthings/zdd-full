@@ -58,9 +58,10 @@ Just put ./commands on your PATH
 
 
 Blow away the whole database and start from scratch
-`docker container stop pg-docker`
-`docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres`
-`docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
+
+    docker container stop pg-docker
+    docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres
+    docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"
 
 
 ## Migrations

@@ -2,11 +2,37 @@ import {useContext} from 'react';
 
 import {UserContext} from './UserContext.js';
 
+const VERSION_HEADER = 'X-Version';
+
+// picks up from .env file in build
+const { REACT_APP_API_VERSION } = process.env;
+
+const httpStatusFilter = function(httpResponse) {
+    if(httpResponse.status !== 200) {
+        console.log('Received ' + httpResponse);
+    }
+
+    if(httpResponse.status === 401 || httpResponse.status === 403) {
+        console.log('TODO push /login to history');
+    }
+    else if(httpResponse.headers.get(VERSION_HEADER) !== REACT_APP_API_VERSION) {
+        const serverApi = httpResponse.headers.get(VERSION_HEADER);
+        const clientApi= REACT_APP_API_VERSION;
+        const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
+        throw new Error(message);
+    }
+
+    return httpResponse;
+}
+
+
 function basicAuthHeader(username, password) {
+
     const encoded = btoa(username + ":" + password);
     return {
         'Authorization': 'Basic ' + encoded,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        VERSION_HEADER: REACT_APP_API_VERSION
     };
 }
 
@@ -30,14 +56,12 @@ function put(url, userData, requestHeaders) {
         body: JSON.stringify(userData),
     };
 
-    return fetch(url, requestMeta);
+    return fetch(url, requestMeta).then(httpStatusFilter);
 }
 
 function post(url, userData, requestHeaders) {
 
-    const body = typeof userData === 'string'
-                    ? userData
-                    : JSON.stringify(userData);
+    const body = typeof userData === 'string' ? userData : JSON.stringify(userData);
 
     const requestMeta = {
         headers: requestHeaders,
@@ -45,7 +69,7 @@ function post(url, userData, requestHeaders) {
         body: body
     };
 
-    return fetch(url, requestMeta);
+    return fetch(url, requestMeta).then(httpStatusFilter);
 }
 
 function get(url, requestHeaders) {
@@ -55,15 +79,7 @@ function get(url, requestHeaders) {
     };
 
     return fetch(url, requestMeta)
-        .then(function(httpResponse) {
-            if(httpResponse.status !== 200) {
-                console.log('Called ' + url + ' and received ' + httpResponse);
-            }
-            if(httpResponse.status === 401 || httpResponse.status === 403) {
-                console.log('TODO push /login to history');
-            }
-            return httpResponse;
-        })
+        .then(httpStatusFilter)
         .then(httpResponse => httpResponse.json());
 }
 
@@ -74,15 +90,7 @@ function fetchWithCreds(url, credentials) {
     };
 
     return fetch(url, requestMeta)
-        .then(function(httpResponse) {
-            if(httpResponse.status !== 200) {
-                console.log('Called ' + url + ' and received ' + httpResponse);
-            }
-            if(httpResponse.status === 401 || httpResponse.status === 403) {
-                console.log('TODO push /login to history');
-            }
-            return httpResponse;
-        })
+        .then(httpStatusFilter)
         .then(httpResponse => httpResponse.json());
 }
 
