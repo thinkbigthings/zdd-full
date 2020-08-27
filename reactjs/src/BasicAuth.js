@@ -8,18 +8,19 @@ const VERSION_HEADER = 'X-Version';
 const { REACT_APP_API_VERSION } = process.env;
 
 const httpStatusFilter = function(httpResponse) {
+
     if(httpResponse.status !== 200) {
         console.log('Received ' + httpResponse);
     }
 
     if(httpResponse.status === 401 || httpResponse.status === 403) {
-        console.log('TODO push /login to history');
+        console.log('TODO redirect to /login');
     }
     else if(httpResponse.headers.get(VERSION_HEADER) !== REACT_APP_API_VERSION) {
         const serverApi = httpResponse.headers.get(VERSION_HEADER);
         const clientApi= REACT_APP_API_VERSION;
         const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
-        throw new Error(message);
+        throw Error(message);
     }
 
     return httpResponse;

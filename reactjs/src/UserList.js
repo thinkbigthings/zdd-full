@@ -12,9 +12,8 @@ import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
 import ErrorModal from "./ErrorModal";
-import ResetPasswordModal from "./ResetPasswordModal";
 
-const blankPage = {
+const initialPage = {
     content: [],
     first: true,
     last: true,
@@ -29,9 +28,28 @@ const blankPage = {
 
 function UserList() {
 
-    const [userPage, setUserPage] = useState(blankPage);
+    const [userPage, setUserPage] = useState(initialPage);
     const [showCreateUser, setShowCreateUser] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
+
+    // calling this from a callback allows the error boundary parent to catch the error
+    const [/* state */, setError] = useState(null);
+
+    let fetchRecentUsers = (pageable) => {
+        get('/user?' + pageQuery(pageable), headers)
+            .then(page => setUserPage(page))
+            .catch(error => setError(() => { throw error }));
+    };
+
+    const headers = useAuthHeader();
+    const onSave = (userData) => {
+        setShowCreateUser(false);
+        post('/user', userData, headers)
+            .then(result => fetchRecentUsers(initialPage.pageable))
+            .catch(error => setError(() => { throw error }));
+    }
+
+
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -43,42 +61,11 @@ function UserList() {
         fetchRecentUsers(pageable);
     }
 
-    const headers = useAuthHeader();
-
-    let fetchRecentUsers = (pageable) => {
-        get('/user?' + pageQuery(pageable), headers)
-            .then(page => setUserPage(page))
-            .catch(error => {
-                console.log(error);
-                setShowErrorModal(true)
-            });
-    };
-
     // useEffect didn't seem to like this being defined inline
     let getCurrentList = () => {
         fetchRecentUsers(userPage.pageable);
     }
 
-    const onSave = (userData) => {
-
-        // TODO could pass in success/failure callbacks?
-        // then fetch/post would work more similarly
-        // and we could share the toast around
-
-        setShowCreateUser(false);
-
-        post('/user', userData, headers)
-            .then(result => {
-                console.log(result);
-                if(result.status !== 200) {
-                    console.log(result);
-                    // setSaveError(true);
-                }
-                else {
-                    fetchRecentUsers(blankPage.pageable);
-                }
-            });
-    }
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
     useEffect(getCurrentList, [setUserPage]);
@@ -88,6 +75,7 @@ function UserList() {
     const firstElementInPage = userPage.pageable.offset + 1;
     const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
+
 
     return (
         <>

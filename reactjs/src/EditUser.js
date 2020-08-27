@@ -19,9 +19,18 @@ function EditUser({history, match}) {
 
     const userContext = useContext(UserContext);
 
+
+    // calling this from a callback allows the error boundary parent to catch the error
+    const [/* state */, setError] = useState(null);
+
     const headers = useAuthHeader();
 
-    const loadUserPromise = get(userEndpoint, headers);
+    const loadUserPromise = get(userEndpoint, headers)
+        .catch(error => setError(() => { throw error }));
+
+
+    // TODO use a different error display if it's a version mismatch vs server error
+    // (e.g. there could be a constraint violation and we don't want to exit this component for that)
 
     const [toast, setToast] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
