@@ -16,11 +16,19 @@ const httpStatusFilter = function(httpResponse) {
     if(httpResponse.status === 401 || httpResponse.status === 403) {
         console.log('TODO redirect to /login');
     }
+
+    if(httpResponse.status >= 500) {
+        const message = 'There was a server error';
+        const userAction = 'Try reloading the page';
+        throw Error(message + " ... " + userAction);
+    }
+
     else if(httpResponse.headers.get(VERSION_HEADER) !== REACT_APP_API_VERSION) {
         const serverApi = httpResponse.headers.get(VERSION_HEADER);
         const clientApi= REACT_APP_API_VERSION;
         const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
-        throw Error(message);
+        const userAction = 'Try reloading the page';
+        throw Error(message + " ... " + userAction);
     }
 
     return httpResponse;

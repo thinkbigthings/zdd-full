@@ -1,5 +1,4 @@
-
-
+# ZDD - Front End
 
 
 ## Prerequisites
@@ -15,10 +14,18 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 This project uses [Font Awesome](https://fontawesome.com) for icons.
 
+## Error Handling
+
+The Error Boundary is for catching general exceptions and errors that the app doesn't know about
+such as calling an undefined method at render time. It doesn't catch everything (e.g. inside callbacks)
+
+In general we should favor catching errors at the point we know where an error could occur
+such as catching non-200 http responses when fetching data, and displaying an appropriate notification there.
+
+
 ## Upgrade Dependencies
 
 Run `npm update` and `npm audit fix` from this folder to automatically update dependency versions.
-
 
 ## Available Scripts
 

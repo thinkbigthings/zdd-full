@@ -1,4 +1,5 @@
 import React from 'react';
+import Jumbotron from "react-bootstrap/Jumbotron";
 
 class ErrorBoundary extends React.Component {
     state = {
@@ -22,7 +23,15 @@ class ErrorBoundary extends React.Component {
             console.log("error is " + JSON.stringify(error));
             console.log("info is " + JSON.stringify(info));
         }
-        return hasError ? <h1>Something went wrong.</h1> : children;
+        return hasError
+            ? <Jumbotron>
+                <h1>
+                    <i className="fas fa-exclamation-triangle"></i>
+                    Something went wrong
+                </h1>
+            </Jumbotron>
+
+            : children;
     }
 }
 

@@ -2,15 +2,19 @@ import React, {useEffect, useState} from 'react';
 
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Button from "react-bootstrap/Button";
+import useError from "./useError";
+import {get} from './BasicAuth.js';
 
 function Home() {
 
     const [info, setInfo] = useState({users:{count:0}});
 
+    const { addError } = useError();
+
     let fetchData2 = () => {
-        fetch('/actuator/info')
-            .then(httpResponse => httpResponse.json())
-            .then(count => setInfo(count));
+        get('/actuator/info')
+            .then(count => setInfo(count))
+            .catch(error => addError("Trouble getting actuator info: " + error.message));
     };
 
     // // this works too

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -11,7 +11,8 @@ import Col          from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
-import ErrorModal from "./ErrorModal";
+import useError from "./useError";
+import {Jumbotron} from "react-bootstrap";
 
 const initialPage = {
     content: [],
@@ -30,26 +31,23 @@ function UserList() {
 
     const [userPage, setUserPage] = useState(initialPage);
     const [showCreateUser, setShowCreateUser] = useState(false);
-    const [showErrorModal, setShowErrorModal] = useState(false);
 
-    // calling this from a callback allows the error boundary parent to catch the error
-    const [/* state */, setError] = useState(null);
+    const {error, addError } = useError();
+    const headers = useAuthHeader();
 
     let fetchRecentUsers = (pageable) => {
         get('/user?' + pageQuery(pageable), headers)
             .then(page => setUserPage(page))
-            .catch(error => setError(() => { throw error }));
+            .catch(error => addError("Trouble fetching users: " + error.message));
     };
 
-    const headers = useAuthHeader();
+
     const onSave = (userData) => {
         setShowCreateUser(false);
         post('/user', userData, headers)
             .then(result => fetchRecentUsers(initialPage.pageable))
-            .catch(error => setError(() => { throw error }));
+            .catch(error => addError("Trouble saving user: " + error.message));
     }
-
-
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -76,10 +74,21 @@ function UserList() {
     const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
 
+    // if(error.hasError) {
+    //     return (
+    //         <>
+    //             <Jumbotron>
+    //                 <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
+    //                 <span className="sr-only">Loading...</span>
+    //             </Jumbotron>
+    //
+    //         </>
+    //     );
+    // }
+
 
     return (
         <>
-            <ErrorModal show={showErrorModal} onHide={() => setShowErrorModal(false)}/>
 
             <div className="container mt-3">
                 <h1>User Management</h1>
