@@ -4,11 +4,14 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
 
+import useError from "./useError";
 
 function ErrorModal(props) {
 
+    const { error, clearError } = useError();
+
     return (
-        <Modal show={props.show} onHide={props.onHide} backdrop="static" centered>
+        <Modal show={error.hasError} onHide={clearError} backdrop="static" centered>
             <Modal.Header closeButton>
                 <Modal.Title>
                     Warning
@@ -16,10 +19,10 @@ function ErrorModal(props) {
             </Modal.Header>
             <Modal.Body>
                 <Alert variant='warning'>
-                    Page is out of date: please reload the page
+                    {error.message}
                 </Alert></Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={props.onHide}>
+                <Button variant="secondary" onClick={clearError}>
                     Ignore
                 </Button>
                 <Button variant="primary" onClick={ () => window.location.reload(true)}>

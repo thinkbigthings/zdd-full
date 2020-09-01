@@ -15,18 +15,20 @@ function About() {
 
     const [serverStatus, setServerStatus] = useState("UNKNOWN");
 
+    function handleResponse(httpResponse) {
+        if (httpResponse.status !== 200) {
+            console.log(httpResponse);
+            setServerStatus("DOWN");
+        } else {
+            setServerStatus("UP");
+        }
+    }
+
     let fetchData = () => {
         fetch('/actuator/health')
-            .then(function(httpResponse) {
-                if(httpResponse.status !== 200) {
-                    console.log(httpResponse);
-                    setServerStatus("DOWN");
-                }
-                else {
-                    setServerStatus("UP");
-                }
-            });
-    };
+            .then(handleResponse)
+            .catch(handleResponse);
+    }
 
     useEffect(fetchData, [setServerStatus]);
 

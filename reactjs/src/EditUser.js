@@ -9,6 +9,7 @@ import {put, post, get, useAuthHeader} from './BasicAuth.js';
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import {UserContext} from "./UserContext";
+import useError from "./useError";
 
 function EditUser({history, match}) {
 
@@ -20,8 +21,14 @@ function EditUser({history, match}) {
     const userContext = useContext(UserContext);
 
     const headers = useAuthHeader();
+    const { addError } = useError();
 
-    const loadUserPromise = get(userEndpoint, headers);
+    const loadUserPromise = get(userEndpoint, headers)
+        .catch(error => addError("Trouble loading user: " + error.message));
+
+
+    // TODO use a different error display if it's a version mismatch vs server error
+    // (e.g. there could be a constraint violation and we don't want to exit this component for that)
 
     const [toast, setToast] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
@@ -29,37 +36,22 @@ function EditUser({history, match}) {
 
     const onSave = (userData) => {
         put(userEndpoint, userData, headers)
-            .then(result => {
-                if(result.status !== 200) {
-                    console.log("ERROR SAVING USER");
-                    console.log(result);
-                    setSaveSuccess(false);
-                    setToast(true);
-                }
-                else {
-                    history.goBack();
-                }
-            });
+            .then(result => history.goBack() )
+            .catch(error => addError("Trouble saving user: " + error.message));
     }
 
     const onResetPassword = (plainTextPassword) => {
         post(updatePasswordEndpoint, plainTextPassword, headers)
             .then(result => {
-                if(result.status !== 200) {
-                    console.log("ERROR SAVING PASSWORD");
-                    console.log(result);
-                    setSaveSuccess(false);
-                    setToast(true);
+                const user = userContext.getCurrentUser();
+                if(user.username === username) {
+                    const updatedUser = {...user, password: plainTextPassword}
+                    userContext.setCurrentUser(updatedUser);
                 }
-                else {
-                    const user = userContext.getCurrentUser();
-                    if(user.username === username) {
-                        const updatedUser = {...user, password: plainTextPassword}
-                        userContext.setCurrentUser(updatedUser);
-                    }
-                    setShowResetPassword(false);
-                }
-            });
+                setShowResetPassword(false);
+            })
+            .catch(error => addError("Trouble Resetting password: " + error.message));
+        ;
     }
 
     // onClose={toggleSuccessToast}

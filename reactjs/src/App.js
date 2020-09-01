@@ -12,20 +12,27 @@ import UserList from './UserList.js';
 import About from './About.js';
 import EditUser from './EditUser.js';
 import Login from './Login.js';
+import ErrorBoundary from './ErrorBoundary.js';
+
 
 import {UserProvider, UserContext} from './UserContext.js';
+import {ErrorProvider} from './ErrorContext.js';
+import ErrorModal from "./ErrorModal";
 
 function App() {
 
-    console.log('rendering App');
-
     return (
         <div className="App">
-            <UserProvider>
-                <UserContext.Consumer>
-                    { value => value.getCurrentUser().isLoggedIn ? <AuthenticatedApp /> : <UnauthenticatedApp /> }
-                </UserContext.Consumer>
-            </UserProvider>
+            <ErrorBoundary>
+                <ErrorProvider>
+                    <ErrorModal />
+                    <UserProvider>
+                        <UserContext.Consumer>
+                            { value => value.getCurrentUser().isLoggedIn ? <AuthenticatedApp /> : <UnauthenticatedApp /> }
+                        </UserContext.Consumer>
+                    </UserProvider>
+                </ErrorProvider>
+            </ErrorBoundary>
         </div>
     );
 }

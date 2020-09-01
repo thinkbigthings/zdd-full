@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -11,10 +11,10 @@ import Col          from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
-import ErrorModal from "./ErrorModal";
-import ResetPasswordModal from "./ResetPasswordModal";
+import useError from "./useError";
+import {Jumbotron} from "react-bootstrap";
 
-const blankPage = {
+const initialPage = {
     content: [],
     first: true,
     last: true,
@@ -29,9 +29,25 @@ const blankPage = {
 
 function UserList() {
 
-    const [userPage, setUserPage] = useState(blankPage);
+    const [userPage, setUserPage] = useState(initialPage);
     const [showCreateUser, setShowCreateUser] = useState(false);
-    const [showErrorModal, setShowErrorModal] = useState(false);
+
+    const {error, addError } = useError();
+    const headers = useAuthHeader();
+
+    let fetchRecentUsers = (pageable) => {
+        get('/user?' + pageQuery(pageable), headers)
+            .then(page => setUserPage(page))
+            .catch(error => addError("Trouble fetching users: " + error.message));
+    };
+
+
+    const onSave = (userData) => {
+        setShowCreateUser(false);
+        post('/user', userData, headers)
+            .then(result => fetchRecentUsers(initialPage.pageable))
+            .catch(error => addError("Trouble saving user: " + error.message));
+    }
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -43,42 +59,11 @@ function UserList() {
         fetchRecentUsers(pageable);
     }
 
-    const headers = useAuthHeader();
-
-    let fetchRecentUsers = (pageable) => {
-        get('/user?' + pageQuery(pageable), headers)
-            .then(page => setUserPage(page))
-            .catch(error => {
-                console.log(error);
-                setShowErrorModal(true)
-            });
-    };
-
     // useEffect didn't seem to like this being defined inline
     let getCurrentList = () => {
         fetchRecentUsers(userPage.pageable);
     }
 
-    const onSave = (userData) => {
-
-        // TODO could pass in success/failure callbacks?
-        // then fetch/post would work more similarly
-        // and we could share the toast around
-
-        setShowCreateUser(false);
-
-        post('/user', userData, headers)
-            .then(result => {
-                console.log(result);
-                if(result.status !== 200) {
-                    console.log(result);
-                    // setSaveError(true);
-                }
-                else {
-                    fetchRecentUsers(blankPage.pageable);
-                }
-            });
-    }
 
     // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
     useEffect(getCurrentList, [setUserPage]);
@@ -89,9 +74,21 @@ function UserList() {
     const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
 
+    // if(error.hasError) {
+    //     return (
+    //         <>
+    //             <Jumbotron>
+    //                 <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
+    //                 <span className="sr-only">Loading...</span>
+    //             </Jumbotron>
+    //
+    //         </>
+    //     );
+    // }
+
+
     return (
         <>
-            <ErrorModal show={showErrorModal} onHide={() => setShowErrorModal(false)}/>
 
             <div className="container mt-3">
                 <h1>User Management</h1>
