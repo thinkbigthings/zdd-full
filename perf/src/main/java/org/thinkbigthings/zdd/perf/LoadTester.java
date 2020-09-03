@@ -3,16 +3,13 @@ package org.thinkbigthings.zdd.perf;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
-import org.thinkbigthings.zdd.dto.AddressDTO;
-import org.thinkbigthings.zdd.dto.UserDTO;
+import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.UserRecord;
 
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -117,31 +114,31 @@ public class LoadTester {
     }
 
     private void doInserts() {
-        range(0, 1000).forEach(i -> adminClient.post(users, createRandomUser()));
+        range(0, 1000).forEach(i -> adminClient.post(users, createRandomUserRecord()));
     }
 
     private void doCRUD() {
 
-        UserDTO user = createRandomUser();
+        UserRecord user = createRandomUserRecord();
         adminClient.post(users, user);
 
-        URI userUrl = URI.create(users.toString() + "/" + user.username);
-        URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username + "/password/update");
+        URI userUrl = URI.create(users.toString() + "/" + user.username());
+        URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username() + "/password/update");
 
-        UserDTO userData = adminClient.get(userUrl, UserDTO.class);
+        UserRecord userData = adminClient.get(userUrl, UserRecord.class);
 
         // test user with own credentials
-        ApiClient userClient = new ApiClient(user.username, user.plainTextPassword);
-        userClient.get(userUrl, UserDTO.class);
+        ApiClient userClient = new ApiClient(user.username(), user.plainTextPassword());
+        userClient.get(userUrl, UserRecord.class);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
-        userClient = new ApiClient(user.username, newPassword);
+        userClient = new ApiClient(user.username(), newPassword);
 
-        updateUserEditableData(userData);
+        userData = updateUserEditableRecord(userData);
         userClient.put(userUrl, userData);
 
-        UserDTO updatedUser = adminClient.get(userUrl, UserDTO.class);
+        UserRecord updatedUser = adminClient.get(userUrl, UserRecord.class);
 
         if( ! userData.equals(updatedUser)) {
             String message = "user updates were not all persisted: " + userData + " vs " + updatedUser;
@@ -155,34 +152,47 @@ public class LoadTester {
         String page = adminClient.get(users);
     }
 
-    private void updateUserEditableData(UserDTO user) {
-        user.displayName = faker.name().name();
-        user.phoneNumber = faker.phoneNumber().phoneNumber();
-        user.heightCm = 150 + random.nextInt(40);
-        user.email = faker.internet().emailAddress();
-        user.addresses.add(randomAddress());
+    private UserRecord updateUserEditableRecord(UserRecord user) {
+
+        Set<AddressRecord> addresses = user.addresses();
+        addresses.add(randomAddressRecord());
+
+        return new UserRecord(user.username(),
+                                 user.plainTextPassword(),
+                                 user.registrationTime(),
+                                 faker.internet().emailAddress(),
+                                 faker.name().name(),
+                                 faker.phoneNumber().phoneNumber(),
+                        random.nextInt(40) + 150,
+                                 addresses,
+                                 user.roles());
+
     }
 
-    private UserDTO createRandomUser() {
+    private UserRecord createRandomUserRecord() {
 
-        UserDTO newUser = new UserDTO();
-        newUser.username = "user-" + randomUUID();
-        newUser.plainTextPassword = "password";
-        updateUserEditableData(newUser);
+        UserRecord newUser = new UserRecord("user-" + randomUUID(),
+                "password",
+                "",
+                "",
+                "",
+                "",
+                0,
+                new HashSet<>(),
+                new HashSet<>()
+        );
+
+        newUser = updateUserEditableRecord(newUser);
         return newUser;
     }
 
-    private AddressDTO randomAddress() {
+    private AddressRecord randomAddressRecord() {
 
-        AddressDTO address = new AddressDTO();
-
-        Address randomAddress = faker.address();
-        address.line1 = randomAddress.streetAddress();
-        address.city = randomAddress.city();
-        address.state = randomAddress.state();
-        address.zip = randomAddress.zipCode();
-
-        return address;
+        Address fakerAddress = faker.address();
+        return new AddressRecord(fakerAddress.streetAddress(),
+                fakerAddress.city(),
+                fakerAddress.state(),
+                fakerAddress.zipCode());
     }
 
 }
