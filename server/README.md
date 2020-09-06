@@ -144,6 +144,11 @@ Base URL is at https://localhost:9000/index.html
 Static content (built JS, etc) should go into src/main/resources/static
 
 
+# Managing dependencies
+
+../gradlew dependencies
+.core:jackson-databind:2.10.3 -> 2.11.2 (*)
++--- com.fasterxml.jackson.core:jackson-core:2.11.2 (n)
 
 
 ## Cloud (Heroku)

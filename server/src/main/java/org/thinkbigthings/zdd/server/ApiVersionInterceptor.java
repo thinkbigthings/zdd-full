@@ -1,7 +1,6 @@
 package org.thinkbigthings.zdd.server;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +34,7 @@ public class ApiVersionInterceptor extends HandlerInterceptorAdapter {
      * Else, DispatcherServlet assumes that this interceptor has already dealt with the response itself.
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws HttpMediaTypeNotAcceptableException {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         response.setHeader(API_VERSION, apiVersion);
 

@@ -2,7 +2,6 @@ package org.thinkbigthings.zdd.perf;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.thinkbigthings.zdd.dto.UserDTO;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -61,11 +60,11 @@ public class ApiClient {
         }
     }
 
-    public void put(URI uri, UserDTO newUser) {
+    public void put(URI uri, Object body) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .PUT(publisher(newUser))
+                .PUT(publisher(body))
                 .setHeader(JSON_CONTENT.name(), JSON_CONTENT.value())
                 .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
                 .build();

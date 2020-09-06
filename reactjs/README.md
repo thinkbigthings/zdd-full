@@ -25,7 +25,7 @@ such as catching non-200 http responses when fetching data, and displaying an ap
 
 ## Upgrade Dependencies
 
-Run `npm update` and `npm audit fix` from this folder to automatically update dependency versions.
+Run `npm update` and `npm audit fix` from the project folder to automatically update dependency versions.
 
 ## Available Scripts
 
