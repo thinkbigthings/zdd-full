@@ -8,6 +8,11 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,24 +35,20 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testRecords() {
+    public void testRecordSerialization() throws Exception {
 
         UserRecord user = new UserRecord("a", "b", null,
                 "a@b", "asdf", "1234", 99,
                 new HashSet<>(), new HashSet<>());
 
-        String s = user.toString();
+        String serializedRecord = Paths.get("build", "serial.data").toString();
+        try(var oos = new ObjectOutputStream(new FileOutputStream(serializedRecord))) {
+            oos.writeObject(user);
+        }
+        try(var ois = new ObjectInputStream(new FileInputStream(serializedRecord))) {
+            System.out.println(ois.readObject());
+        }
 
-        String name = "newuserhere";
-
-//        UserDTO newUser = new UserDTO();
-//
-//        newUser.username = name;
-//        newUser.email = name + "@email.com";
-//
-//        UserDTO created = service.saveNewUser(newUser);
-//
-//        assertEquals(name, created.username);
     }
 
     @Test

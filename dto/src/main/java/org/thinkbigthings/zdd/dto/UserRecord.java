@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +15,7 @@ public record UserRecord(@JsonProperty("username") String username,
                         @JsonProperty("phoneNumber") String phoneNumber,
                         @JsonProperty("heightCm") int heightCm,
                         @JsonProperty("addresses") Set<AddressRecord> addresses,
-                        @JsonProperty("roles") Set<String> roles) {
+                        @JsonProperty("roles") Set<String> roles) implements Serializable {
 
 
 
