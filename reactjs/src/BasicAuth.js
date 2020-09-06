@@ -9,6 +9,8 @@ const { REACT_APP_API_VERSION } = process.env;
 
 const httpStatusFilter = function(httpResponse) {
 
+    const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
+
     if(httpResponse.status !== 200) {
         console.log('Received ' + httpResponse);
     }
@@ -23,7 +25,8 @@ const httpStatusFilter = function(httpResponse) {
         throw Error(message + " ... " + userAction);
     }
 
-    else if(httpResponse.headers.get(VERSION_HEADER) !== REACT_APP_API_VERSION) {
+    if(serverApiVersion !== null && serverApiVersion !== REACT_APP_API_VERSION)
+    {
         const serverApi = httpResponse.headers.get(VERSION_HEADER);
         const clientApi= REACT_APP_API_VERSION;
         const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
