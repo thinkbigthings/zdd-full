@@ -9,7 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import static java.util.Optional.ofNullable;
 
 /**
- * This adds a Version header all requests including for static resources.
+ * This adds a Version header requests an the API and for static resources.
+ *
+ * However Interceptors are not called on requests to actuator endpoints.
+ * To intercept those you'd need to do more configuration work or use a Filter.
+ * https://github.com/spring-projects/spring-boot/issues/11234
+ *
  * If during development the UI is being served by a UI dev environment (e.g. npm start, Express)
  * then you won't see that header in requests for static resources.
  */
