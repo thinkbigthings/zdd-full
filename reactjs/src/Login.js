@@ -1,8 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import Button from "react-bootstrap/Button";
 
-import {UserContext} from './UserContext.js';
 import {fetchWithCreds} from './BasicAuth.js';
+import useCurrentUser from "./useCurrentUser";
 
 
 // login needs to be a component in the router for history to be passed here
@@ -12,8 +12,7 @@ function Login({history}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    // context shared from the top level
-    const userContext = useContext(UserContext);
+    const {onLogin} = useCurrentUser();
 
     // call the callback function if the enter key was pressed in the event
     function callOnEnter(event, callback) {
@@ -22,7 +21,7 @@ function Login({history}) {
         }
     }
 
-    const onLogin = () => {
+    const onClickLogin = () => {
 
         const credentials = {
             username: username,
@@ -35,7 +34,8 @@ function Login({history}) {
         fetchWithCreds(userUrl, credentials)
             .then(retrievedUser => {
                 const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
-                userContext.setCurrentUser(loggedInUser);
+                // userContext.setCurrentUser(loggedInUser);
+                onLogin(loggedInUser);
                 history.push("/");
             });
     }
@@ -57,11 +57,11 @@ function Login({history}) {
                     <input type="text" className="form-control" id="inputPassword" placeholder="Password"
                            value={password}
                            onChange={e => setPassword(e.target.value) }
-                           onKeyPress={e => callOnEnter(e, onLogin) }
+                           onKeyPress={e => callOnEnter(e, onClickLogin) }
                     />
                 </div>
 
-                <Button variant="success" onClick={() => onLogin() }>Login</Button>
+                <Button variant="success" onClick={() => onClickLogin() }>Login</Button>
             </form>
 
         </div>
