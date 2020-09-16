@@ -1,6 +1,5 @@
-import {useContext} from 'react';
 
-import {UserContext} from './UserContext.js';
+import useCurrentUser from "./useCurrentUser";
 
 const VERSION_HEADER = 'X-Version';
 
@@ -50,14 +49,13 @@ function basicAuthHeader(username, password) {
 
 function useAuthHeader() {
 
-    // context shared from the top level
-    const userContext = useContext(UserContext);
-    const user = userContext.getCurrentUser();
-    if( ! user.isLoggedIn) {
+    const {currentUser} = useCurrentUser();
+
+    if( ! currentUser.isLoggedIn) {
         throw new Error("user is not logged in");
     }
 
-    return basicAuthHeader(user.username, user.password);
+    return basicAuthHeader(currentUser.username, currentUser.password);
 }
 
 function put(url, userData, requestHeaders) {

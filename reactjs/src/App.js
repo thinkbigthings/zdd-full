@@ -14,10 +14,10 @@ import EditUser from './EditUser.js';
 import Login from './Login.js';
 import ErrorBoundary from './ErrorBoundary.js';
 
-
-import {UserProvider, UserContext} from './UserContext.js';
 import {ErrorProvider} from './ErrorContext.js';
 import ErrorModal from "./ErrorModal";
+import useCurrentUser from "./useCurrentUser";
+import {CurrentUserContext, CurrentUserProvider} from "./CurrentUserContext";
 
 function App() {
 
@@ -26,11 +26,11 @@ function App() {
             <ErrorBoundary>
                 <ErrorProvider>
                     <ErrorModal />
-                    <UserProvider>
-                        <UserContext.Consumer>
-                            { value => value.getCurrentUser().isLoggedIn ? <AuthenticatedApp /> : <UnauthenticatedApp /> }
-                        </UserContext.Consumer>
-                    </UserProvider>
+                    <CurrentUserProvider>
+                        <CurrentUserContext.Consumer>
+                            { value => value[0].isLoggedIn ? <AuthenticatedApp /> : <UnauthenticatedApp /> }
+                        </CurrentUserContext.Consumer>
+                    </CurrentUserProvider>
                 </ErrorProvider>
             </ErrorBoundary>
         </div>
@@ -54,12 +54,11 @@ function UnauthenticatedApp() {
 
 function AuthenticatedApp() {
 
-    const userContext = useContext(UserContext);
-    const user = userContext.getCurrentUser();
+    const {currentUser, hasAdmin, onLogout} = useCurrentUser();
 
-    const userUrl = "#/users/"+user.username+"/edit";
+    const userUrl = "#/users/"+currentUser.username+"/edit";
 
-    if(userContext.hasAdmin()) {
+    if(hasAdmin()) {
         return (
             <HashRouter>
                 <NavBar bg="dark" variant="dark">
@@ -71,7 +70,7 @@ function AuthenticatedApp() {
                         <Nav.Link href="#about">About</Nav.Link>
                     </Nav>
                     <Form inline>
-                        <Nav.Link onClick={userContext.clearCurrentUser}>Logout</Nav.Link>
+                        <Nav.Link onClick={onLogout}>Logout</Nav.Link>
                     </Form>
                 </NavBar>
                 <Route exact path="/" render={() => <Home/>}/>
@@ -92,7 +91,7 @@ function AuthenticatedApp() {
                         <Nav.Link href={userUrl}>Profile</Nav.Link>
                     </Nav>
                     <Form inline>
-                        <Nav.Link onClick={userContext.clearCurrentUser}>Logout</Nav.Link>
+                        <Nav.Link onClick={onLogout}>Logout</Nav.Link>
                     </Form>
                 </NavBar>
                 <Route exact path="/" render={() => <Home/>}/>
