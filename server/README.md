@@ -6,7 +6,7 @@ This is a project to illustrate zero downtime deployments.
 
 Software that needs to be installed:
 
-* Java 14
+* Java 15
 * PostgreSQL 11 (via docker, see below)
 * Gradle (via gradle wrapper, see below)
 
@@ -146,9 +146,21 @@ Static content (built JS, etc) should go into src/main/resources/static
 
 # Managing dependencies
 
-../gradlew dependencies
-.core:jackson-databind:2.10.3 -> 2.11.2 (*)
-+--- com.fasterxml.jackson.core:jackson-core:2.11.2 (n)
+From this project, use `../gradlew dependencies`
+
+To upgrade versions of Java in general:
+
+- Set the project base build.gradle's sourceCompatibility
+- Update the README that references Java version
+
+To upgrade versions of Java in IntelliJ:
+
+- I think you need to add the SDK in Module Settings -> Platform Settings -> SDK
+  But see if updating Build Tools below works first
+- Click "IntelliJ IDEA" -> Preferences -> Build, Execution, Deployment -> Build Tools -> Gradle
+  and set Gradle JVM to the new version
+- Might need to right click the project and go to module settings to set it there too?
+- You'll also need to edit the version in any Run Configurations
 
 
 ## Cloud (Heroku)
