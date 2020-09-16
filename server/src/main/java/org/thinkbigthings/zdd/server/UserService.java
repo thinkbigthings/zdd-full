@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
+import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
 import javax.persistence.EntityNotFoundException;
@@ -65,6 +67,34 @@ public class UserService {
             return toRecord(userRepo.save(user));
         }
         catch(ConstraintViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public UserRecord saveNewUser(RegistrationRequest registration) {
+
+        String username = registration.username();
+
+        if( ! URLEncoder.encode(username, UTF_8).equals(username)) {
+            throw new IllegalArgumentException("Username must be url-safe");
+        }
+
+        if(userRepo.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username already exists " + registration.username());
+        }
+
+        var user = fromRecord(username, registration.personalInfo());
+        user.setRegistrationTime(Instant.now());
+        user.setEnabled(true);
+        user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
+        user.getRoles().add(User.Role.USER);
+
+        try {
+            return toRecord(userRepo.save(user));
+        }
+        catch(ConstraintViolationException e) {
+            e.getConstraintViolations().forEach(System.out::println);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
         }
     }
@@ -134,6 +164,22 @@ public class UserService {
                 address.getCity(),
                 address.getState(),
                 address.getZip());
+    }
+
+    public User fromRecord(String username, PersonalInfo userData) {
+
+        var user = new User(username, userData.displayName());
+
+        user.setEmail(userData.email());
+        user.setPhoneNumber(userData.phoneNumber());
+        user.setHeightCm(userData.heightCm());
+
+        userData.addresses().stream()
+                .map(this::fromRecord)
+                .peek(a -> a.setUser(user))
+                .collect(toCollection(() -> user.getAddresses()));
+
+        return user;
     }
 
     public User fromRecord(UserRecord userData) {
