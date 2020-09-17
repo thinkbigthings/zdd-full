@@ -6,6 +6,7 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
 import java.io.FileInputStream;
@@ -37,7 +38,7 @@ public class UserServiceTest {
     @Test
     public void testRecordSerialization() throws Exception {
 
-        UserRecord user = new UserRecord("a", "b", null,
+        UserRecord user = new UserRecord("a", null,
                 "a@b", "asdf", "1234", 99,
                 new HashSet<>(), new HashSet<>());
 
@@ -56,10 +57,9 @@ public class UserServiceTest {
 
         String name = "newuserhere";
 
-        UserRecord newUser = new UserRecord(name, "b", null
-                , name + "@email.com", "asdf", "1234", 99, new HashSet<>(), new HashSet<>());
+        RegistrationRequest register = new RegistrationRequest(name, "b", "name@email.com");
 
-        UserRecord created = service.saveNewUser(newUser);
+        UserRecord created = service.saveNewUser(register);
 
         assertEquals(name, created.username());
     }
@@ -69,11 +69,9 @@ public class UserServiceTest {
 
         String name = "first last";
 
-        UserRecord newUser = new UserRecord(name, "b", null,
-                name + "@email.com", "asdf", "1234", 99,
-                new HashSet<>(), new HashSet<>());
+        RegistrationRequest register = new RegistrationRequest(name, "b", "name@email.com");
 
-        assertThrows(IllegalArgumentException.class, () -> service.saveNewUser(newUser));
+        assertThrows(IllegalArgumentException.class, () -> service.saveNewUser(register));
     }
 
 }

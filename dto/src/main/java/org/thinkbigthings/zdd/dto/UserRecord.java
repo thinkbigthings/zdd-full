@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public record UserRecord(@JsonProperty("username") String username,
-                        @JsonProperty("plainTextPassword") String plainTextPassword,
                         @JsonProperty("registrationTime") String registrationTime,
                         @JsonProperty("email") String email,
                         @JsonProperty("displayName") String displayName,

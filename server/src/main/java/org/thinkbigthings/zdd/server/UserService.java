@@ -84,36 +84,10 @@ public class UserService {
             throw new IllegalArgumentException("Username already exists " + registration.username());
         }
 
-        var user = fromRecord(username, registration.personalInfo());
+        var user = fromRegistration(registration);
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
-        user.getRoles().add(User.Role.USER);
-
-        try {
-            return toRecord(userRepo.save(user));
-        }
-        catch(ConstraintViolationException e) {
-            e.getConstraintViolations().forEach(System.out::println);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public UserRecord saveNewUser(UserRecord userRecord) {
-
-        if( ! URLEncoder.encode(userRecord.username(), UTF_8).equals(userRecord.username())) {
-            throw new IllegalArgumentException("Username must be url-safe");
-        }
-
-        if(userRepo.existsByUsername(userRecord.username())) {
-            throw new IllegalArgumentException("Username already exists " + userRecord.username());
-        }
-
-        var user = fromRecord(userRecord);
-        user.setRegistrationTime(Instant.now());
-        user.setEnabled(true);
-        user.setPassword(passwordEncoder.encode(userRecord.plainTextPassword()));
         user.getRoles().add(User.Role.USER);
 
         try {
@@ -149,7 +123,6 @@ public class UserService {
                 .collect(toSet());
 
         return new UserRecord( user.getUsername(),
-                "",
                 user.getRegistrationTime().toString(),
                 user.getEmail(),
                 user.getDisplayName(),
@@ -166,34 +139,14 @@ public class UserService {
                 address.getZip());
     }
 
-    public User fromRecord(String username, PersonalInfo userData) {
+    public User fromRegistration(RegistrationRequest registration) {
 
-        var user = new User(username, userData.displayName());
+        var user = new User(registration.username(), registration.username());
 
-        user.setEmail(userData.email());
-        user.setPhoneNumber(userData.phoneNumber());
-        user.setHeightCm(userData.heightCm());
-
-        userData.addresses().stream()
-                .map(this::fromRecord)
-                .peek(a -> a.setUser(user))
-                .collect(toCollection(() -> user.getAddresses()));
-
-        return user;
-    }
-
-    public User fromRecord(UserRecord userData) {
-
-        var user = new User(userData.username(), userData.displayName());
-
-        user.setEmail(userData.email());
-        user.setPhoneNumber(userData.phoneNumber());
-        user.setHeightCm(userData.heightCm());
-
-        userData.addresses().stream()
-                .map(this::fromRecord)
-                .peek(a -> a.setUser(user))
-                .collect(toCollection(() -> user.getAddresses()));
+        user.setDisplayName(registration.username());
+        user.setEmail(registration.email());
+        user.setPhoneNumber("");
+        user.setHeightCm(0);
 
         return user;
     }

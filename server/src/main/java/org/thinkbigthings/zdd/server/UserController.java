@@ -39,14 +39,14 @@ public class UserController {
         return service.saveNewUser(newUser);
     }
 
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public UserRecord createUser(@RequestBody UserRecord newUser) {
-
-        return service.saveNewUser(newUser);
-    }
+//
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public UserRecord createUser(@RequestBody UserRecord newUser) {
+//
+//        return service.saveNewUser(newUser);
+//    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
     @RequestMapping(value="/user/{username}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

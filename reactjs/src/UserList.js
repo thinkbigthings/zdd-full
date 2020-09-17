@@ -41,10 +41,15 @@ function UserList() {
             .catch(error => addError("Trouble fetching users: " + error.message));
     };
 
-
-    const onSave = (userData) => {
+    const onCreate = (userData) => {
         setShowCreateUser(false);
-        post('/user', userData, headers)
+
+        const registrationRequest = {
+            username: userData.username,
+            plainTextPassword: userData.password,
+            email: userData.email
+        }
+        post('/registration', registrationRequest, headers)
             .then(result => fetchRecentUsers(initialPage.pageable))
             .catch(error => addError("Trouble saving user: " + error.message));
     }
@@ -94,7 +99,7 @@ function UserList() {
                 <h1>User Management</h1>
 
                 <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
-                <CreateUserModal show={showCreateUser} onConfirm={onSave} onHide={() => setShowCreateUser(false)} />
+                <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
 
                 <Container className="container mt-3">
                     {userPage.content.map(user =>

@@ -165,7 +165,6 @@ public class LoadTester {
         addresses.add(randomAddressRecord());
 
         return new UserRecord(user.username(),
-                                 user.plainTextPassword(),
                                  user.registrationTime(),
                                  faker.internet().emailAddress(),
                                  faker.name().name(),
@@ -191,7 +190,7 @@ public class LoadTester {
         String password = "password";
         PersonalInfo info = randomPersonalInfo();
 
-        return new RegistrationRequest(username, password, info);
+        return new RegistrationRequest(username, password, info.email());
     }
 
     private AddressRecord randomAddressRecord() {
