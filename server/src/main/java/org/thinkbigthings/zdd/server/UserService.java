@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
-import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
@@ -84,14 +83,8 @@ public class UserService {
             throw new IllegalArgumentException("Username already exists " + registration.username());
         }
 
-        var user = fromRegistration(registration);
-        user.setRegistrationTime(Instant.now());
-        user.setEnabled(true);
-        user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
-        user.getRoles().add(User.Role.USER);
-
         try {
-            return toRecord(userRepo.save(user));
+            return toRecord(userRepo.save(fromRegistration(registration)));
         }
         catch(ConstraintViolationException e) {
             e.getConstraintViolations().forEach(System.out::println);
@@ -145,8 +138,10 @@ public class UserService {
 
         user.setDisplayName(registration.username());
         user.setEmail(registration.email());
-        user.setPhoneNumber("");
-        user.setHeightCm(0);
+        user.setRegistrationTime(Instant.now());
+        user.setEnabled(true);
+        user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
+        user.getRoles().add(User.Role.USER);
 
         return user;
     }
