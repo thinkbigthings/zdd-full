@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
 @RestController
@@ -28,13 +29,24 @@ public class UserController {
 
         return service.getUsers(page);
     }
+
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UserRecord createUser(@RequestBody UserRecord newUser) {
+    public UserRecord createUserRegistration(@RequestBody RegistrationRequest newUser) {
 
         return service.saveNewUser(newUser);
     }
+
+//
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+//    @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public UserRecord createUser(@RequestBody UserRecord newUser) {
+//
+//        return service.saveNewUser(newUser);
+//    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
     @RequestMapping(value="/user/{username}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

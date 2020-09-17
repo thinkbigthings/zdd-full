@@ -22,6 +22,11 @@ such as calling an undefined method at render time. It doesn't catch everything 
 In general we should favor catching errors at the point we know where an error could occur
 such as catching non-200 http responses when fetching data, and displaying an appropriate notification there.
 
+## Debugging
+
+IntelliJ supports debugging JS in the IDE. 
+You use a JavaScript Debug configuration (not Debug on NPM Start)
+See the IDE help for more details.
 
 ## Upgrade Dependencies
 

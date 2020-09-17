@@ -231,4 +231,4 @@ function UserForm(props) {
     );
 }
 
-export {UserForm, blankUser};
+export {UserForm};

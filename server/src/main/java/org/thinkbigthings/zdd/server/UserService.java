@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
 import javax.persistence.EntityNotFoundException;
@@ -70,24 +71,20 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord saveNewUser(UserRecord userRecord) {
+    public UserRecord saveNewUser(RegistrationRequest registration) {
 
-        if( ! URLEncoder.encode(userRecord.username(), UTF_8).equals(userRecord.username())) {
+        String username = registration.username();
+
+        if( ! URLEncoder.encode(username, UTF_8).equals(username)) {
             throw new IllegalArgumentException("Username must be url-safe");
         }
 
-        if(userRepo.existsByUsername(userRecord.username())) {
-            throw new IllegalArgumentException("Username already exists " + userRecord.username());
+        if(userRepo.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username already exists " + registration.username());
         }
 
-        var user = fromRecord(userRecord);
-        user.setRegistrationTime(Instant.now());
-        user.setEnabled(true);
-        user.setPassword(passwordEncoder.encode(userRecord.plainTextPassword()));
-        user.getRoles().add(User.Role.USER);
-
         try {
-            return toRecord(userRepo.save(user));
+            return toRecord(userRepo.save(fromRegistration(registration)));
         }
         catch(ConstraintViolationException e) {
             e.getConstraintViolations().forEach(System.out::println);
@@ -119,7 +116,6 @@ public class UserService {
                 .collect(toSet());
 
         return new UserRecord( user.getUsername(),
-                "",
                 user.getRegistrationTime().toString(),
                 user.getEmail(),
                 user.getDisplayName(),
@@ -136,18 +132,16 @@ public class UserService {
                 address.getZip());
     }
 
-    public User fromRecord(UserRecord userData) {
+    public User fromRegistration(RegistrationRequest registration) {
 
-        var user = new User(userData.username(), userData.displayName());
+        var user = new User(registration.username(), registration.username());
 
-        user.setEmail(userData.email());
-        user.setPhoneNumber(userData.phoneNumber());
-        user.setHeightCm(userData.heightCm());
-
-        userData.addresses().stream()
-                .map(this::fromRecord)
-                .peek(a -> a.setUser(user))
-                .collect(toCollection(() -> user.getAddresses()));
+        user.setDisplayName(registration.username());
+        user.setEmail(registration.email());
+        user.setRegistrationTime(Instant.now());
+        user.setEnabled(true);
+        user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
+        user.getRoles().add(User.Role.USER);
 
         return user;
     }

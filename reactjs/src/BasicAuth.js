@@ -18,6 +18,12 @@ const httpStatusFilter = function(httpResponse) {
         console.log('TODO redirect to /login');
     }
 
+    if(httpResponse.status >= 400) {
+        const message = 'There was an input error';
+        const userAction = 'Try again';
+        throw Error(message + " ... " + userAction);
+    }
+
     if(httpResponse.status >= 500) {
         const message = 'There was a server error';
         const userAction = 'Try reloading the page';

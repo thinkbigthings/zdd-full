@@ -1,9 +1,12 @@
 package org.thinkbigthings.zdd.perf;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
+import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
 import java.net.URI;
@@ -29,6 +32,7 @@ public class LoadTester {
     private boolean insertOnly;
     private String baseUrl;
 
+    private URI registration;
     private URI users;
     private URI info;
     private URI health;
@@ -43,6 +47,7 @@ public class LoadTester {
 
         baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
+        registration = URI.create(baseUrl + "/registration");
         users = URI.create(baseUrl + "/user");
         info = URI.create(baseUrl + "/actuator/info");
         health = URI.create(baseUrl + "/actuator/health");
@@ -114,26 +119,28 @@ public class LoadTester {
     }
 
     private void doInserts() {
-        range(0, 1000).forEach(i -> adminClient.post(users, createRandomUserRecord()));
+        range(0, 1000).forEach(i -> adminClient.post(registration, createRandomUserRegistration()));
     }
 
     private void doCRUD() {
 
-        UserRecord user = createRandomUserRecord();
-        adminClient.post(users, user);
+        RegistrationRequest registrationRequest = createRandomUserRegistration();
+        adminClient.post(registration, registrationRequest);
+        String username = registrationRequest.username();
+        String password = registrationRequest.plainTextPassword();
 
-        URI userUrl = URI.create(users.toString() + "/" + user.username());
-        URI updatePasswordUrl = URI.create(users.toString() + "/" + user.username() + "/password/update");
+        URI userUrl = URI.create(users.toString() + "/" + username);
+        URI updatePasswordUrl = URI.create(users.toString() + "/" + username + "/password/update");
 
         UserRecord userData = adminClient.get(userUrl, UserRecord.class);
 
         // test user with own credentials
-        ApiClient userClient = new ApiClient(user.username(), user.plainTextPassword());
+        ApiClient userClient = new ApiClient(username, password, latency);
         userClient.get(userUrl, UserRecord.class);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
-        userClient = new ApiClient(user.username(), newPassword);
+        userClient = new ApiClient(username, newPassword);
 
         userData = updateUserEditableRecord(userData);
         userClient.put(userUrl, userData);
@@ -158,7 +165,6 @@ public class LoadTester {
         addresses.add(randomAddressRecord());
 
         return new UserRecord(user.username(),
-                                 user.plainTextPassword(),
                                  user.registrationTime(),
                                  faker.internet().emailAddress(),
                                  faker.name().name(),
@@ -166,24 +172,25 @@ public class LoadTester {
                         random.nextInt(40) + 150,
                                  addresses,
                                  user.roles());
-
     }
 
-    private UserRecord createRandomUserRecord() {
+    private PersonalInfo randomPersonalInfo() {
 
-        UserRecord newUser = new UserRecord("user-" + randomUUID(),
-                "password",
-                "",
-                "",
-                "",
-                "",
-                0,
-                new HashSet<>(),
-                new HashSet<>()
-        );
+        return new PersonalInfo(
+                faker.internet().emailAddress(),
+                faker.name().name(),
+                faker.phoneNumber().phoneNumber(),
+                random.nextInt(40) + 150,
+                Set.of(randomAddressRecord()));
+    }
 
-        newUser = updateUserEditableRecord(newUser);
-        return newUser;
+    private RegistrationRequest createRandomUserRegistration() {
+
+        String username = "user-" + randomUUID();
+        String password = "password";
+        PersonalInfo info = randomPersonalInfo();
+
+        return new RegistrationRequest(username, password, info.email());
     }
 
     private AddressRecord randomAddressRecord() {
