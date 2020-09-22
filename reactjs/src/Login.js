@@ -34,7 +34,6 @@ function Login({history}) {
         fetchWithCreds(userUrl, credentials)
             .then(retrievedUser => {
                 const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
-                // userContext.setCurrentUser(loggedInUser);
                 onLogin(loggedInUser);
                 history.push("/");
             });
