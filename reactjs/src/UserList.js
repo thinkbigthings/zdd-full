@@ -12,7 +12,7 @@ import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
 import useError from "./useError";
-import {Jumbotron} from "react-bootstrap";
+import useApi from "./useApi";
 
 const initialPage = {
     content: [],
@@ -29,16 +29,16 @@ const initialPage = {
 
 function UserList() {
 
-    const [userPage, setUserPage] = useState(initialPage);
     const [showCreateUser, setShowCreateUser] = useState(false);
 
-    const {error, addError } = useError();
+    const {error, addError} = useError();
     const headers = useAuthHeader();
 
+    const {setUrl, isLoading, hasError, fetchedData} = useApi('/user?page=0&size=10', initialPage);
+
+
     let fetchRecentUsers = (pageable) => {
-        get('/user?' + pageQuery(pageable), headers)
-            .then(page => setUserPage(page))
-            .catch(error => addError("Trouble fetching users: " + error.message));
+        setUrl('/user?' + pageQuery(pageable));
     };
 
     const onCreate = (userData) => {
@@ -59,41 +59,28 @@ function UserList() {
     }
 
     function movePage(amount) {
-        let pageable = copy(userPage.pageable);
+        let pageable = copy(fetchedData.pageable);
         pageable.pageNumber = pageable.pageNumber + amount;
         fetchRecentUsers(pageable);
     }
 
-    // useEffect didn't seem to like this being defined inline
-    let getCurrentList = () => {
-        fetchRecentUsers(userPage.pageable);
+    const styleFirst = fetchedData.first ? "disabled" : "";
+    const styleLast = fetchedData.last ? "disabled" : "";
+    const firstElementInPage = fetchedData.pageable.offset + 1;
+    const lastElementInPage = fetchedData.pageable.offset + fetchedData.numberOfElements;
+    const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
+
+    if(isLoading) {
+        return (
+            <>
+                    <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
+                    <span className="sr-only">Loading...</span>
+            </>
+        );
     }
-
-
-    // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
-    useEffect(getCurrentList, [setUserPage]);
-
-    const styleFirst = userPage.first ? "disabled" : "";
-    const styleLast = userPage.last ? "disabled" : "";
-    const firstElementInPage = userPage.pageable.offset + 1;
-    const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
-    const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
-
-    // if(error.hasError) {
-    //     return (
-    //         <>
-    //             <Jumbotron>
-    //                 <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
-    //                 <span className="sr-only">Loading...</span>
-    //             </Jumbotron>
-    //
-    //         </>
-    //     );
-    // }
-
-
     return (
         <>
+
 
             <div className="container mt-3">
                 <h1>User Management</h1>
@@ -102,7 +89,7 @@ function UserList() {
                 <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
 
                 <Container className="container mt-3">
-                    {userPage.content.map(user =>
+                    {fetchedData.content.map(user =>
                         <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
                             <Col >{user.displayName}</Col>
                             <Col xs={2}>
