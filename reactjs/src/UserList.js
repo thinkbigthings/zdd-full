@@ -7,10 +7,10 @@ import Button       from "react-bootstrap/Button";
 import Container    from 'react-bootstrap/Container';
 import Row          from 'react-bootstrap/Row';
 import Col          from 'react-bootstrap/Col';
-
-import Spinner      from 'react-bootstrap/Spinner';
-import Jumbotron from "react-bootstrap/Jumbotron";
-
+//
+// import Spinner      from 'react-bootstrap/Spinner';
+// import Jumbotron from "react-bootstrap/Jumbotron";
+//
 
 import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
@@ -38,7 +38,7 @@ function UserList() {
     const {error, addError} = useError();
     const headers = useAuthHeader();
 
-    const {setUrl, isLoading, hasError, fetchedData} = useApi('/user?page=0&size=10', initialPage);
+    const {setUrl, isLoading, hasError, fetchedData, isLongRequest} = useApi('/user?page=0&size=10', initialPage);
 
 
     let fetchRecentUsers = (pageable) => {
@@ -72,7 +72,14 @@ function UserList() {
     const lastElementInPage = fetchedData.pageable.offset + fetchedData.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
 
-    if(isLoading) {
+    if(isLoading && ! isLongRequest) {
+        console.log(isLoading + ' ' + isLongRequest);
+        return (
+            <div />
+         );
+    }
+
+    if(isLoading && isLongRequest) {
         return (
             <Container>
                 <Row className="text-center">
@@ -93,7 +100,6 @@ function UserList() {
     return (
         <>
 
-
             <div className="container mt-3">
                 <h1>User Management</h1>
 
@@ -101,30 +107,16 @@ function UserList() {
                 <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
 
                 <Container className="container mt-3">
-                    {
-                        isLoading ?                         <Spinner animation="border" role="status">
-                            <span className="sr-only">Loading asdf asf asdf sd...</span>
-                        </Spinner>
-                            : fetchedData.content.map(user =>
-                                <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
-                                    <Col >{user.displayName}</Col>
-                                    <Col xs={2}>
-                                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
-                                            <i className="mr-2 fas fa-user-edit" />Edit
-                                        </Link>
-                                    </Col>
-                                </Row>)
-                    }
-                    {/*{fetchedData.content.map(user =>*/}
-                    {/*    <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">*/}
-                    {/*        <Col >{user.displayName}</Col>*/}
-                    {/*        <Col xs={2}>*/}
-                    {/*            <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">*/}
-                    {/*                <i className="mr-2 fas fa-user-edit" />Edit*/}
-                    {/*            </Link>*/}
-                    {/*        </Col>*/}
-                    {/*    </Row>*/}
-                    {/*)}*/}
+                    {fetchedData.content.map(user =>
+                        <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
+                            <Col >{user.displayName}</Col>
+                            <Col xs={2}>
+                                <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
+                                    <i className="mr-2 fas fa-user-edit" />Edit
+                                </Link>
+                            </Col>
+                        </Row>
+                    )}
                 </Container>
 
                 <ButtonGroup className="mt-2">

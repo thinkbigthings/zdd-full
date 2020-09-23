@@ -74,19 +74,34 @@ const useApi = (initialUrl, initialData) => {
     const [hasError, setError] = useState(false);
     const [fetchedData, setFetchedData] = useState(initialData);
 
+    const[isLongRequest, setLongRequest] = useState(false);
+
     const requestHeaders = useAuthHeader();
+
+    const longLoadTimeMs = 1000;
+
+    let longLoadTimer = setTimeout(() => {}, longLoadTimeMs);
 
     useEffect(() => {
 
+        // the caller can choose to only show a spinner if it takes a long time
+        // otherwise it's a poor UX to flash a spinner for a fraction of a second
+        // let longLoadTimer = setTimeout(() => setLongRequest(isLoading), 500);
+
         const handleFetchResponse = response => {
+            clearTimeout(longLoadTimer);
             setError(!response.ok);
             setLoading(false);
+            setLongRequest(false);
             return response.ok && response.json ? response.json() : initialData;
         };
 
         // default is GET
         const fetchData = () => {
+            clearTimeout(longLoadTimer);
+            longLoadTimer = setTimeout(() => setLongRequest(true), longLoadTimeMs);
             setLoading(true);
+            setLongRequest(false);
             return fetch(url, { headers: requestHeaders })
                 .then(handleFetchResponse)
                 .catch(handleFetchResponse);
@@ -96,12 +111,19 @@ const useApi = (initialUrl, initialData) => {
             fetchData().then(data => setFetchedData(data));
         }
 
+        // // might need to set the cleanup function if any flags need to be reset for subsequent calls
+        // return () => {
+        //    // cleanup would go here...
+        // }
+
     }, [url]);
+
 
 
     return {
         setUrl,
         isLoading,
+        isLongRequest,
         hasError,
         fetchedData
     }
