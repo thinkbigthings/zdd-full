@@ -64,8 +64,6 @@ function UserList() {
         fetchRecentUsers(pageable);
     }
 
-    const styleFirst = fetchedData.first ? "disabled" : "";
-    const styleLast = fetchedData.last ? "disabled" : "";
     const firstElementInPage = fetchedData.pageable.offset + 1;
     const lastElementInPage = fetchedData.pageable.offset + fetchedData.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
@@ -102,11 +100,11 @@ function UserList() {
                 </Container>
 
                 <ButtonGroup className="mt-2">
-                    <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
+                    <Button variant="primary" disabled={fetchedData.first} className={"btn btn-primary "} onClick={ () => movePage(-1) }>
                         <i className="mr-2 fas fa-caret-left" />Previous
                     </Button>
                     <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
-                    <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
+                    <Button variant="primary" disabled={fetchedData.last} className={"btn btn-primary "} onClick={ () => movePage(1) }>
                         <i className="mr-2 fas fa-caret-right" />Next
                     </Button>
                 </ButtonGroup>
