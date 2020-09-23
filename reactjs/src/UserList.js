@@ -8,6 +8,10 @@ import Container    from 'react-bootstrap/Container';
 import Row          from 'react-bootstrap/Row';
 import Col          from 'react-bootstrap/Col';
 
+import Spinner      from 'react-bootstrap/Spinner';
+import Jumbotron from "react-bootstrap/Jumbotron";
+
+
 import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
@@ -70,12 +74,22 @@ function UserList() {
 
     if(isLoading) {
         return (
-            <>
-                    <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
-                    <span className="sr-only">Loading...</span>
-            </>
+            <Container>
+                <Row className="text-center">
+                    <Col xs="12" className="pt-5">
+                        {/*//         <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>*/}
+                        {/*//         <span className="sr-only">Loading...</span>*/}
+                        <div className="d-flex justify-content-center">
+                            <div className="spinner-border text-secondary" role="status">
+                                <span className="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+            </Container>
         );
     }
+
     return (
         <>
 
@@ -87,16 +101,30 @@ function UserList() {
                 <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
 
                 <Container className="container mt-3">
-                    {fetchedData.content.map(user =>
-                        <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
-                            <Col >{user.displayName}</Col>
-                            <Col xs={2}>
-                                <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
-                                    <i className="mr-2 fas fa-user-edit" />Edit
-                                </Link>
-                            </Col>
-                        </Row>
-                    )}
+                    {
+                        isLoading ?                         <Spinner animation="border" role="status">
+                            <span className="sr-only">Loading asdf asf asdf sd...</span>
+                        </Spinner>
+                            : fetchedData.content.map(user =>
+                                <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
+                                    <Col >{user.displayName}</Col>
+                                    <Col xs={2}>
+                                        <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
+                                            <i className="mr-2 fas fa-user-edit" />Edit
+                                        </Link>
+                                    </Col>
+                                </Row>)
+                    }
+                    {/*{fetchedData.content.map(user =>*/}
+                    {/*    <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">*/}
+                    {/*        <Col >{user.displayName}</Col>*/}
+                    {/*        <Col xs={2}>*/}
+                    {/*            <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">*/}
+                    {/*                <i className="mr-2 fas fa-user-edit" />Edit*/}
+                    {/*            </Link>*/}
+                    {/*        </Col>*/}
+                    {/*    </Row>*/}
+                    {/*)}*/}
                 </Container>
 
                 <ButtonGroup className="mt-2">
