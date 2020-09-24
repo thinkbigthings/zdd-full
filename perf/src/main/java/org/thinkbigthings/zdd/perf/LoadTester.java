@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.dto.User;
 
 import java.net.URI;
 import java.time.Duration;
@@ -133,7 +134,7 @@ public class LoadTester {
 
         // test user with own credentials
         ApiClient userClient = new ApiClient(username, password, latency);
-        userClient.get(infoUrl, PersonalInfo.class);
+        userClient.get(userUrl, User.class);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
@@ -142,7 +143,7 @@ public class LoadTester {
         var updatedInfo = randomPersonalInfo();
         userClient.put(infoUrl, updatedInfo);
 
-        PersonalInfo retrievedInfo = adminClient.get(infoUrl, PersonalInfo.class);
+        PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
 
         if( ! retrievedInfo.equals(updatedInfo)) {
             String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;

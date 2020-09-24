@@ -8,8 +8,8 @@ import Toast from "react-bootstrap/Toast";
 import {put, post, get, useAuthHeader} from './BasicAuth.js';
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import {UserContext} from "./UserContext";
 import useError from "./useError";
+import useCurrentUser from "./useCurrentUser";
 
 function EditUser({history, match}) {
 
@@ -19,7 +19,7 @@ function EditUser({history, match}) {
     const userInfoEndpoint = userEndpoint + '/personalInfo';
     const updatePasswordEndpoint = userEndpoint + '/password/update'
 
-    const userContext = useContext(UserContext);
+    const {currentUser, onLogin} = useCurrentUser();
 
     const headers = useAuthHeader();
     const { addError } = useError();
@@ -36,16 +36,6 @@ function EditUser({history, match}) {
     const [showResetPassword, setShowResetPassword] = useState(false);
 
     const onSave = (personalInfo) => {
-
-        // // rebuild because incoming object has extra info
-        // const personalInfo = {
-        //     email: userData.email,
-        //     displayName: userData.displayName,
-        //     phoneNumber: userData.phoneNumber,
-        //     heightCm: userData.heightCm,
-        //     addresses: userData.addresses,
-        // }
-
         put(userInfoEndpoint, personalInfo, headers)
             .then(result => history.goBack() )
             .catch(error => addError("Trouble saving user: " + error.message));
@@ -54,10 +44,8 @@ function EditUser({history, match}) {
     const onResetPassword = (plainTextPassword) => {
         post(updatePasswordEndpoint, plainTextPassword, headers)
             .then(result => {
-                const user = userContext.getCurrentUser();
-                if(user.username === username) {
-                    const updatedUser = {...user, password: plainTextPassword}
-                    userContext.setCurrentUser(updatedUser);
+                if(currentUser.username === username) {
+                    onLogin({...currentUser, password: plainTextPassword});
                 }
                 setShowResetPassword(false);
             })

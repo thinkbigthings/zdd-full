@@ -31,7 +31,6 @@ public class UserController {
         return service.getUsers(page);
     }
 
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -46,14 +45,6 @@ public class UserController {
     public User updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {
 
         return service.updateUser(username, userData);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
-    @RequestMapping(value="/user/{username}/personalInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public PersonalInfo getUserInfo(@PathVariable String username) {
-
-        return service.getUserInfo(username);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")

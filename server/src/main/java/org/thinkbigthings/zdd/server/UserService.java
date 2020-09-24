@@ -105,18 +105,10 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
-    @Transactional(readOnly = true)
-    public PersonalInfo getUserInfo(String username) {
-
-        return userRepo.findByUsername(username)
-                .map(this::toPersonalInfoRecord)
-                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
-    }
-
     public PersonalInfo toPersonalInfoRecord(User user) {
 
         Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toUserRecord)
+                .map(this::toAddressRecord)
                 .collect(toSet());
 
         return new PersonalInfo(user.getEmail(),
@@ -138,7 +130,7 @@ public class UserService {
                 toPersonalInfoRecord(user));
     }
 
-    public AddressRecord toUserRecord(Address address) {
+    public AddressRecord toAddressRecord(Address address) {
         return new AddressRecord(address.getLine1(),
                 address.getCity(),
                 address.getState(),
