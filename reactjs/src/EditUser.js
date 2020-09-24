@@ -15,15 +15,16 @@ function EditUser({history, match}) {
 
     const { params: { username } } = match;
 
-    const userInfoEndpoint = '/user/' + username + '/personalInfo';
-    const updatePasswordEndpoint = userInfoEndpoint + '/password/update'
+    const userEndpoint = '/user/' + username;
+    const userInfoEndpoint = userEndpoint + '/personalInfo';
+    const updatePasswordEndpoint = userEndpoint + '/password/update'
 
     const userContext = useContext(UserContext);
 
     const headers = useAuthHeader();
     const { addError } = useError();
 
-    const loadUserPromise = get(userInfoEndpoint, headers)
+    const loadUserPromise = get(userEndpoint, headers)
         .catch(error => addError("Trouble loading user: " + error.message));
 
 
