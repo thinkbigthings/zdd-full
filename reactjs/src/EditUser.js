@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 
-import {UserForm2} from './UserForm2.js';
+import {UserForm} from './UserForm.js';
 import ResetPasswordModal from "./ResetPasswordModal.js";
 
 import Toast from "react-bootstrap/Toast";
@@ -94,7 +94,7 @@ function EditUser({history, match}) {
             <ResetPasswordModal show={showResetPassword} onConfirm={onResetPassword} onHide={() => setShowResetPassword(false)} />
 
             <Container className="pl-0 pr-0">
-                <UserForm2 loadUserPromise={loadUserPromise} onSave={onSave} onCancel={history.goBack}/>
+                <UserForm loadUserPromise={loadUserPromise} onSave={onSave} onCancel={history.goBack}/>
             </Container>
         </div>
 

@@ -40,7 +40,7 @@ const blankFormState = {
 }
 
 
-function UserForm2(props) {
+function UserForm(props) {
 
     const {loadUserPromise, onSave, onCancel} = props;
 
@@ -232,4 +232,4 @@ function UserForm2(props) {
     );
 }
 
-export {UserForm2};
+export {UserForm};
