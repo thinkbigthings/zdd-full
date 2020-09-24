@@ -1,13 +1,11 @@
 package org.thinkbigthings.zdd.perf;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
-import org.thinkbigthings.zdd.dto.UserRecord;
 
 import java.net.URI;
 import java.time.Duration;
@@ -133,11 +131,9 @@ public class LoadTester {
         URI updatePasswordUrl = URI.create(users.toString() + "/" + username + "/password/update");
         URI infoUrl = URI.create(users.toString() + "/" + username + "/personalInfo");
 
-        UserRecord userData = adminClient.get(userUrl, UserRecord.class);
-
         // test user with own credentials
         ApiClient userClient = new ApiClient(username, password, latency);
-        userClient.get(userUrl, UserRecord.class);
+        userClient.get(infoUrl, PersonalInfo.class);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);

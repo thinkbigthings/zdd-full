@@ -1,5 +1,6 @@
 package org.thinkbigthings.zdd.server;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord updateUser(String username, PersonalInfo userData) {
+    public org.thinkbigthings.zdd.dto.User updateUser(String username, PersonalInfo userData) {
 
         var user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
@@ -72,7 +73,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord saveNewUser(RegistrationRequest registration) {
+    public org.thinkbigthings.zdd.dto.User saveNewUser(RegistrationRequest registration) {
 
         String username = registration.username();
 
@@ -95,14 +96,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<UserRecord> getUsers(Pageable page) {
-        return userRepo.findAll(page).map(this::toRecord);
+        return userRepo.findAll(page).map(this::toUserRecord);
     }
 
     @Transactional(readOnly = true)
     public UserRecord getUser(String username) {
 
         return userRepo.findByUsername(username)
-                .map(this::toRecord)
+                .map(this::toUserRecord)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
@@ -117,7 +118,7 @@ public class UserService {
     public PersonalInfo toPersonalInfoRecord(User user) {
 
         Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toRecord)
+                .map(this::toUserRecord)
                 .collect(toSet());
 
         return new PersonalInfo(user.getEmail(),
@@ -127,10 +128,26 @@ public class UserService {
                 addresses);
     }
 
-    public UserRecord toRecord(User user) {
+    public org.thinkbigthings.zdd.dto.User toRecord(User user) {
 
         Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toRecord)
+                .map(this::toUserRecord)
+                .collect(toSet());
+
+        Set<String> roles = user.getRoles().stream()
+                .map(User.Role::name)
+                .collect(toSet());
+
+        return new org.thinkbigthings.zdd.dto.User( user.getUsername(),
+                user.getRegistrationTime().toString(),
+                roles,
+                toPersonalInfoRecord(user));
+    }
+
+    public UserRecord toUserRecord(User user) {
+
+        Set<AddressRecord> addresses = user.getAddresses().stream()
+                .map(this::toUserRecord)
                 .collect(toSet());
 
         Set<String> roles = user.getRoles().stream()
@@ -147,7 +164,7 @@ public class UserService {
                 roles);
     }
 
-    public AddressRecord toRecord(Address address) {
+    public AddressRecord toUserRecord(Address address) {
         return new AddressRecord(address.getLine1(),
                 address.getCity(),
                 address.getState(),

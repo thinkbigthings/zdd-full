@@ -35,24 +35,15 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UserRecord createUserRegistration(@RequestBody RegistrationRequest newUser) {
+    public org.thinkbigthings.zdd.dto.User createUserRegistration(@RequestBody RegistrationRequest newUser) {
 
         return service.saveNewUser(newUser);
     }
 
-//
-//    @PreAuthorize("hasRole('ROLE_ADMIN')")
-//    @RequestMapping(value="/user", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ResponseBody
-//    public UserRecord createUser(@RequestBody UserRecord newUser) {
-//
-//        return service.saveNewUser(newUser);
-//    }
-
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
     @RequestMapping(value="/user/{username}/personalInfo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UserRecord updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {
+    public org.thinkbigthings.zdd.dto.User updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {
 
         return service.updateUser(username, userData);
     }
