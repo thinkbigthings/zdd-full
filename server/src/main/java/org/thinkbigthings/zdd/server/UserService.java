@@ -1,6 +1,5 @@
 package org.thinkbigthings.zdd.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
-import org.thinkbigthings.zdd.dto.UserRecord;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
@@ -100,10 +98,10 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserRecord getUser(String username) {
+    public org.thinkbigthings.zdd.dto.User getUser(String username) {
 
         return userRepo.findByUsername(username)
-                .map(this::toUserRecord)
+                .map(this::toRecord)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
@@ -130,10 +128,6 @@ public class UserService {
 
     public org.thinkbigthings.zdd.dto.User toRecord(User user) {
 
-        Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toUserRecord)
-                .collect(toSet());
-
         Set<String> roles = user.getRoles().stream()
                 .map(User.Role::name)
                 .collect(toSet());
@@ -142,26 +136,6 @@ public class UserService {
                 user.getRegistrationTime().toString(),
                 roles,
                 toPersonalInfoRecord(user));
-    }
-
-    public UserRecord toUserRecord(User user) {
-
-        Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toUserRecord)
-                .collect(toSet());
-
-        Set<String> roles = user.getRoles().stream()
-                .map(User.Role::name)
-                .collect(toSet());
-
-        return new UserRecord( user.getUsername(),
-                user.getRegistrationTime().toString(),
-                user.getEmail(),
-                user.getDisplayName(),
-                user.getPhoneNumber(),
-                user.getHeightCm(),
-                addresses,
-                roles);
     }
 
     public AddressRecord toUserRecord(Address address) {

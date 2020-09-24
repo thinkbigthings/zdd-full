@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
 
-import {UserForm} from './UserForm.js';
+import {UserForm2} from './UserForm2.js';
 import ResetPasswordModal from "./ResetPasswordModal.js";
 
 import Toast from "react-bootstrap/Toast";
@@ -35,16 +35,16 @@ function EditUser({history, match}) {
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [showResetPassword, setShowResetPassword] = useState(false);
 
-    const onSave = (userData) => {
+    const onSave = (personalInfo) => {
 
-        // rebuild because incoming object has extra info
-        const personalInfo = {
-            email: userData.email,
-            displayName: userData.displayName,
-            phoneNumber: userData.phoneNumber,
-            heightCm: userData.heightCm,
-            addresses: userData.addresses,
-        }
+        // // rebuild because incoming object has extra info
+        // const personalInfo = {
+        //     email: userData.email,
+        //     displayName: userData.displayName,
+        //     phoneNumber: userData.phoneNumber,
+        //     heightCm: userData.heightCm,
+        //     addresses: userData.addresses,
+        // }
 
         put(userInfoEndpoint, personalInfo, headers)
             .then(result => history.goBack() )
@@ -94,7 +94,7 @@ function EditUser({history, match}) {
             <ResetPasswordModal show={showResetPassword} onConfirm={onResetPassword} onHide={() => setShowResetPassword(false)} />
 
             <Container className="pl-0 pr-0">
-                <UserForm loadUserPromise={loadUserPromise} onSave={onSave} onCancel={history.goBack}/>
+                <UserForm2 loadUserPromise={loadUserPromise} onSave={onSave} onCancel={history.goBack}/>
             </Container>
         </div>
 

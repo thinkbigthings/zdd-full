@@ -17,13 +17,15 @@ const blankAddress = {
 
 const blankUser = {
     username: '',
-    displayName: '',
-    email: '',
-    heightCm: 0,
-    phoneNumber: '',
+    roles: [],
     registrationTime: '',
-    addresses: [],
-    roles: []
+    personalInfo: {
+        displayName: '',
+        email: '',
+        heightCm: 0,
+        phoneNumber: '',
+        addresses: [],
+    }
 }
 
 const blankEditableAddress = {
@@ -38,7 +40,7 @@ const blankFormState = {
 }
 
 
-function UserForm(props) {
+function UserForm2(props) {
 
     const {loadUserPromise, onSave, onCancel} = props;
 
@@ -63,7 +65,7 @@ function UserForm(props) {
                 const index = newState.editableAddress.originatingIndex;
                 const updatedAddress = newState.editableAddress.address;
                 newState.editableAddress.isEditing = false;
-                newState.user.addresses[index] = {...updatedAddress};
+                newState.user.personalInfo.addresses[index] = {...updatedAddress};
                 return newState;
             }
             case 'DISCARD_ADDRESS_EDIT': {
@@ -77,7 +79,7 @@ function UserForm(props) {
                 return newState;
             }
             case 'DELETE_ADDRESS': {
-                newState.user.addresses.splice(action.payload, 1);
+                newState.user.personalInfo.addresses.splice(action.payload, 1);
                 return newState;
             }
             case 'LOAD_USER': {
@@ -85,7 +87,7 @@ function UserForm(props) {
                 return newState;
             }
             case 'UPDATE_USER': {
-                newState.user = {...newState.user, ...action.payload};
+                newState.user.personalInfo = {...newState.user.personalInfo, ...action.payload};
                 return newState;
             }
             default: {
@@ -132,7 +134,7 @@ function UserForm(props) {
                 <div className="form-group">
                     <label htmlFor="inputDisplayName">Display Name</label>
                     <input type="text" className="form-control" id="inputDisplayName" placeholder="Display Name"
-                           value={formState.user.displayName}
+                           value={formState.user.personalInfo.displayName}
                            onChange={e => dispatch({type:'UPDATE_USER', payload: {displayName: e.target.value }})}/>
                 </div>
 
@@ -140,7 +142,7 @@ function UserForm(props) {
                     <label htmlFor="exampleInputEmail1">Email address</label>
                     <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
                            placeholder="Enter email"
-                           value={formState.user.email}
+                           value={formState.user.personalInfo.email}
                            onChange={e => dispatch({type:'UPDATE_USER', payload: {email: e.target.value }})}/>
                     <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone
                         else.</small>
@@ -149,14 +151,14 @@ function UserForm(props) {
                 <div className="form-group">
                     <label htmlFor="inputHeight">Height (cm)</label>
                     <input type="number" className="form-control" id="inputHeight" placeholder="Height"
-                           value={formState.user.heightCm}
+                           value={formState.user.personalInfo.heightCm}
                            onChange={e => dispatch({type:'UPDATE_USER', payload: {heightCm: e.target.value }})}/>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="inputPhone">Phone Number</label>
                     <input type="text" className="form-control" id="inputPhone" placeholder="Phone Number"
-                           value={formState.user.phoneNumber}
+                           value={formState.user.personalInfo.phoneNumber}
                            onChange={e => dispatch({type:'UPDATE_USER', payload: {phoneNumber: e.target.value }})}/>
                 </div>
 
@@ -171,7 +173,7 @@ function UserForm(props) {
                     </Button>
 
                     <Container className="container mt-3">
-                        {formState.user.addresses.map( (address, index) =>
+                        {formState.user.personalInfo.addresses.map( (address, index) =>
                             <AddressRow key={index} currentAddress={address}
                                         onEdit={() => dispatch({type:'START_ADDRESS_EDIT', payload: index})}
                                         onDelete={() => dispatch({type:'DELETE_ADDRESS', payload: index})} />
@@ -221,7 +223,7 @@ function UserForm(props) {
                     </Modal>
                 </div>
 
-                <Button variant="success" onClick={() => { onSave(formState.user); }}>Save</Button>
+                <Button variant="success" onClick={() => { onSave(formState.user.personalInfo); }}>Save</Button>
                 <Button variant="light" onClick={onCancel}>Cancel</Button>
             </form>
 
@@ -230,4 +232,4 @@ function UserForm(props) {
     );
 }
 
-export {UserForm};
+export {UserForm2};
