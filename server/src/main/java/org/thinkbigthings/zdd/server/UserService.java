@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
-import org.thinkbigthings.zdd.dto.UserRecord;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
@@ -45,20 +45,20 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord updateUser(String username, UserRecord userRecord) {
+    public org.thinkbigthings.zdd.dto.User updateUser(String username, PersonalInfo userData) {
 
         var user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
 
-        user.setEmail(userRecord.email());
-        user.setDisplayName(userRecord.displayName());
-        user.setPhoneNumber(userRecord.phoneNumber());
-        user.setHeightCm(userRecord.heightCm());
+        user.setEmail(userData.email());
+        user.setDisplayName(userData.displayName());
+        user.setPhoneNumber(userData.phoneNumber());
+        user.setHeightCm(userData.heightCm());
 
         user.getAddresses().forEach(a -> a.setUser(null));
         user.getAddresses().clear();
 
-        List<Address> newAddressEntities = userRecord.addresses().stream().map(this::fromRecord).collect(toList());
+        List<Address> newAddressEntities = userData.addresses().stream().map(this::fromRecord).collect(toList());
         user.getAddresses().addAll(newAddressEntities);
         user.getAddresses().forEach(a -> a.setUser(user));
 
@@ -71,7 +71,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord saveNewUser(RegistrationRequest registration) {
+    public org.thinkbigthings.zdd.dto.User saveNewUser(RegistrationRequest registration) {
 
         String username = registration.username();
 
@@ -93,39 +93,44 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserRecord> getUsers(Pageable page) {
+    public Page<org.thinkbigthings.zdd.dto.User> getUsers(Pageable page) {
         return userRepo.findAll(page).map(this::toRecord);
     }
 
     @Transactional(readOnly = true)
-    public UserRecord getUser(String username) {
+    public org.thinkbigthings.zdd.dto.User getUser(String username) {
 
         return userRepo.findByUsername(username)
                 .map(this::toRecord)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
     }
 
-    public UserRecord toRecord(User user) {
+    public PersonalInfo toPersonalInfoRecord(User user) {
 
         Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toRecord)
+                .map(this::toAddressRecord)
                 .collect(toSet());
+
+        return new PersonalInfo(user.getEmail(),
+                user.getDisplayName(),
+                user.getPhoneNumber(),
+                user.getHeightCm(),
+                addresses);
+    }
+
+    public org.thinkbigthings.zdd.dto.User toRecord(User user) {
 
         Set<String> roles = user.getRoles().stream()
                 .map(User.Role::name)
                 .collect(toSet());
 
-        return new UserRecord( user.getUsername(),
+        return new org.thinkbigthings.zdd.dto.User( user.getUsername(),
                 user.getRegistrationTime().toString(),
-                user.getEmail(),
-                user.getDisplayName(),
-                user.getPhoneNumber(),
-                user.getHeightCm(),
-                addresses,
-                roles);
+                roles,
+                toPersonalInfoRecord(user));
     }
 
-    public AddressRecord toRecord(Address address) {
+    public AddressRecord toAddressRecord(Address address) {
         return new AddressRecord(address.getLine1(),
                 address.getCity(),
                 address.getState(),

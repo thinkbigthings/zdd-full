@@ -6,8 +6,8 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
-import org.thinkbigthings.zdd.dto.UserRecord;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,13 +38,12 @@ public class UserServiceTest {
     @Test
     public void testRecordSerialization() throws Exception {
 
-        UserRecord user = new UserRecord("a", null,
-                "a@b", "asdf", "1234", 99,
-                new HashSet<>(), new HashSet<>());
+        PersonalInfo userInfo = new PersonalInfo("a", null,
+                "1234567890", 99, new HashSet<>());
 
         String serializedRecord = Paths.get("build", "serial.data").toString();
         try(var oos = new ObjectOutputStream(new FileOutputStream(serializedRecord))) {
-            oos.writeObject(user);
+            oos.writeObject(userInfo);
         }
         try(var ois = new ObjectInputStream(new FileInputStream(serializedRecord))) {
             System.out.println(ois.readObject());
@@ -59,7 +58,7 @@ public class UserServiceTest {
 
         RegistrationRequest register = new RegistrationRequest(name, "b", "name@email.com");
 
-        UserRecord created = service.saveNewUser(register);
+        org.thinkbigthings.zdd.dto.User created = service.saveNewUser(register);
 
         assertEquals(name, created.username());
     }

@@ -1,13 +1,12 @@
 package org.thinkbigthings.zdd.perf;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
-import org.thinkbigthings.zdd.dto.UserRecord;
+import org.thinkbigthings.zdd.dto.User;
 
 import java.net.URI;
 import java.time.Duration;
@@ -131,24 +130,23 @@ public class LoadTester {
 
         URI userUrl = URI.create(users.toString() + "/" + username);
         URI updatePasswordUrl = URI.create(users.toString() + "/" + username + "/password/update");
-
-        UserRecord userData = adminClient.get(userUrl, UserRecord.class);
+        URI infoUrl = URI.create(users.toString() + "/" + username + "/personalInfo");
 
         // test user with own credentials
         ApiClient userClient = new ApiClient(username, password, latency);
-        userClient.get(userUrl, UserRecord.class);
+        userClient.get(userUrl, User.class);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
         userClient = new ApiClient(username, newPassword);
 
-        userData = updateUserEditableRecord(userData);
-        userClient.put(userUrl, userData);
+        var updatedInfo = randomPersonalInfo();
+        userClient.put(infoUrl, updatedInfo);
 
-        UserRecord updatedUser = adminClient.get(userUrl, UserRecord.class);
+        PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
 
-        if( ! userData.equals(updatedUser)) {
-            String message = "user updates were not all persisted: " + userData + " vs " + updatedUser;
+        if( ! retrievedInfo.equals(updatedInfo)) {
+            String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;
             throw new RuntimeException(message);
         }
 
@@ -159,20 +157,6 @@ public class LoadTester {
         String page = adminClient.get(users);
     }
 
-    private UserRecord updateUserEditableRecord(UserRecord user) {
-
-        Set<AddressRecord> addresses = user.addresses();
-        addresses.add(randomAddressRecord());
-
-        return new UserRecord(user.username(),
-                                 user.registrationTime(),
-                                 faker.internet().emailAddress(),
-                                 faker.name().name(),
-                                 faker.phoneNumber().phoneNumber(),
-                        random.nextInt(40) + 150,
-                                 addresses,
-                                 user.roles());
-    }
 
     private PersonalInfo randomPersonalInfo() {
 
