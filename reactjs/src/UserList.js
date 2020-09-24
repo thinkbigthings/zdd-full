@@ -12,7 +12,6 @@ import copy from './Copier.js';
 import {useAuthHeader, get, post} from "./BasicAuth";
 import CreateUserModal from "./CreateUserModal";
 import useError from "./useError";
-import {Jumbotron} from "react-bootstrap";
 
 const initialPage = {
     content: [],
@@ -79,18 +78,6 @@ function UserList() {
     const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
 
-    // if(error.hasError) {
-    //     return (
-    //         <>
-    //             <Jumbotron>
-    //                 <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>
-    //                 <span className="sr-only">Loading...</span>
-    //             </Jumbotron>
-    //
-    //         </>
-    //     );
-    // }
-
 
     return (
         <>
@@ -103,8 +90,8 @@ function UserList() {
 
                 <Container className="container mt-3">
                     {userPage.content.map(user =>
-                        <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
-                            <Col >{user.displayName}</Col>
+                        <Row key={user.personalInfo.displayName} className="pt-2 pb-2 border-bottom border-top ">
+                            <Col >{user.personalInfo.displayName}</Col>
                             <Col xs={2}>
                                 <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
                                     <i className="mr-2 fas fa-user-edit" />Edit

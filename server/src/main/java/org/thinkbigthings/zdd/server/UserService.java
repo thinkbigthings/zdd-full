@@ -95,8 +95,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserRecord> getUsers(Pageable page) {
-        return userRepo.findAll(page).map(this::toUserRecord);
+    public Page<org.thinkbigthings.zdd.dto.User> getUsers(Pageable page) {
+        return userRepo.findAll(page).map(this::toRecord);
     }
 
     @Transactional(readOnly = true)
