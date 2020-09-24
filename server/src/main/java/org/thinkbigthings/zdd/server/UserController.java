@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
@@ -54,6 +55,22 @@ public class UserController {
     public UserRecord updateUser(@RequestBody UserRecord newUser, @PathVariable String username) {
 
         return service.updateUser(username, newUser);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
+    @RequestMapping(value="/user/{username}/personalInfo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public UserRecord updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {
+
+        return service.updateUser(username, userData);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
+    @RequestMapping(value="/user/{username}/personalInfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public PersonalInfo getUserInfo(@PathVariable String username) {
+
+        return service.getUserInfo(username);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")

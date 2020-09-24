@@ -1,5 +1,6 @@
 package org.thinkbigthings.zdd.server;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
+import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserRecord;
 
@@ -42,6 +44,32 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
 
         userRepo.save(user);
+    }
+
+    @Transactional
+    public UserRecord updateUser(String username, PersonalInfo userData) {
+
+        var user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
+
+        user.setEmail(userData.email());
+        user.setDisplayName(userData.displayName());
+        user.setPhoneNumber(userData.phoneNumber());
+        user.setHeightCm(userData.heightCm());
+
+        user.getAddresses().forEach(a -> a.setUser(null));
+        user.getAddresses().clear();
+
+        List<Address> newAddressEntities = userData.addresses().stream().map(this::fromRecord).collect(toList());
+        user.getAddresses().addAll(newAddressEntities);
+        user.getAddresses().forEach(a -> a.setUser(user));
+
+        try {
+            return toRecord(userRepo.save(user));
+        }
+        catch(ConstraintViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -103,6 +131,27 @@ public class UserService {
         return userRepo.findByUsername(username)
                 .map(this::toRecord)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
+    }
+
+    @Transactional(readOnly = true)
+    public PersonalInfo getUserInfo(String username) {
+
+        return userRepo.findByUsername(username)
+                .map(this::toPersonalInfoRecord)
+                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
+    }
+
+    public PersonalInfo toPersonalInfoRecord(User user) {
+
+        Set<AddressRecord> addresses = user.getAddresses().stream()
+                .map(this::toRecord)
+                .collect(toSet());
+
+        return new PersonalInfo(user.getEmail(),
+                user.getDisplayName(),
+                user.getPhoneNumber(),
+                user.getHeightCm(),
+                addresses);
     }
 
     public UserRecord toRecord(User user) {
