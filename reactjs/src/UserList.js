@@ -38,7 +38,7 @@ function UserList() {
     const {error, addError} = useError();
     const headers = useAuthHeader();
 
-    const {setUrl, isLoading, hasError, fetchedData, isLongRequest} = useApi('/user?page=0&size=10', initialPage);
+    const {setUrl, isLoading, isLongRequest, fetchedData} = useApi('/user?page=0&size=10', initialPage);
 
 
     let fetchRecentUsers = (pageable) => {

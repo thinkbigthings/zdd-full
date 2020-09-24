@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 
 import useCurrentUser from "./useCurrentUser";
+import useError from "./useError";
 
 const VERSION_HEADER = 'X-Version';
 
@@ -49,7 +50,6 @@ const useApi = (initialUrl, initialData) => {
     const [url, setUrl] = useState(initialUrl);
     const [isLoading, setLoading] = useState(true);
     const [isLongRequest, setLongRequest] = useState(false);
-    const [hasError, setError] = useState(false);
     const [fetchedData, setFetchedData] = useState(initialData);
 
     const {currentUser} = useCurrentUser();
@@ -60,19 +60,18 @@ const useApi = (initialUrl, initialData) => {
         VERSION_HEADER: REACT_APP_API_VERSION
     };
 
+    const { addError } = useError();
+
     const longLoadTimeMs = 1000;
 
+    // the caller can choose to only show a spinner if it takes a long time using the isLongRequest flag
+    // otherwise it's a poor UX to flash a spinner for a fraction of a second
     let longRequestTimer = setTimeout(() => {}, longLoadTimeMs);
 
     useEffect(() => {
 
-        // the caller can choose to only show a spinner if it takes a long time using the isLongRequest flag
-        // otherwise it's a poor UX to flash a spinner for a fraction of a second
-        // let longLoadTimer = setTimeout(() => setLongRequest(isLoading), 500);
-
         const handleFetchResponse = response => {
             clearTimeout(longRequestTimer);
-            setError(!response.ok);
             setLoading(false);
             setLongRequest(false);
 
@@ -86,9 +85,12 @@ const useApi = (initialUrl, initialData) => {
             setLoading(true);
             setLongRequest(false);
             return fetch(url, { headers: requestHeaders })
-                // .then(checkResponseCode )
+                .then(checkResponseCode )
                 .then(handleFetchResponse)
-                .catch(handleFetchResponse);
+                .catch(error => {
+                    addError("The app encountered an error: " + error.message);
+                    return initialData;
+                });
         };
 
         if(initialUrl) {
@@ -107,7 +109,6 @@ const useApi = (initialUrl, initialData) => {
         setUrl,
         isLoading,
         isLongRequest,
-        hasError,
         fetchedData
     }
 };
