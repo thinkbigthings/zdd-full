@@ -108,8 +108,8 @@ function UserList() {
 
                 <Container className="container mt-3">
                     {fetchedData.content.map(user =>
-                        <Row key={user.displayName} className="pt-2 pb-2 border-bottom border-top ">
-                            <Col >{user.displayName}</Col>
+                        <Row key={user.personalInfo.displayName} className="pt-2 pb-2 border-bottom border-top ">
+                            <Col >{user.personalInfo.displayName}</Col>
                             <Col xs={2}>
                                 <Link to={"/users/" + user.username + "/edit" } className="btn btn-primary">
                                     <i className="mr-2 fas fa-user-edit" />Edit
