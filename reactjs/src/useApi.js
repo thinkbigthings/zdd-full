@@ -8,7 +8,7 @@ const VERSION_HEADER = 'X-Version';
 // picks up from .env file in build
 const { REACT_APP_API_VERSION } = process.env;
 
-const httpStatusFilter = function(httpResponse) {
+const checkResponseCode = function(httpResponse) {
 
     const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
 
@@ -44,65 +44,49 @@ const httpStatusFilter = function(httpResponse) {
     return httpResponse;
 }
 
-
-function basicAuthHeader(username, password) {
-
-    const encoded = btoa(username + ":" + password);
-    return {
-        'Authorization': 'Basic ' + encoded,
-        "Content-Type": "application/json",
-        VERSION_HEADER: REACT_APP_API_VERSION
-    };
-}
-
-
-function useAuthHeader() {
-
-    const {currentUser} = useCurrentUser();
-
-    if( ! currentUser.isLoggedIn) {
-        throw new Error("user is not logged in");
-    }
-
-    return basicAuthHeader(currentUser.username, currentUser.password);
-}
-
 const useApi = (initialUrl, initialData) => {
 
     const [url, setUrl] = useState(initialUrl);
     const [isLoading, setLoading] = useState(true);
+    const [isLongRequest, setLongRequest] = useState(false);
     const [hasError, setError] = useState(false);
     const [fetchedData, setFetchedData] = useState(initialData);
 
-    const[isLongRequest, setLongRequest] = useState(false);
-
-    const requestHeaders = useAuthHeader();
+    const {currentUser} = useCurrentUser();
+    const encoded = btoa(currentUser.username + ":" + currentUser.password);
+    const requestHeaders = {
+        'Authorization': 'Basic ' + encoded,
+        "Content-Type": "application/json",
+        VERSION_HEADER: REACT_APP_API_VERSION
+    };
 
     const longLoadTimeMs = 1000;
 
-    let longLoadTimer = setTimeout(() => {}, longLoadTimeMs);
+    let longRequestTimer = setTimeout(() => {}, longLoadTimeMs);
 
     useEffect(() => {
 
-        // the caller can choose to only show a spinner if it takes a long time
+        // the caller can choose to only show a spinner if it takes a long time using the isLongRequest flag
         // otherwise it's a poor UX to flash a spinner for a fraction of a second
         // let longLoadTimer = setTimeout(() => setLongRequest(isLoading), 500);
 
         const handleFetchResponse = response => {
-            clearTimeout(longLoadTimer);
+            clearTimeout(longRequestTimer);
             setError(!response.ok);
             setLoading(false);
             setLongRequest(false);
+
             return response.ok && response.json ? response.json() : initialData;
         };
 
         // default is GET
         const fetchData = () => {
-            clearTimeout(longLoadTimer);
-            longLoadTimer = setTimeout(() => setLongRequest(true), longLoadTimeMs);
+            clearTimeout(longRequestTimer);
+            longRequestTimer = setTimeout(() => setLongRequest(true), longLoadTimeMs);
             setLoading(true);
             setLongRequest(false);
             return fetch(url, { headers: requestHeaders })
+                // .then(checkResponseCode )
                 .then(handleFetchResponse)
                 .catch(handleFetchResponse);
         };
@@ -117,7 +101,6 @@ const useApi = (initialUrl, initialData) => {
         // }
 
     }, [url]);
-
 
 
     return {
