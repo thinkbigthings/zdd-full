@@ -222,7 +222,6 @@ function UserForm(props) {
                 </div>
 
                 <Button variant="success" onClick={() => { onSave(formState.user); }}>Save</Button>
-                {/*<Link to={"/users" } className="btn btn-light ml-3">Cancel</Link>*/}
                 <Button variant="light" onClick={onCancel}>Cancel</Button>
             </form>
 

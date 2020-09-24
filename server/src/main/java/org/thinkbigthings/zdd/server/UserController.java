@@ -50,14 +50,6 @@ public class UserController {
 //    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
-    @RequestMapping(value="/user/{username}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public UserRecord updateUser(@RequestBody UserRecord newUser, @PathVariable String username) {
-
-        return service.updateUser(username, newUser);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
     @RequestMapping(value="/user/{username}/personalInfo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public UserRecord updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {

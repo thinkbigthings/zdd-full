@@ -15,15 +15,15 @@ function EditUser({history, match}) {
 
     const { params: { username } } = match;
 
-    const userEndpoint = '/user/' + username;
-    const updatePasswordEndpoint = userEndpoint + '/password/update'
+    const userInfoEndpoint = '/user/' + username + '/personalInfo';
+    const updatePasswordEndpoint = userInfoEndpoint + '/password/update'
 
     const userContext = useContext(UserContext);
 
     const headers = useAuthHeader();
     const { addError } = useError();
 
-    const loadUserPromise = get(userEndpoint, headers)
+    const loadUserPromise = get(userInfoEndpoint, headers)
         .catch(error => addError("Trouble loading user: " + error.message));
 
 
@@ -35,7 +35,17 @@ function EditUser({history, match}) {
     const [showResetPassword, setShowResetPassword] = useState(false);
 
     const onSave = (userData) => {
-        put(userEndpoint, userData, headers)
+
+        // rebuild because incoming object has extra info
+        const personalInfo = {
+            email: userData.email,
+            displayName: userData.displayName,
+            phoneNumber: userData.phoneNumber,
+            heightCm: userData.heightCm,
+            addresses: userData.addresses,
+        }
+
+        put(userInfoEndpoint, personalInfo, headers)
             .then(result => history.goBack() )
             .catch(error => addError("Trouble saving user: " + error.message));
     }

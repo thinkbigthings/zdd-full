@@ -1,6 +1,5 @@
 package org.thinkbigthings.zdd.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -61,32 +60,6 @@ public class UserService {
         user.getAddresses().clear();
 
         List<Address> newAddressEntities = userData.addresses().stream().map(this::fromRecord).collect(toList());
-        user.getAddresses().addAll(newAddressEntities);
-        user.getAddresses().forEach(a -> a.setUser(user));
-
-        try {
-            return toRecord(userRepo.save(user));
-        }
-        catch(ConstraintViolationException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
-        }
-    }
-
-    @Transactional
-    public UserRecord updateUser(String username, UserRecord userRecord) {
-
-        var user = userRepo.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
-
-        user.setEmail(userRecord.email());
-        user.setDisplayName(userRecord.displayName());
-        user.setPhoneNumber(userRecord.phoneNumber());
-        user.setHeightCm(userRecord.heightCm());
-
-        user.getAddresses().forEach(a -> a.setUser(null));
-        user.getAddresses().clear();
-
-        List<Address> newAddressEntities = userRecord.addresses().stream().map(this::fromRecord).collect(toList());
         user.getAddresses().addAll(newAddressEntities);
         user.getAddresses().forEach(a -> a.setUser(user));
 
