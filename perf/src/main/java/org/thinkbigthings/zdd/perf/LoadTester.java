@@ -118,7 +118,7 @@ public class LoadTester {
     }
 
     private void doInserts() {
-        range(0, 1000).forEach(i -> adminClient.post(registration, createRandomUserRegistration()));
+        range(0, 100).forEach(i -> adminClient.post(registration, createRandomUserRegistration()));
     }
 
     private void doCRUD() {

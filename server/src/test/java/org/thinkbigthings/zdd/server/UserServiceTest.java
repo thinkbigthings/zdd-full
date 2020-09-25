@@ -6,6 +6,7 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 
@@ -38,8 +39,7 @@ public class UserServiceTest {
     @Test
     public void testRecordSerialization() throws Exception {
 
-        PersonalInfo userInfo = new PersonalInfo("a", null,
-                "1234567890", 99, new HashSet<>());
+        AddressRecord userInfo = new AddressRecord("a", null,"PA", "12345");
 
         String serializedRecord = Paths.get("build", "serial.data").toString();
         try(var oos = new ObjectOutputStream(new FileOutputStream(serializedRecord))) {

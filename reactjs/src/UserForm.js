@@ -1,4 +1,4 @@
-import React, {useEffect, useReducer} from 'react';
+import React, {useReducer} from 'react';
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -15,34 +15,15 @@ const blankAddress = {
     zip: ''
 }
 
-const blankUser = {
-    username: '',
-    roles: [],
-    registrationTime: '',
-    personalInfo: {
-        displayName: '',
-        email: '',
-        heightCm: 0,
-        phoneNumber: '',
-        addresses: [],
-    }
-}
-
 const blankEditableAddress = {
     isEditing: false,
     address: blankAddress,
     originatingIndex: 0
 }
 
-const blankFormState = {
-    user: blankUser,
-    editableAddress: blankEditableAddress
-}
-
-
 function UserForm(props) {
 
-    const {loadUserPromise, onSave, onCancel} = props;
+    const {onCancel, onSave, userData} = props;
 
     // return new state based on current state and action
     // reducer itself should not cause side effects, it should be called FROM a side effect
@@ -96,12 +77,13 @@ function UserForm(props) {
         }
     }
 
-    const [formState, dispatch] = useReducer(formReducer, blankFormState);
+    const [formState, dispatch] = useReducer(formReducer, {user: userData, editableAddress: blankEditableAddress});
 
-    // TODO do we need the deps when using the reducer? Seems to function the same with/without the dispatch dependency
-    // TODO braces around the method body of the effect seem to be necessary when it's a promise, not sure why
-    // TODO could the load function be the third parameter to the reducer hook? to lazy initialize the full state
-    useEffect(() => { loadUserPromise.then(u => dispatch({type:'LOAD_USER', payload: u}))}, [loadUserPromise, dispatch]);
+    // the context hook retains its value over re-renders,
+    // so need to trigger the update here once the data has been loaded for real
+    if(userData.username !== '' && formState.user.username === '') {
+        dispatch({type:'LOAD_USER', payload: userData});
+    }
 
     const address = formState.editableAddress.address;
 

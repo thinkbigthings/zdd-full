@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -9,9 +9,9 @@ import Row          from 'react-bootstrap/Row';
 import Col          from 'react-bootstrap/Col';
 
 import copy from './Copier.js';
-import {useAuthHeader, get, post} from "./BasicAuth";
-import CreateUserModal from "./CreateUserModal";
-import useError from "./useError";
+import CreateUser from "./CreateUser";
+import useApiLoader from "./useApiLoader";
+import CenteredSpinner from "./CenteredSpinner";
 
 const initialPage = {
     content: [],
@@ -28,56 +28,29 @@ const initialPage = {
 
 function UserList() {
 
-    const [userPage, setUserPage] = useState(initialPage);
-    const [showCreateUser, setShowCreateUser] = useState(false);
-
-    const {error, addError } = useError();
-    const headers = useAuthHeader();
+    const {setUrl, isLoading, isLongRequest, fetchedData} = useApiLoader('/user?page=0&size=10', initialPage);
 
     let fetchRecentUsers = (pageable) => {
-        get('/user?' + pageQuery(pageable), headers)
-            .then(page => setUserPage(page))
-            .catch(error => addError("Trouble fetching users: " + error.message));
+        setUrl('/user?' + pageQuery(pageable));
     };
-
-    const onCreate = (userData) => {
-        setShowCreateUser(false);
-
-        const registrationRequest = {
-            username: userData.username,
-            plainTextPassword: userData.password,
-            email: userData.email
-        }
-        post('/registration', registrationRequest, headers)
-            .then(result => fetchRecentUsers(initialPage.pageable))
-            .catch(error => addError("Trouble saving user: " + error.message));
-    }
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
     }
 
     function movePage(amount) {
-        let pageable = copy(userPage.pageable);
+        let pageable = copy(fetchedData.pageable);
         pageable.pageNumber = pageable.pageNumber + amount;
         fetchRecentUsers(pageable);
     }
 
-    // useEffect didn't seem to like this being defined inline
-    let getCurrentList = () => {
-        fetchRecentUsers(userPage.pageable);
-    }
+    const firstElementInPage = fetchedData.pageable.offset + 1;
+    const lastElementInPage = fetchedData.pageable.offset + fetchedData.numberOfElements;
+    const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
 
+    if(isLoading && ! isLongRequest) { return <div />; }
 
-    // When React's Suspense feature with fetch is ready, that'll be the preferred way to fetch data
-    useEffect(getCurrentList, [setUserPage]);
-
-    const styleFirst = userPage.first ? "disabled" : "";
-    const styleLast = userPage.last ? "disabled" : "";
-    const firstElementInPage = userPage.pageable.offset + 1;
-    const lastElementInPage = userPage.pageable.offset + userPage.numberOfElements;
-    const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + userPage.totalElements;
-
+    if(isLoading && isLongRequest) {   return <CenteredSpinner /> ; }
 
     return (
         <>
@@ -85,11 +58,10 @@ function UserList() {
             <div className="container mt-3">
                 <h1>User Management</h1>
 
-                <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
-                <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
+                <CreateUser />
 
                 <Container className="container mt-3">
-                    {userPage.content.map(user =>
+                    {fetchedData.content.map(user =>
                         <Row key={user.personalInfo.displayName} className="pt-2 pb-2 border-bottom border-top ">
                             <Col >{user.personalInfo.displayName}</Col>
                             <Col xs={2}>
@@ -102,11 +74,11 @@ function UserList() {
                 </Container>
 
                 <ButtonGroup className="mt-2">
-                    <Button variant="primary" className={"btn btn-primary " + styleFirst} onClick={ () => movePage(-1) }>
+                    <Button variant="primary" disabled={fetchedData.first} className={"btn btn-primary "} onClick={ () => movePage(-1) }>
                         <i className="mr-2 fas fa-caret-left" />Previous
                     </Button>
                     <div className="page-item disabled"><span className="page-link">{currentPage}</span></div>
-                    <Button variant="primary" className={"btn btn-primary " + styleLast} onClick={ () => movePage(1) }>
+                    <Button variant="primary" disabled={fetchedData.last} className={"btn btn-primary "} onClick={ () => movePage(1) }>
                         <i className="mr-2 fas fa-caret-right" />Next
                     </Button>
                 </ButtonGroup>
