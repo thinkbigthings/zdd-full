@@ -1,12 +1,10 @@
 
-import useCurrentUser from "./useCurrentUser";
-
 const VERSION_HEADER = 'X-Version';
 
 // picks up from .env file in build
 const { REACT_APP_API_VERSION } = process.env;
 
-const httpStatusFilter = function(httpResponse) {
+const throwOnBadResponse = function(httpResponse) {
 
     const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
 
@@ -42,48 +40,4 @@ const httpStatusFilter = function(httpResponse) {
     return httpResponse;
 }
 
-
-function basicAuthHeader(username, password) {
-
-    const encoded = btoa(username + ":" + password);
-    return {
-        'Authorization': 'Basic ' + encoded,
-        "Content-Type": "application/json",
-        VERSION_HEADER: REACT_APP_API_VERSION
-    };
-}
-
-function useAuthHeader() {
-
-    const {currentUser} = useCurrentUser();
-
-    if( ! currentUser.isLoggedIn) {
-        throw new Error("user is not logged in");
-    }
-
-    return basicAuthHeader(currentUser.username, currentUser.password);
-}
-
-function get(url, requestHeaders) {
-
-    const requestMeta = {
-        headers: requestHeaders
-    };
-
-    return fetch(url, requestMeta)
-        .then(httpStatusFilter)
-        .then(httpResponse => httpResponse.json());
-}
-
-function fetchWithCreds(url, credentials) {
-
-    const requestMeta = {
-        headers: basicAuthHeader(credentials.username, credentials.password)
-    };
-
-    return fetch(url, requestMeta)
-        .then(httpStatusFilter)
-        .then(httpResponse => httpResponse.json());
-}
-
-export {fetchWithCreds, get, useAuthHeader}
+export {throwOnBadResponse, VERSION_HEADER, REACT_APP_API_VERSION};

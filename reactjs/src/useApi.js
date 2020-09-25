@@ -1,50 +1,12 @@
 import { useState, useEffect } from 'react';
 
-
-import useCurrentUser from "./useCurrentUser";
 import useError from "./useError";
+import useAuthHeader from "./useAuthHeader";
 
-const VERSION_HEADER = 'X-Version';
+import {throwOnBadResponse} from './HttpResponseFilter';
 
-// picks up from .env file in build
-const { REACT_APP_API_VERSION } = process.env;
-
-const checkResponseCode = function(httpResponse) {
-
-    const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
-
-    if(httpResponse.status !== 200) {
-        console.log('Received ' + httpResponse);
-    }
-
-    if(httpResponse.status === 401 || httpResponse.status === 403) {
-        console.log('TODO redirect to /login');
-    }
-
-    if(httpResponse.status >= 400) {
-        const message = 'There was an input error';
-        const userAction = 'Try again';
-        throw Error(message + " ... " + userAction);
-    }
-
-    if(httpResponse.status >= 500) {
-        const message = 'There was a server error';
-        const userAction = 'Try reloading the page';
-        throw Error(message + " ... " + userAction);
-    }
-
-    if(serverApiVersion !== null && serverApiVersion !== REACT_APP_API_VERSION)
-    {
-        const serverApi = httpResponse.headers.get(VERSION_HEADER);
-        const clientApi= REACT_APP_API_VERSION;
-        const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
-        const userAction = 'Try reloading the page';
-        throw Error(message + " ... " + userAction);
-    }
-
-    return httpResponse;
-}
-
+// this is more of a data loader for a page, which is useful as a hook
+// methods in callbacks can't be hooks, so it makes sense to use fetch()
 const useApi = (initialUrl, initialData) => {
 
     const [url, setUrl] = useState(initialUrl);
@@ -52,13 +14,7 @@ const useApi = (initialUrl, initialData) => {
     const [isLongRequest, setLongRequest] = useState(false);
     const [fetchedData, setFetchedData] = useState(initialData);
 
-    const {currentUser} = useCurrentUser();
-    const encoded = btoa(currentUser.username + ":" + currentUser.password);
-    const requestHeaders = {
-        'Authorization': 'Basic ' + encoded,
-        "Content-Type": "application/json",
-        VERSION_HEADER: REACT_APP_API_VERSION
-    };
+    const requestHeaders = useAuthHeader();
 
     const { addError } = useError();
 
@@ -80,12 +36,22 @@ const useApi = (initialUrl, initialData) => {
 
         // default is GET
         const fetchData = () => {
+
+            // TODO Assignments to the 'longRequestTimer' variable from inside Reach Hook useEffect will be lost after each render.
+            // To preserve the value over time, store it in a useRef Hook and keep the mutable value in the '.current' property.
+            // Otherwise, you can move this variable directly inside useEffect react-hooks/exhaustive-deps
+
             clearTimeout(longRequestTimer);
             longRequestTimer = setTimeout(() => setLongRequest(true), longLoadTimeMs);
             setLoading(true);
             setLongRequest(false);
-            return fetch(url, { headers: requestHeaders })
-                .then(checkResponseCode )
+
+            console.log(JSON.stringify(requestHeaders));
+
+            let request = { headers: requestHeaders };
+
+            return fetch(url, request)
+                .then(throwOnBadResponse)
                 .then(handleFetchResponse)
                 .catch(error => {
                     addError("The app encountered an error: " + error.message);
@@ -93,7 +59,7 @@ const useApi = (initialUrl, initialData) => {
                 });
         };
 
-        if(initialUrl) {
+        if(url) {
             fetchData().then(data => setFetchedData(data));
         }
 
@@ -103,7 +69,6 @@ const useApi = (initialUrl, initialData) => {
         // }
 
     }, [url]);
-
 
     return {
         setUrl,

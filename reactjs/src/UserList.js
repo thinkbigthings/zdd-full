@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -7,15 +7,9 @@ import Button       from "react-bootstrap/Button";
 import Container    from 'react-bootstrap/Container';
 import Row          from 'react-bootstrap/Row';
 import Col          from 'react-bootstrap/Col';
-//
-// import Spinner      from 'react-bootstrap/Spinner';
-// import Jumbotron from "react-bootstrap/Jumbotron";
-//
 
 import copy from './Copier.js';
-import {useAuthHeader, get, post} from "./BasicAuth";
-import CreateUserModal from "./CreateUserModal";
-import useError from "./useError";
+import CreateUser from "./CreateUser";
 import useApi from "./useApi";
 
 const initialPage = {
@@ -33,30 +27,11 @@ const initialPage = {
 
 function UserList() {
 
-    const [showCreateUser, setShowCreateUser] = useState(false);
-
-    const {error, addError} = useError();
-    const headers = useAuthHeader();
-
     const {setUrl, isLoading, isLongRequest, fetchedData} = useApi('/user?page=0&size=10', initialPage);
-
 
     let fetchRecentUsers = (pageable) => {
         setUrl('/user?' + pageQuery(pageable));
     };
-
-    const onCreate = (userData) => {
-        setShowCreateUser(false);
-
-        const registrationRequest = {
-            username: userData.username,
-            plainTextPassword: userData.password,
-            email: userData.email
-        }
-        post('/registration', registrationRequest, headers)
-            .then(result => fetchRecentUsers(initialPage.pageable))
-            .catch(error => addError("Trouble saving user: " + error.message));
-    }
 
     const pageQuery = (pageable) => {
         return 'page=' + pageable.pageNumber + '&size=' + pageable.pageSize;
@@ -73,7 +48,6 @@ function UserList() {
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
 
     if(isLoading && ! isLongRequest) {
-        console.log(isLoading + ' ' + isLongRequest);
         return (
             <div />
          );
@@ -103,8 +77,7 @@ function UserList() {
             <div className="container mt-3">
                 <h1>User Management</h1>
 
-                <Button variant="success" onClick={() => setShowCreateUser(true)}>Create User</Button>
-                <CreateUserModal show={showCreateUser} onConfirm={onCreate} onHide={() => setShowCreateUser(false)} />
+                <CreateUser />
 
                 <Container className="container mt-3">
                     {fetchedData.content.map(user =>

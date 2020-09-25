@@ -1,15 +1,18 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 
 import {UserForm} from './UserForm.js';
 import ResetPasswordModal from "./ResetPasswordModal.js";
 
 import Toast from "react-bootstrap/Toast";
 
-import {put, post, get, useAuthHeader} from './BasicAuth.js';
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import {get, useAuthHeader} from './BasicAuth.js';
 import useError from "./useError";
 import useCurrentUser from "./useCurrentUser";
+import useApiPost from "./useApiPost";
+import useApiPut from "./useApiPut";
+
 
 function EditUser({history, match}) {
 
@@ -24,6 +27,9 @@ function EditUser({history, match}) {
     const headers = useAuthHeader();
     const { addError } = useError();
 
+    const post = useApiPost();
+    const put = useApiPut();
+
     const loadUserPromise = get(userEndpoint, headers)
         .catch(error => addError("Trouble loading user: " + error.message));
 
@@ -36,21 +42,18 @@ function EditUser({history, match}) {
     const [showResetPassword, setShowResetPassword] = useState(false);
 
     const onSave = (personalInfo) => {
-        put(userInfoEndpoint, personalInfo, headers)
-            .then(result => history.goBack() )
-            .catch(error => addError("Trouble saving user: " + error.message));
+        put(userInfoEndpoint, personalInfo)
+            .then(result => history.goBack());
     }
 
     const onResetPassword = (plainTextPassword) => {
-        post(updatePasswordEndpoint, plainTextPassword, headers)
+        post(updatePasswordEndpoint, plainTextPassword)
             .then(result => {
                 if(currentUser.username === username) {
                     onLogin({...currentUser, password: plainTextPassword});
                 }
                 setShowResetPassword(false);
-            })
-            .catch(error => addError("Trouble Resetting password: " + error.message));
-        ;
+            });
     }
 
     // onClose={toggleSuccessToast}
