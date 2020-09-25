@@ -71,13 +71,13 @@ function CreateUser(props) {
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <input type="text" className="form-control" id="password" placeholder="Password"
+                        <input type="password"  className="form-control" id="password" placeholder="Password"
                                value={user.password}
                                onChange={e => updateUser({password : e.target.value })} />
                     </div>
                     <div className="form-group">
                         <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input type="text" className="form-control" id="confirmPassword" placeholder="Confirm Password"
+                        <input type="password"  className="form-control" id="confirmPassword" placeholder="Confirm Password"
                                value={user.confirmPassword}
                                onChange={e => updateUser({confirmPassword : e.target.value })} />
                     </div>

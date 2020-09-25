@@ -53,7 +53,7 @@ function Login({history}) {
 
                 <div className="form-group">
                     <label htmlFor="password">Password</label>
-                    <input type="text" className="form-control" id="inputPassword" placeholder="Password"
+                    <input type="password" className="form-control" id="inputPassword" placeholder="Password"
                            value={password}
                            onChange={e => setPassword(e.target.value) }
                            onKeyPress={e => callOnEnter(e, onClickLogin) }

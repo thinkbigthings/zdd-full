@@ -49,13 +49,13 @@ function ResetPasswordModal(props) {
                 </Alert>
                 <div className="form-group">
                     <label htmlFor="password">New Password</label>
-                    <input type="text" className="form-control" id="password" placeholder="Password"
+                    <input type="password"  className="form-control" id="password" placeholder="Password"
                            value={password}
                            onChange={e => setPassword(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="confirmPassword">Confirm Password</label>
-                    <input type="text" className="form-control" id="confirmPassword" placeholder="Confirm Password"
+                    <input type="password"  className="form-control" id="confirmPassword" placeholder="Confirm Password"
                            value={confirmPassword}
                            onChange={e => setConfirmPassword(e.target.value)}
                            onKeyPress={e => callOnEnter(e, onConfirm) }/>
