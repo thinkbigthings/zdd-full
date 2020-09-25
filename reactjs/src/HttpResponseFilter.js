@@ -6,8 +6,6 @@ const { REACT_APP_API_VERSION } = process.env;
 
 const throwOnBadResponse = function(httpResponse) {
 
-    const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
-
     if(httpResponse.status !== 200) {
         console.log('Received ' + httpResponse);
     }
@@ -28,11 +26,9 @@ const throwOnBadResponse = function(httpResponse) {
         throw Error(message + " ... " + userAction);
     }
 
-    if(serverApiVersion !== null && serverApiVersion !== REACT_APP_API_VERSION)
-    {
-        const serverApi = httpResponse.headers.get(VERSION_HEADER);
-        const clientApi= REACT_APP_API_VERSION;
-        const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
+    const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
+    if(serverApiVersion !== null && serverApiVersion !== REACT_APP_API_VERSION) {
+        const message = 'client is version ' + REACT_APP_API_VERSION + ' and server is version ' + serverApiVersion;
         const userAction = 'Try reloading the page';
         throw Error(message + " ... " + userAction);
     }

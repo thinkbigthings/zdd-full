@@ -1,78 +1,26 @@
 
-import useCurrentUser from "./useCurrentUser";
-
-const VERSION_HEADER = 'X-Version';
-
-// picks up from .env file in build
-const { REACT_APP_API_VERSION } = process.env;
-
-const httpStatusFilter = function(httpResponse) {
-
-    const serverApiVersion = httpResponse.headers.get(VERSION_HEADER);
-
-    if(httpResponse.status !== 200) {
-        console.log('Received ' + httpResponse);
-    }
-
-    if(httpResponse.status === 401 || httpResponse.status === 403) {
-        console.log('TODO redirect to /login');
-    }
-
-    if(httpResponse.status >= 400) {
-        const message = 'There was an input error';
-        const userAction = 'Try again';
-        throw Error(message + " ... " + userAction);
-    }
-
-    if(httpResponse.status >= 500) {
-        const message = 'There was a server error';
-        const userAction = 'Try reloading the page';
-        throw Error(message + " ... " + userAction);
-    }
-
-    if(serverApiVersion !== null && serverApiVersion !== REACT_APP_API_VERSION)
-    {
-        const serverApi = httpResponse.headers.get(VERSION_HEADER);
-        const clientApi= REACT_APP_API_VERSION;
-        const message = 'client is version ' + clientApi + ' and server is version ' + serverApi;
-        const userAction = 'Try reloading the page';
-        throw Error(message + " ... " + userAction);
-    }
-
-    return httpResponse;
-}
-
+import {REACT_APP_API_VERSION, VERSION_HEADER, throwOnBadResponse} from "./HttpResponseFilter";
 
 function basicAuthHeader(username, password) {
 
     const encoded = btoa(username + ":" + password);
-    return {
+    let headers = {
         'Authorization': 'Basic ' + encoded,
-        "Content-Type": "application/json",
-        VERSION_HEADER: REACT_APP_API_VERSION
+        "Content-Type": "application/json"
     };
+    headers[VERSION_HEADER] = REACT_APP_API_VERSION;
+    return headers;
 }
 
-function useAuthHeader() {
-
-    const {currentUser} = useCurrentUser();
-
-    if( ! currentUser.isLoggedIn) {
-        throw new Error("user is not logged in");
-    }
-
-    return basicAuthHeader(currentUser.username, currentUser.password);
-}
-
-function fetchWithCreds(url, credentials) {
+function getWithCreds(url, credentials) {
 
     const requestMeta = {
         headers: basicAuthHeader(credentials.username, credentials.password)
     };
 
     return fetch(url, requestMeta)
-        .then(httpStatusFilter)
+        .then(throwOnBadResponse)
         .then(httpResponse => httpResponse.json());
 }
 
-export {fetchWithCreds, useAuthHeader}
+export {getWithCreds, basicAuthHeader}

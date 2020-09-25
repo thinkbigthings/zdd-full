@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Button from "react-bootstrap/Button";
 
-import {fetchWithCreds} from './BasicAuth.js';
+import {getWithCreds} from './BasicAuth.js';
 import useCurrentUser from "./useCurrentUser";
 
 
@@ -31,7 +31,7 @@ function Login({history}) {
         // TODO maybe pass in response handlers: map of response code to callbacks
         // and a default callback (so one for 200 and one for other errors as you can fill it in)
         const userUrl = '/user/' + username;
-        fetchWithCreds(userUrl, credentials)
+        getWithCreds(userUrl, credentials)
             .then(retrievedUser => {
                 const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
                 onLogin(loggedInUser);
