@@ -5,8 +5,9 @@ import useAuthHeader from "./useAuthHeader";
 
 import {throwOnBadResponse} from './HttpResponseFilter';
 
+// inspired by https://www.henriksommerfeld.se/error-handling-with-fetch/
+
 // this is more of a data loader for a page, which is useful as a hook
-// methods in callbacks can't be hooks, so it makes sense to use fetch()
 const useApiLoader = (initialUrl, initialData) => {
 
     const [url, setUrl] = useState(initialUrl);
@@ -27,6 +28,7 @@ const useApiLoader = (initialUrl, initialData) => {
     useEffect(() => {
 
         const handleFetchResponse = response => {
+
             clearTimeout(longRequestTimer);
             setLoading(false);
             setLongRequest(false);
@@ -34,7 +36,6 @@ const useApiLoader = (initialUrl, initialData) => {
             return response.ok && response.json ? response.json() : initialData;
         };
 
-        // default is GET
         const fetchData = () => {
 
             // TODO Assignments to the 'longRequestTimer' variable from inside Reach Hook useEffect will be lost after each render.
@@ -63,9 +64,9 @@ const useApiLoader = (initialUrl, initialData) => {
             fetchData().then(data => setFetchedData(data));
         }
 
-        // // might need to set the cleanup function if any flags need to be reset for subsequent calls
+        // // // might need to set the cleanup function if any flags need to be reset for subsequent calls
         // return () => {
-        //    // cleanup would go here...
+        //    unmounted = true;
         // }
 
     }, [url]);

@@ -64,17 +64,6 @@ function useAuthHeader() {
     return basicAuthHeader(currentUser.username, currentUser.password);
 }
 
-function get(url, requestHeaders) {
-
-    const requestMeta = {
-        headers: requestHeaders
-    };
-
-    return fetch(url, requestMeta)
-        .then(httpStatusFilter)
-        .then(httpResponse => httpResponse.json());
-}
-
 function fetchWithCreds(url, credentials) {
 
     const requestMeta = {
@@ -86,4 +75,4 @@ function fetchWithCreds(url, credentials) {
         .then(httpResponse => httpResponse.json());
 }
 
-export {fetchWithCreds, get, useAuthHeader}
+export {fetchWithCreds, useAuthHeader}
