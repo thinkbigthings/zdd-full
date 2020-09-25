@@ -7,7 +7,7 @@ import {throwOnBadResponse} from './HttpResponseFilter';
 
 // this is more of a data loader for a page, which is useful as a hook
 // methods in callbacks can't be hooks, so it makes sense to use fetch()
-const useApi = (initialUrl, initialData) => {
+const useApiLoader = (initialUrl, initialData) => {
 
     const [url, setUrl] = useState(initialUrl);
     const [isLoading, setLoading] = useState(true);
@@ -78,4 +78,4 @@ const useApi = (initialUrl, initialData) => {
     }
 };
 
-export default useApi;
+export default useApiLoader;

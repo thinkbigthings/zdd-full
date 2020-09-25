@@ -10,7 +10,7 @@ import Col          from 'react-bootstrap/Col';
 
 import copy from './Copier.js';
 import CreateUser from "./CreateUser";
-import useApi from "./useApi";
+import useApiLoader from "./useApiLoader";
 import CenteredSpinner from "./CenteredSpinner";
 
 const initialPage = {
@@ -28,7 +28,7 @@ const initialPage = {
 
 function UserList() {
 
-    const {setUrl, isLoading, isLongRequest, fetchedData} = useApi('/user?page=0&size=10', initialPage);
+    const {setUrl, isLoading, isLongRequest, fetchedData} = useApiLoader('/user?page=0&size=10', initialPage);
 
     let fetchRecentUsers = (pageable) => {
         setUrl('/user?' + pageQuery(pageable));

@@ -2,7 +2,7 @@ import React from 'react';
 
 import Jumbotron from "react-bootstrap/Jumbotron";
 import CenteredSpinner from "./CenteredSpinner";
-import useApi from "./useApi";
+import useApiLoader from "./useApiLoader";
 
 const initialData = {
     users: {
@@ -12,7 +12,7 @@ const initialData = {
 
 function Home() {
 
-    const {isLoading, isLongRequest, fetchedData} = useApi('/actuator/info', initialData);
+    const {isLoading, isLongRequest, fetchedData} = useApiLoader('/actuator/info', initialData);
 
     if(isLoading && ! isLongRequest) { return <div />; }
 
