@@ -11,6 +11,7 @@ import Col          from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import CreateUser from "./CreateUser";
 import useApi from "./useApi";
+import CenteredSpinner from "./CenteredSpinner";
 
 const initialPage = {
     content: [],
@@ -47,29 +48,9 @@ function UserList() {
     const lastElementInPage = fetchedData.pageable.offset + fetchedData.numberOfElements;
     const currentPage = firstElementInPage + "-" + lastElementInPage + " of " + fetchedData.totalElements;
 
-    if(isLoading && ! isLongRequest) {
-        return (
-            <div />
-         );
-    }
+    if(isLoading && ! isLongRequest) { return <div />; }
 
-    if(isLoading && isLongRequest) {
-        return (
-            <Container>
-                <Row className="text-center">
-                    <Col xs="12" className="pt-5">
-                        {/*//         <i className="fa fa-cog fa-spin fa-3x fa-fw"></i>*/}
-                        {/*//         <span className="sr-only">Loading...</span>*/}
-                        <div className="d-flex justify-content-center">
-                            <div className="spinner-border text-secondary" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </div>
-                        </div>
-                    </Col>
-                </Row>
-            </Container>
-        );
-    }
+    if(isLoading && isLongRequest) {   return <CenteredSpinner /> ; }
 
     return (
         <>
