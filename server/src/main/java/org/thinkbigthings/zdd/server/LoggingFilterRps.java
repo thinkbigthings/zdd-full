@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import javax.servlet.*;
 import java.io.IOException;
-import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,10 +20,14 @@ import static java.time.Instant.now;
 @Component
 public class LoggingFilterRps implements Filter {
 
-    private final String legend = " reqs, avg-ms, max-ms: [";
+    private final String legend = "[reqs, avg-ms, max-ms]";
     private final Runnable logger = () -> log(getAndResetStatistics());
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
     private final ConcurrentHashMap<Long, AtomicLong> timeToRequestCount = new ConcurrentHashMap<>();
+
+    private final String timeFormat = "yyyy-MM-dd hh:mm:ss";
+    private final String zone = "America/New_York";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeFormat).withZone(ZoneId.of(zone));
 
     public LoggingFilterRps() {
         executor.scheduleAtFixedRate(logger, 0, 1, TimeUnit.SECONDS);
@@ -50,7 +55,7 @@ public class LoggingFilterRps implements Filter {
 
     private void log(List<RequestDurationCount> histogram) {
 
-        Instant logTime = now();
+        var logTime = formatter.format(now());
 
         var maxTimeMs = histogram.stream()
                 .mapToLong(RequestDurationCount::requestDurationMs)
@@ -66,8 +71,9 @@ public class LoggingFilterRps implements Filter {
                 .sum();
 
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
+        var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-        //System.out.println(logTime + legend + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]");
+        System.out.println(logTime + " " + legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map
@@ -77,10 +83,10 @@ public class LoggingFilterRps implements Filter {
         List<RequestDurationCount> durations = new ArrayList<>();
 
         timeToRequestCount.forEachEntry(1024, entry -> {
-            long requestCount = entry.getValue().getAndSet(0L);
+            long requestCountPerDuration = entry.getValue().getAndSet(0L);
             long requestDuration = entry.getKey();
-            if(requestCount != 0L) {
-                durations.add(new RequestDurationCount(requestDuration, requestCount));
+            if(requestCountPerDuration != 0L) {
+                durations.add(new RequestDurationCount(requestDuration, requestCountPerDuration));
             }
         });
 

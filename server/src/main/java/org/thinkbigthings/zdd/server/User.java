@@ -15,7 +15,6 @@ import static java.util.stream.Collectors.toList;
 public class User {
 
     public enum Role {
-        // these are stored by ordinal in the database, so don't change the order!
         ADMIN, USER;
     }
 
