@@ -123,8 +123,11 @@ curl -k --user admin:admin "https://localhost:9000/user/admin"
 
 use JSESSIONID and remember-me cookies
 
-curl -k -v -b cookies.txt -c cookies.txt  --user admin:admin "https://localhost:9000/user/admin"
-curl -k -v -b cookies.txt -c cookies.txt  "https://localhost:9000/user/admin"
+rm cookies.txt
+curl -k -v -c cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/login"
+cat cookies.txt
+curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
+cat cookies.txt
 
 
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
