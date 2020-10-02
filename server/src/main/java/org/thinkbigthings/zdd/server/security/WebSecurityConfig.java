@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
@@ -34,11 +35,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                 .httpBasic()
                     .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
                 .rememberMe()
                     .alwaysRemember(true)
-                    .tokenRepository(new InMemoryTokenRepositoryImpl()).useSecureCookie(true)
-//                    .rememberMeParameter("remember me token name goes here")
+                    .useSecureCookie(true)
+                    .tokenRepository(new InMemoryTokenRepositoryImpl())
                     .userDetailsService(userDetailsService)
+//                    .rememberMeParameter("remember me token name goes here")
 //                    .rememberMeServices()
                     .and()
                 .csrf()
