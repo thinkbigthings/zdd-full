@@ -116,10 +116,15 @@ curl quick guide: https://gist.github.com/subfuzion/08c5d85437d5d4f00e58
 WITH SECURITY
 
 (this one should fail)
-curl -k --user user:password "https://localhost:9000/protected"
+curl -k --user user:password "https://localhost:9000/user/admin"
 
 (this one should pass)
-curl -k --user admin:admin "https://localhost:9000/protected"
+curl -k --user admin:admin "https://localhost:9000/user/admin"
+
+use JSESSIONID and remember-me cookies
+
+curl -k -v -b cookies.txt -c cookies.txt  --user admin:admin "https://localhost:9000/user/admin"
+curl -k -v -b cookies.txt -c cookies.txt  "https://localhost:9000/user/admin"
 
 
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
