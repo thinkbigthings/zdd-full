@@ -23,6 +23,18 @@ public class UserController {
         service = s;
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value="/user/{username}/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void login(@PathVariable String username) {
+        // placeholder to retrieve tokens
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
+    @RequestMapping(value="/user/{username}/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void logout(@PathVariable String username) {
+        service.logout(username);
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody

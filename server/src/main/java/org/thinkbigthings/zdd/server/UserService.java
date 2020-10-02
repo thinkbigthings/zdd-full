@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,10 +28,17 @@ public class UserService {
 
     private UserRepository userRepo;
     private PasswordEncoder passwordEncoder;
+    private InMemoryTokenRepositoryImpl tokenRepository;
 
-    public UserService(UserRepository repo, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repo, PasswordEncoder passwordEncoder, InMemoryTokenRepositoryImpl tokenRepository) {
         this.userRepo = repo;
         this.passwordEncoder = passwordEncoder;
+        this.tokenRepository = tokenRepository;
+    }
+
+    @Transactional
+    public void logout(String username) {
+        tokenRepository.removeUserTokens(username);
     }
 
     @Transactional

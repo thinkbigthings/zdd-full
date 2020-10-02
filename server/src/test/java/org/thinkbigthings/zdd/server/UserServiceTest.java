@@ -6,6 +6,7 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 
@@ -22,12 +23,13 @@ public class UserServiceTest {
 
     private UserRepository userRepo = Mockito.mock(UserRepository.class);
     private PasswordEncoder pwEncoder = Mockito.mock(PasswordEncoder.class);
+    private InMemoryTokenRepositoryImpl tokenRepository = Mockito.mock(InMemoryTokenRepositoryImpl.class);
 
     private UserService service;
 
     @BeforeEach
     public void setup() {
-        service = new UserService(userRepo, pwEncoder);
+        service = new UserService(userRepo, pwEncoder, tokenRepository);
 
         Mockito.when(userRepo.save(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(userRepo.saveAndFlush(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
