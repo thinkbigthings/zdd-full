@@ -8,10 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.User;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class UserController {
@@ -20,13 +24,14 @@ public class UserController {
 
     // if there's only one constructor, can omit Autowired and Inject
     public UserController(UserService s) {
-        service = s;
+        this.service = s;
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value="/user/{username}/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void login(@PathVariable String username) {
-        // placeholder to retrieve tokens
+    @RequestMapping(value="/user/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void login(HttpServletRequest request, HttpServletResponse response) {
+
+        // placeholder to retrieve an initial token
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")

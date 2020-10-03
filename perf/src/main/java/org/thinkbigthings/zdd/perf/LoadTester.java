@@ -21,6 +21,8 @@ import static java.util.UUID.randomUUID;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+import static org.thinkbigthings.zdd.perf.ApiClient.createBasicAuthHeader;
+import static org.thinkbigthings.zdd.perf.ApiClient.createTokenAuthHeader;
 
 @Component
 public class LoadTester {
@@ -56,7 +58,7 @@ public class LoadTester {
         numThreads = config.getThreads();
         latency = config.getLatency();
 
-        adminClient = new ApiClient("admin", "admin", latency);
+        adminClient = new ApiClient(createBasicAuthHeader("admin", "admin"), latency);
 
         System.out.println("Number Threads: " + numThreads);
         System.out.println("Insert only: " + insertOnly);
@@ -128,17 +130,25 @@ public class LoadTester {
         String username = registrationRequest.username();
         String password = registrationRequest.plainTextPassword();
 
-        URI userUrl = URI.create(users.toString() + "/" + username);
-        URI updatePasswordUrl = URI.create(users.toString() + "/" + username + "/password/update");
-        URI infoUrl = URI.create(users.toString() + "/" + username + "/personalInfo");
 
-        // test user with own credentials
-        ApiClient userClient = new ApiClient(username, password, latency);
-        userClient.get(userUrl, User.class);
+        URI userUrl = URI.create(users + "/" + username);
+        URI updatePasswordUrl = URI.create(userUrl + "/password/update");
+        URI infoUrl = URI.create(userUrl + "/personalInfo");
+        URI loginUrl = URI.create(users + "/login");
+        URI logout = URI.create(userUrl + "/logout");
+
+        ApiClient.Header basicAuthHeader = createBasicAuthHeader(username, password);
+        ApiClient userClient = new ApiClient(basicAuthHeader, latency);
+
+        ApiClient.Header tokenHeader = createTokenAuthHeader(userClient.getResponse(loginUrl).headers());
+        userClient = new ApiClient(tokenHeader, latency);
+
+        User user = userClient.get(userUrl, User.class);
+        System.out.println(user);
 
         String newPassword = "password";
         userClient.post(updatePasswordUrl, newPassword);
-        userClient = new ApiClient(username, newPassword);
+        userClient = new ApiClient(basicAuthHeader);
 
         var updatedInfo = randomPersonalInfo();
         userClient.put(infoUrl, updatedInfo);

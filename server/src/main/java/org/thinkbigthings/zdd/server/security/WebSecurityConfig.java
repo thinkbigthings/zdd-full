@@ -5,18 +5,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.RememberMeServices;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private AppUserDetailsService userDetailsService;
-    private PersistentTokenRepository tokenRepository;
+    private RememberMeServices rememberMeServices;
 
-    public WebSecurityConfig(AppUserDetailsService userDetailsService, PersistentTokenRepository tokenRepository) {
-        this.userDetailsService = userDetailsService;
-        this.tokenRepository = tokenRepository;
+    public WebSecurityConfig(RememberMeServices rememberMeServices) {
+        this.rememberMeServices = rememberMeServices;
     }
 
     private static final String[] OPEN_ENDPOINTS = new String[]{
@@ -35,11 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .rememberMe()
-                    .alwaysRemember(true)
-                    .useSecureCookie(true)
-                    .tokenRepository(tokenRepository)
-                    .userDetailsService(userDetailsService)
-//                    .rememberMeParameter("remember me token name goes here")
+                    .rememberMeServices(rememberMeServices)
                     .and()
                 .csrf()
                     .disable();

@@ -8,12 +8,14 @@ import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class ApiClient {
@@ -30,19 +32,18 @@ public class ApiClient {
     // TODO warn or throw if using an insecure (not https) url because we are passing around basic auth
 
     private HttpClient client;
-    private Header BASIC_AUTH;
+    private Header authHeader;
     private Duration syntheticLatency;
 
-    public ApiClient(String username, String password) {
-        this(username, password, Duration.ZERO);
+    public ApiClient(Header authHeader) {
+        this(authHeader, Duration.ZERO);
     }
 
-    public ApiClient(String username, String password, Duration syntheticLatency) {
+    public ApiClient(Header authHeader, Duration syntheticLatency) {
 
         this.syntheticLatency = syntheticLatency;
 
-        String encodedCredentials = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-        BASIC_AUTH = new Header("Authorization", "Basic " + encodedCredentials);
+        this.authHeader = authHeader;
 
         try {
             // clients are immutable and thread safe
@@ -60,13 +61,33 @@ public class ApiClient {
         }
     }
 
+
+    public static Header createTokenAuthHeader(HttpHeaders responseHeaders) {
+
+        String cookies = responseHeaders.firstValue("set-cookie").get();
+        String rememberMe = Arrays.stream(cookies.split(";"))
+                .map(String::trim)
+                .filter(c -> c.startsWith("remember-me="))
+                .findFirst()
+                .get();
+
+        String token = rememberMe.substring("remember-me=".length());
+
+        return new Header("Cookie", "remember-me="+token);
+    }
+
+    public static Header createBasicAuthHeader(String username, String password) {
+        String encodedCredentials = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        return new Header("Authorization", "Basic " + encodedCredentials);
+    }
+
     public void put(URI uri, Object body) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .PUT(publisher(body))
                 .setHeader(JSON_CONTENT.name(), JSON_CONTENT.value())
-                .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
+                .setHeader(authHeader.name(), authHeader.value())
                 .build();
 
         sendWithLatency(request);
@@ -78,23 +99,25 @@ public class ApiClient {
                 .uri(uri)
                 .POST(publisher(body))
                 .setHeader(JSON_CONTENT.name(), JSON_CONTENT.value())
-                .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
+                .setHeader(authHeader.name(), authHeader.value())
                 .build();
 
         sendWithLatency(request);
     }
 
-    public String get(URI uri) {
+    public HttpResponse<String> getResponse(URI uri) {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
                 .GET()
-                .setHeader(BASIC_AUTH.name(), BASIC_AUTH.value())
+                .setHeader(authHeader.name(), authHeader.value())
                 .build();
 
-        HttpResponse<String> response = sendWithLatency(request);
+        return sendWithLatency(request);
+    }
 
-        return response.body();
+    public String get(URI uri) {
+        return getResponse(uri).body();
     }
 
     public <T> T get(URI uri, Class<T> jsonResponse) {
@@ -108,7 +131,6 @@ public class ApiClient {
 
             // more on body handlers here https://openjdk.java.net/groups/net/httpclient/recipes.html
             // might be fun to have direct-to-json-object body handler
-
             sleep(syntheticLatency);
             HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
             sleep(syntheticLatency);

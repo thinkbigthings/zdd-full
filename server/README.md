@@ -121,7 +121,8 @@ curl -k --user user:password "https://localhost:9000/user/admin"
 (this one should pass)
 curl -k --user admin:admin "https://localhost:9000/user/admin"
 
-use JSESSIONID and remember-me cookies
+#HttpOnly_localhost     FALSE   /       TRUE    1602942120      remember-me     cDZDaXRtJTJCa3A5SW1yOHZaQ3BuWkt3JTNEJTNEOm85WXhRN3ZoUnpycklqRTBkOE9qRFElM0QlM0Q
+#HttpOnly_localhost     FALSE   /       TRUE    1602942142      remember-me     cDZDaXRtJTJCa3A5SW1yOHZaQ3BuWkt3JTNEJTNEOm85WXhRN3ZoUnpycklqRTBkOE9qRFElM0QlM0Q
 
 rm cookies.txt
 curl -k -v -c cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/user/login"
