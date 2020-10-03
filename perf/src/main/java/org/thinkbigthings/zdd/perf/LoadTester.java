@@ -138,20 +138,21 @@ public class LoadTester {
         URI logout = URI.create(userUrl + "/logout");
 
         ApiClient.Header basicAuthHeader = createBasicAuthHeader(username, password);
-        ApiClient userClient = new ApiClient(basicAuthHeader, latency);
+        ApiClient basicAuthClient = new ApiClient(basicAuthHeader, latency);
 
-        ApiClient.Header tokenHeader = createTokenAuthHeader(userClient.getResponse(loginUrl).headers());
-        userClient = new ApiClient(tokenHeader, latency);
+        ApiClient.Header tokenHeader = createTokenAuthHeader(basicAuthClient.getResponse(loginUrl).headers());
+        ApiClient tokenAuthClient = new ApiClient(tokenHeader, latency);
 
-        User user = userClient.get(userUrl, User.class);
+
+        User user = tokenAuthClient.get(userUrl, User.class);
         System.out.println(user);
 
         String newPassword = "password";
-        userClient.post(updatePasswordUrl, newPassword);
-        userClient = new ApiClient(basicAuthHeader);
+        tokenAuthClient.post(updatePasswordUrl, newPassword);
+        basicAuthClient = new ApiClient(basicAuthHeader);
 
         var updatedInfo = randomPersonalInfo();
-        userClient.put(infoUrl, updatedInfo);
+        tokenAuthClient.put(infoUrl, updatedInfo);
 
         PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
 
@@ -159,6 +160,16 @@ public class LoadTester {
             String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;
             throw new RuntimeException(message);
         }
+
+        tokenAuthClient.get(logout);
+        try {
+            tokenAuthClient.get(userUrl, User.class);
+        }
+        catch(Exception e) {
+            System.out.println("user was appropriately logged out");
+        }
+
+
 
         adminClient.get(info);
 

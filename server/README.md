@@ -121,15 +121,14 @@ curl -k --user user:password "https://localhost:9000/user/admin"
 (this one should pass)
 curl -k --user admin:admin "https://localhost:9000/user/admin"
 
-#HttpOnly_localhost     FALSE   /       TRUE    1602942120      remember-me     cDZDaXRtJTJCa3A5SW1yOHZaQ3BuWkt3JTNEJTNEOm85WXhRN3ZoUnpycklqRTBkOE9qRFElM0QlM0Q
-#HttpOnly_localhost     FALSE   /       TRUE    1602942142      remember-me     cDZDaXRtJTJCa3A5SW1yOHZaQ3BuWkt3JTNEJTNEOm85WXhRN3ZoUnpycklqRTBkOE9qRFElM0QlM0Q
+
 
 rm cookies.txt
-curl -k -v -c cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/user/login"
+curl -k -v -b cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/user/login"
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt
-curl -k -v -c cookies.txt -c cookies.txt "https://localhost:9000/user/logout"
+curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin/logout"
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt
