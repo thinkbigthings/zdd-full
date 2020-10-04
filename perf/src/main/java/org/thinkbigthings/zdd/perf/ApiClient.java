@@ -170,9 +170,9 @@ public class ApiClient {
 
         if(response.statusCode() != 200) {
             String message = "Return status code was " + response.statusCode();
-            message += " in call to " + response.request().uri();
-            message += " with headers " + response.headers().map();
-            message += " with body " + response.body();
+            message += " in call to " + response.request().uri() + System.lineSeparator();
+            message += " with response headers " + response.headers().map() + System.lineSeparator();
+            message += " with response body " + response.body();
             throw new RuntimeException(message);
         }
 

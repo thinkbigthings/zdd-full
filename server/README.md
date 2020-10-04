@@ -128,10 +128,11 @@ curl -k -v -b cookies.txt -c cookies.txt --user admin:admin "https://localhost:9
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt
-curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin/logout"
+curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/logout"
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt
+rm cookies.txt
 
 Run the server, then from another command line run `curl -k https://localhost:9000/user`
 

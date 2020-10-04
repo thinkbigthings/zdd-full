@@ -135,7 +135,7 @@ public class LoadTester {
         URI updatePasswordUrl = URI.create(userUrl + "/password/update");
         URI infoUrl = URI.create(userUrl + "/personalInfo");
         URI loginUrl = URI.create(users + "/login");
-        URI logout = URI.create(userUrl + "/logout");
+        URI logout = URI.create(users + "/logout");
 
         ApiClient.Header basicAuthHeader = createBasicAuthHeader(username, password);
         ApiClient basicAuthClient = new ApiClient(basicAuthHeader, latency);
@@ -143,13 +143,11 @@ public class LoadTester {
         ApiClient.Header tokenHeader = createTokenAuthHeader(basicAuthClient.getResponse(loginUrl).headers());
         ApiClient tokenAuthClient = new ApiClient(tokenHeader, latency);
 
-
         User user = tokenAuthClient.get(userUrl, User.class);
         System.out.println(user);
 
         String newPassword = "password";
         tokenAuthClient.post(updatePasswordUrl, newPassword);
-        basicAuthClient = new ApiClient(basicAuthHeader);
 
         var updatedInfo = randomPersonalInfo();
         tokenAuthClient.put(infoUrl, updatedInfo);
