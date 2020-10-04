@@ -124,11 +124,11 @@ curl -k --user admin:admin "https://localhost:9000/user/admin"
 
 
 rm cookies.txt
-curl -k -v -b cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/user/login"
+curl -k -v -b cookies.txt -c cookies.txt --user admin:admin "https://localhost:9000/login"
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt
-curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/logout"
+curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/logout"
 cat cookies.txt
 curl -k -v -b cookies.txt -c cookies.txt "https://localhost:9000/user/admin"
 cat cookies.txt

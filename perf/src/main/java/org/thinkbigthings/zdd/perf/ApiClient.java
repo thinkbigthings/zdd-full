@@ -168,7 +168,7 @@ public class ApiClient {
 
     public HttpResponse<String> throwOnError(HttpResponse<String> response) {
 
-        if(response.statusCode() != 200) {
+        if(response.statusCode() < 200 || response.statusCode() >= 300) {
             String message = "Return status code was " + response.statusCode();
             message += " in call to " + response.request().uri() + System.lineSeparator();
             message += " with response headers " + response.headers().map() + System.lineSeparator();

@@ -30,15 +30,23 @@ public class UserController {
         this.rememberMeServices = rememberMeServices;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public User createUserRegistration(@RequestBody RegistrationRequest newUser) {
+
+        return userService.saveNewUser(newUser);
+    }
+
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value="/user/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public void login(HttpServletRequest request, HttpServletResponse response) {
 
         // placeholder to retrieve an initial token
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value="/user/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value="/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public void logout(HttpServletRequest request, HttpServletResponse response,  Authentication authentication) {
 
         // TODO this logs out the current user, not the specified user.
@@ -52,14 +60,6 @@ public class UserController {
     public Page<User> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
 
         return userService.getUsers(page);
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public User createUserRegistration(@RequestBody RegistrationRequest newUser) {
-
-        return userService.saveNewUser(newUser);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")

@@ -34,6 +34,8 @@ public class LoadTester {
     private String baseUrl;
 
     private URI registration;
+    private URI login;
+    private URI logout;
     private URI users;
     private URI info;
     private URI health;
@@ -49,6 +51,8 @@ public class LoadTester {
         baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
         registration = URI.create(baseUrl + "/registration");
+        login = URI.create(baseUrl + "/login");
+        logout = URI.create(baseUrl + "/logout");
         users = URI.create(baseUrl + "/user");
         info = URI.create(baseUrl + "/actuator/info");
         health = URI.create(baseUrl + "/actuator/health");
@@ -134,13 +138,11 @@ public class LoadTester {
         URI userUrl = URI.create(users + "/" + username);
         URI updatePasswordUrl = URI.create(userUrl + "/password/update");
         URI infoUrl = URI.create(userUrl + "/personalInfo");
-        URI loginUrl = URI.create(users + "/login");
-        URI logout = URI.create(users + "/logout");
 
         ApiClient.Header basicAuthHeader = createBasicAuthHeader(username, password);
         ApiClient basicAuthClient = new ApiClient(basicAuthHeader, latency);
 
-        ApiClient.Header tokenHeader = createTokenAuthHeader(basicAuthClient.getResponse(loginUrl).headers());
+        ApiClient.Header tokenHeader = createTokenAuthHeader(basicAuthClient.getResponse(login).headers());
         ApiClient tokenAuthClient = new ApiClient(tokenHeader, latency);
 
         User user = tokenAuthClient.get(userUrl, User.class);
