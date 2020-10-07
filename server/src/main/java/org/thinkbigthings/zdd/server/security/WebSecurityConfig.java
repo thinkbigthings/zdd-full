@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf()
                 .disable()
             .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER) // Spring Security doesn't create it, so lets Spring Session create it?
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER) // Spring Security never creates it, Spring Session does
                 .and()
             .exceptionHandling()
                 .accessDeniedHandler((req, resp, e) -> e.printStackTrace() )

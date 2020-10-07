@@ -11,11 +11,14 @@ public class SecurityBeans {
 
     @Bean
     public PersistentTokenBasedRememberMeServices createRememberMeServices(AppUserDetailsService userDetailsService, PersistentTokenRepository tokenRepository) {
-        SingleTokenRememberMeServices rememberMeServices = new SingleTokenRememberMeServices("appkey", userDetailsService, tokenRepository);
+
+        PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices("appkey", userDetailsService, tokenRepository);
+
         rememberMeServices.setAlwaysRemember(true);
         rememberMeServices.setUseSecureCookie(true);
-        // rememberMeServices.setCookieName();
         rememberMeServices.setTokenValiditySeconds(AbstractRememberMeServices.TWO_WEEKS_S);
+        // rememberMeServices.setCookieName();
+
         return rememberMeServices;
     }
 
