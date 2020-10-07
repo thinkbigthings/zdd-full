@@ -21,8 +21,6 @@ import static java.util.UUID.randomUUID;
 import static java.util.concurrent.CompletableFuture.runAsync;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
-import static org.thinkbigthings.zdd.perf.ApiClient.createBasicAuthHeader;
-import static org.thinkbigthings.zdd.perf.ApiClient.createTokenAuthHeader;
 
 @Component
 public class LoadTester {
@@ -34,15 +32,13 @@ public class LoadTester {
     private String baseUrl;
 
     private URI registration;
-    private URI login;
-    private URI logout;
     private URI users;
     private URI info;
     private URI health;
 
     private Random random = new Random();
     private Faker faker = new Faker(Locale.US, new Random());
-    private ApiClient adminClient;
+    private ApiClientStateful adminClient;
 
     private final Instant end;
 
@@ -51,8 +47,6 @@ public class LoadTester {
         baseUrl = "https://" + config.getHost() + ":" + config.getPort();
 
         registration = URI.create(baseUrl + "/registration");
-        login = URI.create(baseUrl + "/login");
-        logout = URI.create(baseUrl + "/logout");
         users = URI.create(baseUrl + "/user");
         info = URI.create(baseUrl + "/actuator/info");
         health = URI.create(baseUrl + "/actuator/health");
@@ -62,7 +56,9 @@ public class LoadTester {
         numThreads = config.getThreads();
         latency = config.getLatency();
 
-        adminClient = new ApiClient(createBasicAuthHeader("admin", "admin"), latency);
+        adminClient = new ApiClientStateful(baseUrl, "admin", "admin");
+
+//        adminClient = new ApiClient(createBasicAuthHeader("admin", "admin"), latency);
 
         System.out.println("Number Threads: " + numThreads);
         System.out.println("Insert only: " + insertOnly);
@@ -129,6 +125,8 @@ public class LoadTester {
 
     private void doCRUD() {
 
+        adminClient.get(URI.create(users + "/" + "admin"), User.class);
+
         RegistrationRequest registrationRequest = createRandomUserRegistration();
         adminClient.post(registration, registrationRequest);
         String username = registrationRequest.username();
@@ -139,20 +137,20 @@ public class LoadTester {
         URI updatePasswordUrl = URI.create(userUrl + "/password/update");
         URI infoUrl = URI.create(userUrl + "/personalInfo");
 
-        ApiClient.Header basicAuthHeader = createBasicAuthHeader(username, password);
-        ApiClient basicAuthClient = new ApiClient(basicAuthHeader, latency);
+        ApiClientStateful newClient = new ApiClientStateful(baseUrl, username, password);
+        newClient.get(userUrl, User.class);
+        newClient.logout();
 
-        ApiClient.Header tokenHeader = createTokenAuthHeader(basicAuthClient.getResponse(login).headers());
-        ApiClient tokenAuthClient = new ApiClient(tokenHeader, latency);
+        newClient = new ApiClientStateful(baseUrl, username, password);
 
-        User user = tokenAuthClient.get(userUrl, User.class);
+        User user = newClient.get(userUrl, User.class);
         System.out.println(user);
 
         String newPassword = "password";
-        tokenAuthClient.post(updatePasswordUrl, newPassword);
+        newClient.post(updatePasswordUrl, newPassword);
 
         var updatedInfo = randomPersonalInfo();
-        tokenAuthClient.put(infoUrl, updatedInfo);
+        newClient.put(infoUrl, updatedInfo);
 
         PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
 
@@ -161,9 +159,9 @@ public class LoadTester {
             throw new RuntimeException(message);
         }
 
-        tokenAuthClient.get(logout);
+        newClient.logout();
         try {
-            tokenAuthClient.get(userUrl, User.class);
+            newClient.get(userUrl, User.class);
         }
         catch(Exception e) {
             System.out.println("user was appropriately logged out");

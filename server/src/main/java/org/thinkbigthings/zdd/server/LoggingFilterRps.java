@@ -4,17 +4,27 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+import static java.util.Spliterator.ORDERED;
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 
 @Component
@@ -38,8 +48,30 @@ public class LoggingFilterRps implements Filter {
         executor.shutdownNow();
     }
 
+    public String toString(Cookie cookie) {
+        return cookie.getName() + ": " + cookie.getValue();
+    }
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+
+
+//        HttpServletRequest request = (HttpServletRequest)req;
+//
+//        String headers = stream(spliteratorUnknownSize(request.getHeaderNames().asIterator(), ORDERED),false)
+//                .map(h -> "Header - " + h + ": " + request.getHeader(h))
+//                .collect(joining(System.lineSeparator()));
+//
+//        Cookie[] reqCookies = ofNullable(request.getCookies()).orElse(new Cookie[]{});
+//        String cookies = Arrays.asList(reqCookies).stream()
+//                .map(c -> "Cookie - " + toString(c))
+//                .collect(joining(System.lineSeparator()));
+
+//        System.out.println(request.getRequestURI());
+//        System.out.println(headers);
+//        System.out.println(cookies);
+//        System.out.println();
+
 
         long startTime = System.currentTimeMillis();
         chain.doFilter(req, res);
@@ -73,7 +105,7 @@ public class LoggingFilterRps implements Filter {
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
         var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-        System.out.println(logTime + " " + legend + ": " + requestLog);
+         System.out.println(logTime + " " + legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map

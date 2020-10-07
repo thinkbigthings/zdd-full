@@ -18,7 +18,7 @@ public class SingleTokenRememberMeServices extends PersistentTokenBasedRememberM
      * That is safer from a security point of view but risks a false positive for cookie theft
      * if the caller makes simultaneous requests.
      */
-    protected boolean newTokenOnAutoLogin = false;
+    protected boolean newTokenOnAutoLogin = true;
 
     public SingleTokenRememberMeServices(String key, UserDetailsService userDetailsService, PersistentTokenRepository tokenRepository) {
         super(key, userDetailsService, tokenRepository);

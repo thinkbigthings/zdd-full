@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.RememberMeServices;
 
+
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -24,19 +25,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    .antMatchers(OPEN_ENDPOINTS).permitAll()
-                    .anyRequest().authenticated()
-                    .and()
-                .httpBasic()
-                    .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
-                .rememberMe()
-                    .rememberMeServices(rememberMeServices)
-                    .and()
-                .csrf()
-                    .disable();
+            .authorizeRequests()
+                .antMatchers(OPEN_ENDPOINTS).permitAll()
+                .anyRequest().authenticated()
+                .and()
+            .httpBasic()
+                .and()
+            .rememberMe()
+                .rememberMeServices(rememberMeServices)
+                .and()
+            .csrf()
+                .disable()
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER) // Spring Security doesn't create it, so lets Spring Session create it?
+                .and()
+            .exceptionHandling()
+                .accessDeniedHandler((req, resp, e) -> e.printStackTrace() )
+                .and()
+            .logout()
+                .logoutSuccessHandler((req, rep, auth) -> System.out.println("Logout success"));
     }
 
 }

@@ -38,20 +38,12 @@ public class UserController {
         return userService.saveNewUser(newUser);
     }
 
+    // The url /logout is automatically configured by spring security, so it's not mapped here
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public void login(HttpServletRequest request, HttpServletResponse response) {
 
-        // placeholder to retrieve an initial token
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value="/logout", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void logout(HttpServletRequest request, HttpServletResponse response,  Authentication authentication) {
-
-        // TODO this logs out the current user, not the specified user.
-        // clears tokens from the repository and clears the cookie
-        rememberMeServices.logout(request, response, authentication);
+        // placeholder to retrieve an initial session and token
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

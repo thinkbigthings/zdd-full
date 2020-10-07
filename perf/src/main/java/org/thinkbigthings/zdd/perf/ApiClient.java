@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.io.IOException;
-import java.net.URI;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -15,8 +15,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Base64;
+import java.util.*;
 
 public class ApiClient {
 
@@ -53,6 +52,7 @@ public class ApiClient {
             System.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
 
             client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(30))
                     .sslContext(sc)
                     .build();
         }
@@ -60,7 +60,6 @@ public class ApiClient {
             throw new RuntimeException(e);
         }
     }
-
 
     public static Header createTokenAuthHeader(HttpHeaders responseHeaders) {
 
@@ -134,6 +133,7 @@ public class ApiClient {
             sleep(syntheticLatency);
             HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
             sleep(syntheticLatency);
+
             return response;
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
