@@ -42,8 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .exceptionHandling()
                 .accessDeniedHandler((req, resp, e) -> e.printStackTrace() )
                 .and()
-            .logout()
-                .logoutSuccessHandler((req, rep, auth) -> System.out.println("Logout success"));
+            .logout();
+//                .logoutSuccessHandler((req, rep, auth) -> System.out.println("Logout success"));
     }
 
 }

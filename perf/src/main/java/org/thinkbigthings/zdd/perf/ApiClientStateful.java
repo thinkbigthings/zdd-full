@@ -48,8 +48,8 @@ public class ApiClientStateful {
         client = basicAuthClient(username, password);
         get(login);
 
-        // subsequent calls use session and/or remember me token
-        // otherwise it still adds the basic auth headers
+        // subsequent calls should use session and/or remember me token
+        // remove the authorizor, otherwise it still adds the basic auth headers
         client = removeBasicAuth(client);
     }
 

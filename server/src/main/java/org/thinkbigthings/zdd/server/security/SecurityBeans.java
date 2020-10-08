@@ -15,9 +15,11 @@ import static org.springframework.security.web.authentication.rememberme.Abstrac
 public class SecurityBeans {
 
     @Bean
-    public PersistentTokenBasedRememberMeServices createRememberMeServices(AppUserDetailsService userDetailsService, PersistentTokenRepository tokenRepository) {
-
-        PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices("appkey", userDetailsService, tokenRepository);
+    public PersistentTokenBasedRememberMeServices createRememberMeServices(AppUserDetailsService userDetails,
+                                                                           PersistentTokenRepository tokenRepository)
+    {
+        PersistentTokenBasedRememberMeServices rememberMeServices;
+        rememberMeServices = new PersistentTokenBasedRememberMeServices("appkey", userDetails, tokenRepository);
 
         rememberMeServices.setAlwaysRemember(true);
         rememberMeServices.setUseSecureCookie(true);
