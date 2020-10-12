@@ -6,10 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
@@ -22,12 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController {
 
     private final UserService userService;
-    private PersistentTokenBasedRememberMeServices rememberMeServices;
 
     // if there's only one constructor, can omit Autowired and Inject
-    public UserController(UserService userService, PersistentTokenBasedRememberMeServices rememberMeServices) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.rememberMeServices = rememberMeServices;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

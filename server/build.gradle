@@ -45,6 +45,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-actuator:2.3.2.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-security:2.3.2.RELEASE'
+    implementation 'org.springframework.session:spring-session-jdbc:2.3.1.RELEASE'
 
     // JAXB was removed in Java 11 so needs to be included here
     implementation 'javax.xml.bind:jaxb-api:2.3.1'

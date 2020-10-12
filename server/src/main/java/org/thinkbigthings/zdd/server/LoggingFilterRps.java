@@ -56,8 +56,8 @@ public class LoggingFilterRps implements Filter {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
 
-//        HttpServletRequest request = (HttpServletRequest)req;
-//
+        HttpServletRequest request = (HttpServletRequest)req;
+
 //        String headers = stream(spliteratorUnknownSize(request.getHeaderNames().asIterator(), ORDERED),false)
 //                .map(h -> "Header - " + h + ": " + request.getHeader(h))
 //                .collect(joining(System.lineSeparator()));
@@ -66,7 +66,7 @@ public class LoggingFilterRps implements Filter {
 //        String cookies = Arrays.asList(reqCookies).stream()
 //                .map(c -> "Cookie - " + toString(c))
 //                .collect(joining(System.lineSeparator()));
-
+//
 //        System.out.println(request.getRequestURI());
 //        System.out.println(headers);
 //        System.out.println(cookies);
@@ -105,7 +105,7 @@ public class LoggingFilterRps implements Filter {
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
         var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-//         System.out.println(logTime + " " + legend + ": " + requestLog);
+         System.out.println(logTime + " " + legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map

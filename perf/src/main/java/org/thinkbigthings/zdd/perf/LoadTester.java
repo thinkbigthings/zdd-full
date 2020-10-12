@@ -27,7 +27,6 @@ public class LoadTester {
 
     private Duration duration;
     private int numThreads;
-    private Duration latency;
     private boolean insertOnly;
     private String baseUrl;
 
@@ -54,22 +53,18 @@ public class LoadTester {
         duration = config.getTestDuration();
         insertOnly = config.isInsertOnly();
         numThreads = config.getThreads();
-        latency = config.getLatency();
 
         adminClient = new ApiClientStateful(baseUrl, "admin", "admin");
 
-//        adminClient = new ApiClient(createBasicAuthHeader("admin", "admin"), latency);
-
         System.out.println("Number Threads: " + numThreads);
         System.out.println("Insert only: " + insertOnly);
-        System.out.println("Latency: " + latency.toMillis()+"ms");
 
-        String hms = String.format("%d:%02d:%02d",
-                duration.toHoursPart(),
-                duration.toMinutesPart(),
-                duration.toSecondsPart());
-
-        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
+//        String hms = String.format("%d:%02d:%02d",
+//                duration.toHoursPart(),
+//                duration.toMinutesPart(),
+//                duration.toSecondsPart());
+//
+//        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
 
         end = Instant.now().plus(duration);
     }
@@ -124,6 +119,9 @@ public class LoadTester {
     }
 
     private void doCRUD() {
+
+//        ApiClient headerClient = new ApiClient(createBasicAuthHeader("admin", "admin"));
+//        headerClient.get(URI.create(baseUrl + "/login"));
 
         adminClient.get(URI.create(users + "/" + "admin"), User.class);
 

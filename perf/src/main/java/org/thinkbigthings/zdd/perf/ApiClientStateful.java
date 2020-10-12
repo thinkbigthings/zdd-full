@@ -14,6 +14,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.stream.Collectors;
+
+import static java.lang.System.lineSeparator;
 
 public class ApiClientStateful {
 
@@ -59,7 +62,7 @@ public class ApiClientStateful {
 
     protected HttpClient basicAuthClient(String username, String password) {
         return HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(30))
+                .connectTimeout(Duration.ofSeconds(300))
                 .cookieHandler(new CookieManager())
                 .authenticator(new BasicAuthenticator(username, password))
                 .sslContext(createSsl())
@@ -125,6 +128,14 @@ public class ApiClientStateful {
             // might be fun to have direct-to-json-object body handler
             HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
 
+            String headerLog = response.headers().map().entrySet().stream()
+                    .map(entry -> entry.getKey() + ": " + String.join(", ", entry.getValue()))
+                    .collect(Collectors.joining(lineSeparator()));
+
+            System.out.println(request.uri().getPath());
+            System.out.println(headerLog);
+            System.out.println();
+
             return response;
         }
         catch (InterruptedException | IOException e) {
@@ -160,8 +171,8 @@ public class ApiClientStateful {
 
         if(response.statusCode() < 200 || response.statusCode() >= 300) {
             String message = "Return status code was " + response.statusCode();
-            message += " in call to " + response.request().uri() + System.lineSeparator();
-            message += " with response headers " + response.headers().map() + System.lineSeparator();
+            message += " in call to " + response.request().uri() + lineSeparator();
+            message += " with response headers " + response.headers().map() + lineSeparator();
             message += " with response body " + response.body();
             throw new RuntimeException(message);
         }
