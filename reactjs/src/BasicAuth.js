@@ -1,11 +1,9 @@
 
 import {REACT_APP_API_VERSION, VERSION_HEADER, throwOnBadResponse} from "./HttpResponseFilter";
 
-function basicAuthHeader(username, password) {
+function basicHeader() {
 
-    const encoded = btoa(username + ":" + password);
     let headers = {
-        'Authorization': 'Basic ' + encoded,
         "Content-Type": "application/json"
     };
     headers[VERSION_HEADER] = REACT_APP_API_VERSION;
@@ -15,7 +13,7 @@ function basicAuthHeader(username, password) {
 function getWithCreds(url, credentials) {
 
     const requestMeta = {
-        headers: basicAuthHeader(credentials.username, credentials.password),
+        headers: basicHeader(credentials.username, credentials.password),
         // credentials: 'same-origin'
     };
 
@@ -24,4 +22,4 @@ function getWithCreds(url, credentials) {
         .then(httpResponse => httpResponse.json());
 }
 
-export {getWithCreds, basicAuthHeader}
+export {getWithCreds, basicHeader}
