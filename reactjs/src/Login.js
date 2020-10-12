@@ -28,12 +28,10 @@ function Login({history}) {
             password: password
         }
 
-        // TODO maybe pass in response handlers: map of response code to callbacks
-        // and a default callback (so one for 200 and one for other errors as you can fill it in)
-        const userUrl = '/user/' + username;
-        getWithCreds(userUrl, credentials)
+        const loginUrl = '/login';
+        getWithCreds(loginUrl, credentials)
             .then(retrievedUser => {
-                const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
+                const loggedInUser = {...retrievedUser, isLoggedIn: true}
                 onLogin(loggedInUser);
                 history.push("/");
             });

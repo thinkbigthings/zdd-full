@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import useError from "./useError";
-import useAuthHeader from "./useAuthHeader";
+import {basicHeader} from "./BasicAuth";
 
 import {throwOnBadResponse} from './HttpResponseFilter';
 
@@ -15,7 +15,7 @@ const useApiLoader = (initialUrl, initialData) => {
     const [isLongRequest, setLongRequest] = useState(false);
     const [fetchedData, setFetchedData] = useState(initialData);
 
-    const requestHeaders = useAuthHeader();
+    const requestHeaders = basicHeader();
 
     const { addError } = useError();
 
@@ -47,9 +47,11 @@ const useApiLoader = (initialUrl, initialData) => {
             setLoading(true);
             setLongRequest(false);
 
-            console.log(JSON.stringify(requestHeaders));
+            let request = {
+                headers: requestHeaders,
+            };
 
-            let request = { headers: requestHeaders };
+            // console.log(JSON.stringify(request));
 
             return fetch(url, request)
                 .then(throwOnBadResponse)

@@ -1,12 +1,12 @@
 
 import useError from "./useError";
-import useAuthHeader from "./useAuthHeader";
+import {basicHeader} from "./BasicAuth";
 import {throwOnBadResponse} from './HttpResponseFilter';
 
 
 const useApiPut = () => {
 
-    const requestHeaders = useAuthHeader();
+    const requestHeaders = basicHeader();
     const { addError } = useError();
 
     function put(url, body) {

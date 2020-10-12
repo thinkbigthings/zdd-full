@@ -15,6 +15,7 @@ import org.thinkbigthings.zdd.dto.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 
 @RestController
 public class UserController {
@@ -34,12 +35,11 @@ public class UserController {
         return userService.saveNewUser(newUser);
     }
 
-    // The url /logout is automatically configured by spring security, so it's not mapped here
+    // The url /logout is automatically configured by spring security, so it's not mapped in this controller
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void login(HttpServletRequest request, HttpServletResponse response) {
-
-        // placeholder to retrieve an initial session and token
+    public User login(Principal principal) {
+        return userService.getUser(principal.getName());
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
