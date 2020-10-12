@@ -27,7 +27,6 @@ public class LoadTester {
 
     private Duration duration;
     private int numThreads;
-    private Duration latency;
     private boolean insertOnly;
     private String baseUrl;
 
@@ -38,7 +37,7 @@ public class LoadTester {
 
     private Random random = new Random();
     private Faker faker = new Faker(Locale.US, new Random());
-    private ApiClient adminClient;
+    private ApiClientStateful adminClient;
 
     private final Instant end;
 
@@ -54,20 +53,18 @@ public class LoadTester {
         duration = config.getTestDuration();
         insertOnly = config.isInsertOnly();
         numThreads = config.getThreads();
-        latency = config.getLatency();
 
-        adminClient = new ApiClient("admin", "admin", latency);
+        adminClient = new ApiClientStateful(baseUrl, "admin", "admin");
 
         System.out.println("Number Threads: " + numThreads);
         System.out.println("Insert only: " + insertOnly);
-        System.out.println("Latency: " + latency.toMillis()+"ms");
 
-        String hms = String.format("%d:%02d:%02d",
-                duration.toHoursPart(),
-                duration.toMinutesPart(),
-                duration.toSecondsPart());
-
-        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
+//        String hms = String.format("%d:%02d:%02d",
+//                duration.toHoursPart(),
+//                duration.toMinutesPart(),
+//                duration.toSecondsPart());
+//
+//        System.out.println("Running test for " + hms + " (hh:mm:ss) connecting to " + baseUrl);
 
         end = Instant.now().plus(duration);
     }
@@ -123,25 +120,35 @@ public class LoadTester {
 
     private void doCRUD() {
 
+//        ApiClient headerClient = new ApiClient(createBasicAuthHeader("admin", "admin"));
+//        headerClient.get(URI.create(baseUrl + "/login"));
+
+        adminClient.get(URI.create(users + "/" + "admin"), User.class);
+
         RegistrationRequest registrationRequest = createRandomUserRegistration();
         adminClient.post(registration, registrationRequest);
         String username = registrationRequest.username();
         String password = registrationRequest.plainTextPassword();
 
-        URI userUrl = URI.create(users.toString() + "/" + username);
-        URI updatePasswordUrl = URI.create(users.toString() + "/" + username + "/password/update");
-        URI infoUrl = URI.create(users.toString() + "/" + username + "/personalInfo");
 
-        // test user with own credentials
-        ApiClient userClient = new ApiClient(username, password, latency);
-        userClient.get(userUrl, User.class);
+        URI userUrl = URI.create(users + "/" + username);
+        URI updatePasswordUrl = URI.create(userUrl + "/password/update");
+        URI infoUrl = URI.create(userUrl + "/personalInfo");
+
+        ApiClientStateful newClient = new ApiClientStateful(baseUrl, username, password);
+        newClient.get(userUrl, User.class);
+        newClient.logout();
+
+        newClient = new ApiClientStateful(baseUrl, username, password);
+
+        User user = newClient.get(userUrl, User.class);
+        System.out.println(user);
 
         String newPassword = "password";
-        userClient.post(updatePasswordUrl, newPassword);
-        userClient = new ApiClient(username, newPassword);
+        newClient.post(updatePasswordUrl, newPassword);
 
         var updatedInfo = randomPersonalInfo();
-        userClient.put(infoUrl, updatedInfo);
+        newClient.put(infoUrl, updatedInfo);
 
         PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
 
@@ -149,6 +156,16 @@ public class LoadTester {
             String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;
             throw new RuntimeException(message);
         }
+
+        newClient.logout();
+        try {
+            newClient.get(userUrl, User.class);
+        }
+        catch(Exception e) {
+            System.out.println("user was appropriately logged out");
+        }
+
+
 
         adminClient.get(info);
 

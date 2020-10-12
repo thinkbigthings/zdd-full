@@ -6,6 +6,7 @@ import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 

@@ -13,22 +13,17 @@ import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.User;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
 
     // if there's only one constructor, can omit Autowired and Inject
-    public UserController(UserService s) {
-        service = s;
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @RequestMapping(value="/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Page<User> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
-
-        return service.getUsers(page);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -36,7 +31,23 @@ public class UserController {
     @ResponseBody
     public User createUserRegistration(@RequestBody RegistrationRequest newUser) {
 
-        return service.saveNewUser(newUser);
+        return userService.saveNewUser(newUser);
+    }
+
+    // The url /logout is automatically configured by spring security, so it's not mapped here
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void login(HttpServletRequest request, HttpServletResponse response) {
+
+        // placeholder to retrieve an initial session and token
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @RequestMapping(value="/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Page<User> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
+
+        return userService.getUsers(page);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
@@ -44,7 +55,7 @@ public class UserController {
     @ResponseBody
     public User updateUser(@RequestBody PersonalInfo userData, @PathVariable String username) {
 
-        return service.updateUser(username, userData);
+        return userService.updateUser(username, userData);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
@@ -52,7 +63,7 @@ public class UserController {
     @ResponseBody
     public void updatePassword(@RequestBody String newPassword, @PathVariable String username, @AuthenticationPrincipal UserDetails user) {
 
-        service.updatePassword(username, newPassword);
+        userService.updatePassword(username, newPassword);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
@@ -60,7 +71,7 @@ public class UserController {
     @ResponseBody
     public User getUser(@PathVariable String username) {
 
-        return service.getUser(username);
+        return userService.getUser(username);
     }
 
 }

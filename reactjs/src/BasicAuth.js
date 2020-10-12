@@ -15,7 +15,8 @@ function basicAuthHeader(username, password) {
 function getWithCreds(url, credentials) {
 
     const requestMeta = {
-        headers: basicAuthHeader(credentials.username, credentials.password)
+        headers: basicAuthHeader(credentials.username, credentials.password),
+        // credentials: 'same-origin'
     };
 
     return fetch(url, requestMeta)
