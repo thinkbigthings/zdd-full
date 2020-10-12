@@ -49,10 +49,9 @@ const useApiLoader = (initialUrl, initialData) => {
 
             let request = {
                 headers: requestHeaders,
-                credentials: 'same-origin'
             };
 
-            console.log(JSON.stringify(request));
+            // console.log(JSON.stringify(request));
 
             return fetch(url, request)
                 .then(throwOnBadResponse)

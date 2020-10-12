@@ -12,9 +12,12 @@ function basicHeader() {
 
 function getWithCreds(url, credentials) {
 
+    const encoded = btoa(credentials.username + ":" + credentials.password);
+
     const requestMeta = {
-        headers: basicHeader(credentials.username, credentials.password),
-        // credentials: 'same-origin'
+        headers: {
+            'Authorization': 'Basic ' + encoded
+        }
     };
 
     return fetch(url, requestMeta)

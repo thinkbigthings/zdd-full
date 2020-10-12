@@ -31,7 +31,7 @@ function Login({history}) {
         const loginUrl = '/login';
         getWithCreds(loginUrl, credentials)
             .then(retrievedUser => {
-                const loggedInUser = {...retrievedUser, ...credentials, isLoggedIn: true}
+                const loggedInUser = {...retrievedUser, isLoggedIn: true}
                 onLogin(loggedInUser);
                 history.push("/");
             });

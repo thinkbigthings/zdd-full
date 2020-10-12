@@ -18,6 +18,7 @@ import {ErrorProvider} from './ErrorContext.js';
 import ErrorModal from "./ErrorModal";
 import useCurrentUser from "./useCurrentUser";
 import {CurrentUserContext, CurrentUserProvider} from "./CurrentUserContext";
+import {basicHeader} from "./BasicAuth";
 
 function App() {
 
@@ -58,6 +59,17 @@ function AuthenticatedApp() {
 
     const userUrl = "#/users/"+currentUser.username+"/edit";
 
+    function onClickLogout() {
+
+        const request = {
+            headers: basicHeader(),
+            method: 'GET'
+        };
+
+        fetch("/logout", request)
+            .then(response => onLogout());
+    }
+
     if(hasAdmin()) {
         return (
             <HashRouter>
@@ -70,7 +82,7 @@ function AuthenticatedApp() {
                         <Nav.Link href="#about">About</Nav.Link>
                     </Nav>
                     <Form inline>
-                        <Nav.Link onClick={onLogout}>Logout</Nav.Link>
+                        <Nav.Link onClick={onClickLogout}>Logout</Nav.Link>
                     </Form>
                 </NavBar>
                 <Route exact path="/" render={() => <Home/>}/>
