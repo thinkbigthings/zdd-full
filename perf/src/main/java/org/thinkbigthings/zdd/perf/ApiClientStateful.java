@@ -14,6 +14,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
@@ -126,15 +127,19 @@ public class ApiClientStateful {
 
             // more on body handlers here https://openjdk.java.net/groups/net/httpclient/recipes.html
             // might be fun to have direct-to-json-object body handler
+
+//            Duration randomLatency = Duration.ofMillis(new Random().nextInt(15));
+//            sleep(randomLatency);
             HttpResponse<String> response = throwOnError(client.send(request, HttpResponse.BodyHandlers.ofString()));
+//            sleep(randomLatency);
 
-            String headerLog = response.headers().map().entrySet().stream()
-                    .map(entry -> entry.getKey() + ": " + String.join(", ", entry.getValue()))
-                    .collect(Collectors.joining(lineSeparator()));
-
-            System.out.println(request.uri().getPath());
-            System.out.println(headerLog);
-            System.out.println();
+//            String headerLog = response.headers().map().entrySet().stream()
+//                    .map(entry -> entry.getKey() + ": " + String.join(", ", entry.getValue()))
+//                    .collect(Collectors.joining(lineSeparator()));
+//
+//            System.out.println(request.uri().getPath());
+//            System.out.println(headerLog);
+//            System.out.println();
 
             return response;
         }
@@ -180,4 +185,17 @@ public class ApiClientStateful {
         return response;
     }
 
+
+    private void sleep(Duration sleepDuration) {
+        if(sleepDuration.isZero()) {
+            return;
+        }
+        try {
+            Thread.sleep(sleepDuration.toMillis());
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -79,6 +79,17 @@ Drop and run all migrations: `gradlew flywayClean; gradlew flywayMigrate -i`
 We run the migration standalone (not on startup of the application)
 So that we have more control over the migration process.
 
+
+## Threads
+
+The Logging filter's ScheduledThreadPoolExecutor has a core pool size
+
+The server defines a number of standard spring boot threads:
+server.tomcat.max-threads
+server.tomcat.min-spare-threads 
+server.tomcat.accept-count
+
+
 ## Security
 
 ## HTTPS

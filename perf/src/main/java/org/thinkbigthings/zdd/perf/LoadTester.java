@@ -15,6 +15,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import static java.util.UUID.randomUUID;
@@ -79,8 +81,8 @@ public class LoadTester {
 
         try {
 
-            List<CompletableFuture<Void>> futures = IntStream.rangeClosed(1, numThreads)
-                    .mapToObj(i -> runAsync(() -> makeCalls(), executor))
+            List<CompletableFuture<Void>> futures = IntStream.range(0, numThreads)
+                    .mapToObj(i -> runAsync(() -> makeCalls(i), executor))
                     .collect(toList());
 
             allOf(futures).join();
@@ -97,7 +99,13 @@ public class LoadTester {
         return Instant.now().isBefore(end);
     }
 
-    private void makeCalls() {
+    private void makeCalls(int threadNumber) {
+
+        // try to make it so not every thread is registering or logging in or out at the same time
+        // the threads have a tendency to "bunch up" and all register (require password hash) at the same time
+        // which is CPU intensive and tends to be a bottleneck because they are lengthy calls
+        // Duration randomPause = Duration.ofMillis(random.nextInt(500));
+        sleep(Duration.ofMillis(threadNumber * 200));
 
         try {
             while(isDurationActive()) {
@@ -120,41 +128,38 @@ public class LoadTester {
 
     private void doCRUD() {
 
-//        ApiClient headerClient = new ApiClient(createBasicAuthHeader("admin", "admin"));
-//        headerClient.get(URI.create(baseUrl + "/login"));
-
         adminClient.get(URI.create(users + "/" + "admin"), User.class);
 
         RegistrationRequest registrationRequest = createRandomUserRegistration();
-        adminClient.post(registration, registrationRequest);
         String username = registrationRequest.username();
         String password = registrationRequest.plainTextPassword();
-
 
         URI userUrl = URI.create(users + "/" + username);
         URI updatePasswordUrl = URI.create(userUrl + "/password/update");
         URI infoUrl = URI.create(userUrl + "/personalInfo");
 
+        System.out.println("registering and logging in " + username);
+        adminClient.post(registration, registrationRequest);
         ApiClientStateful newClient = new ApiClientStateful(baseUrl, username, password);
-        newClient.get(userUrl, User.class);
-        newClient.logout();
-
-        newClient = new ApiClientStateful(baseUrl, username, password);
-
-        User user = newClient.get(userUrl, User.class);
-        System.out.println(user);
 
         String newPassword = "password";
         newClient.post(updatePasswordUrl, newPassword);
 
-        var updatedInfo = randomPersonalInfo();
-        newClient.put(infoUrl, updatedInfo);
+        // do lots of regular work that's not logging in or updating password (those are auth / cpu heavy)
+        int numLoops = 100;
+        for(int i=0; i < numLoops; i++) {
 
-        PersonalInfo retrievedInfo = adminClient.get(userUrl, User.class).personalInfo();
+            newClient.get(userUrl, User.class);
 
-        if( ! retrievedInfo.equals(updatedInfo)) {
-            String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;
-            throw new RuntimeException(message);
+            var updatedInfo = randomPersonalInfo();
+            newClient.put(infoUrl, updatedInfo);
+
+            PersonalInfo retrievedInfo = newClient.get(userUrl, User.class).personalInfo();
+
+            if (!retrievedInfo.equals(updatedInfo)) {
+                String message = "user updates were not all persisted: " + retrievedInfo + " vs " + updatedInfo;
+                throw new RuntimeException(message);
+            }
         }
 
         newClient.logout();
@@ -164,8 +169,6 @@ public class LoadTester {
         catch(Exception e) {
             System.out.println("user was appropriately logged out");
         }
-
-
 
         adminClient.get(info);
 
@@ -203,4 +206,16 @@ public class LoadTester {
                 fakerAddress.zipCode());
     }
 
+    private void sleep(Duration sleepDuration) {
+        if(sleepDuration.isZero()) {
+            return;
+        }
+        try {
+            Thread.sleep(sleepDuration.toMillis());
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 }
