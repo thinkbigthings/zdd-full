@@ -32,7 +32,7 @@ public class LoggingFilterRps implements Filter {
 
     private final String legend = "[reqs, avg-ms, max-ms]";
     private final Runnable logger = () -> log(getAndResetStatistics());
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(5);
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(50);
     private final ConcurrentHashMap<Long, AtomicLong> timeToRequestCount = new ConcurrentHashMap<>();
 
     private final String timeFormat = "yyyy-MM-dd hh:mm:ss";
@@ -105,7 +105,7 @@ public class LoggingFilterRps implements Filter {
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
         var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-         System.out.println(logTime + " " + legend + ": " + requestLog);
+        System.out.println(logTime + " " + legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map
