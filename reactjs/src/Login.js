@@ -3,10 +3,12 @@ import Button from "react-bootstrap/Button";
 
 import {getWithCreds} from './BasicAuth.js';
 import useCurrentUser from "./useCurrentUser";
-
+import useError from "./useError";
 
 // login needs to be a component in the router for history to be passed here
 function Login({history}) {
+
+    const { addError } = useError();
 
     // local form state
     const [username, setUsername] = useState('');
@@ -34,6 +36,10 @@ function Login({history}) {
                 const loggedInUser = {...retrievedUser, isLoggedIn: true}
                 onLogin(loggedInUser);
                 history.push("/");
+            })
+            .catch(error => {
+                console.log(error.message);
+                addError("Login failed.");
             });
     }
 

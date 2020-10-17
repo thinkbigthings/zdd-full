@@ -14,9 +14,13 @@ function getWithCreds(url, credentials) {
 
     const encoded = btoa(credentials.username + ":" + credentials.password);
 
+    // If the server returns a 401 status code and includes one or more WWW-Authenticate headers, then
+    // the browser pops up an authentication dialog asking for the username and password
+    // Including X-Requested-With by the client signals the server to not respond with that header
     const requestMeta = {
         headers: {
-            'Authorization': 'Basic ' + encoded
+            'Authorization': 'Basic ' + encoded,
+            'X-Requested-With': 'XMLHttpRequest'
         }
     };
 

@@ -23,7 +23,7 @@ function ErrorModal(props) {
                 </Alert></Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={clearError}>
-                    Ignore
+                    Cancel
                 </Button>
                 <Button variant="primary" onClick={ () => window.location.reload(true)}>
                     Reload
