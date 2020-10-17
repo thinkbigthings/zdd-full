@@ -7,6 +7,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
@@ -39,7 +41,9 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public User login(Principal principal) {
-        return userService.getUser(principal.getName());
+        // Session is not written to database on login until after the user has returned,
+        // so the session is not immediately available on login
+        return userService.getUser(principal.getName()).withIsLoggedIn(true);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

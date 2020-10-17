@@ -1,6 +1,7 @@
 package org.thinkbigthings.zdd.server;
 
 import org.junit.jupiter.api.Test;
+import org.thinkbigthings.zdd.server.entity.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
