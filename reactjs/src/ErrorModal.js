@@ -5,10 +5,14 @@ import Modal from "react-bootstrap/Modal";
 import Alert from "react-bootstrap/Alert";
 
 import useError from "./useError";
+import {recoveryActions} from "./ErrorContext";
 
 function ErrorModal(props) {
 
     const { error, clearError } = useError();
+
+    const displayReload = error.recoveryAction === recoveryActions.RELOAD;
+    const displayReloadStyle = displayReload ? '' : 'd-none';
 
     return (
         <Modal show={error.hasError} onHide={clearError} backdrop="static" centered>
@@ -25,7 +29,7 @@ function ErrorModal(props) {
                 <Button variant="secondary" onClick={clearError}>
                     Cancel
                 </Button>
-                <Button variant="primary" onClick={ () => window.location.reload(true)}>
+                <Button className={displayReloadStyle} variant="primary" onClick={ () => window.location.reload(true)}>
                     Reload
                 </Button>
             </Modal.Footer>

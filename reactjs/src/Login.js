@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import {getWithCreds} from './BasicAuth.js';
 import useCurrentUser from "./useCurrentUser";
 import useError from "./useError";
+import {recoveryActions} from "./ErrorContext";
 
 // login needs to be a component in the router for history to be passed here
 function Login({history}) {
@@ -39,7 +40,7 @@ function Login({history}) {
             })
             .catch(error => {
                 console.log(error.message);
-                addError("Login failed.");
+                addError("Login failed.", recoveryActions.NONE);
             });
     }
 

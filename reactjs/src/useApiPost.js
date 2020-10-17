@@ -2,6 +2,7 @@
 import useError from "./useError";
 import {basicHeader} from "./BasicAuth";
 import {throwOnBadResponse} from './HttpResponseFilter';
+import {recoveryActions} from "./ErrorContext";
 
 
 const useApiPost = () => {
@@ -22,7 +23,7 @@ const useApiPost = () => {
         return fetch(url, requestMeta)
             .then(throwOnBadResponse)
             .catch(error => {
-                addError("The app encountered an error: " + error.message);
+                addError("The app encountered an error: " + error.message, recoveryActions.RELOAD);
             });
     }
 

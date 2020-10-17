@@ -4,6 +4,7 @@ import useError from "./useError";
 import {basicHeader} from "./BasicAuth";
 
 import {throwOnBadResponse} from './HttpResponseFilter';
+import {recoveryActions} from "./ErrorContext";
 
 // inspired by https://www.henriksommerfeld.se/error-handling-with-fetch/
 
@@ -57,7 +58,7 @@ const useApiLoader = (initialUrl, initialData) => {
                 .then(throwOnBadResponse)
                 .then(handleFetchResponse)
                 .catch(error => {
-                    addError("The app encountered an error: " + error.message);
+                    addError("The app encountered an error: " + error.message, recoveryActions.RELOAD);
                     return initialData;
                 });
         };
