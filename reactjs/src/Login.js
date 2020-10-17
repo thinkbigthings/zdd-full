@@ -1,10 +1,27 @@
 import React, {useState} from 'react';
 import Button from "react-bootstrap/Button";
 
-import {getWithCreds} from './BasicAuth.js';
 import useCurrentUser from "./useCurrentUser";
 import useError from "./useError";
 import {recoveryActions} from "./ErrorContext";
+import {REACT_APP_API_VERSION, throwOnBadResponse, VERSION_HEADER} from "./HttpResponseFilter";
+
+function getWithCreds(url, credentials) {
+
+    const encoded = btoa(credentials.username + ":" + credentials.password);
+
+    // If the server returns a 401 status code and includes one or more WWW-Authenticate headers, then
+    // the browser pops up an authentication dialog asking for the username and password
+    // Including X-Requested-With by the client signals the server to not respond with that header
+    const requestMeta = {
+        headers: {
+            'Authorization': 'Basic ' + encoded,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    };
+
+    return fetch(url, requestMeta);
+}
 
 // login needs to be a component in the router for history to be passed here
 function Login({history}) {
@@ -24,18 +41,31 @@ function Login({history}) {
         }
     }
 
+    const loginUrl = '/login';
+
     const onClickLogin = () => {
 
-        const credentials = {
-            username: username,
-            password: password
-        }
+        getWithCreds(loginUrl, { username, password })
+            .then(throwOnBadResponse)
+            .then(response =>
+                response.json().then(data => ({
+                    user: data,
+                    status: response.status,
+                    headers: response.headers
+                }))
+            )
+            .then(response => {
 
-        const loginUrl = '/login';
-        getWithCreds(loginUrl, credentials)
-            .then(retrievedUser => {
-                onLogin(retrievedUser);
+                onLogin(response.user);
                 history.push("/");
+
+                // Check current client version and if out of date do a hard refresh.
+                // If someone logs out and attempts to log in later, this gives us a good boundary to update the client.
+                const clientApiVersion = REACT_APP_API_VERSION;
+                const serverApiVersion = response.headers.get(VERSION_HEADER);
+                if(clientApiVersion !== serverApiVersion) {
+                    window.location.reload(true);
+                }
             })
             .catch(error => {
                 console.log(error.message);
