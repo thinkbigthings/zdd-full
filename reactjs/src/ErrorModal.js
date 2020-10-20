@@ -6,12 +6,23 @@ import Alert from "react-bootstrap/Alert";
 
 import useError from "./useError";
 import {recoveryActions} from "./ErrorContext";
+import useCurrentUser from "./useCurrentUser";
 
 function ErrorModal(props) {
 
     const { error, clearError } = useError();
+    const {onLogout} = useCurrentUser();
 
+    function refreshLogin() {
+        onLogout();
+        clearError();
+        window.location.replace('/#/login');
+        window.location.reload(true)
+    }
+
+    const displayLogin = error.recoveryAction === recoveryActions.LOGIN;
     const displayReload = error.recoveryAction === recoveryActions.RELOAD;
+    const displayLoginStyle = displayLogin ? '' : 'd-none';
     const displayReloadStyle = displayReload ? '' : 'd-none';
 
     return (
@@ -28,6 +39,9 @@ function ErrorModal(props) {
             <Modal.Footer>
                 <Button variant="secondary" onClick={clearError}>
                     Cancel
+                </Button>
+                <Button className={displayLoginStyle} variant="primary" onClick={ refreshLogin }>
+                    Login
                 </Button>
                 <Button className={displayReloadStyle} variant="primary" onClick={ () => window.location.reload(true)}>
                     Reload

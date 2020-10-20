@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 
 const recoveryActions = {
     NONE: 'none',
+    LOGIN: 'login',
     RELOAD: 'reload'
 }
 

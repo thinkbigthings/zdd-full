@@ -1,14 +1,14 @@
 
 import useError from "./useError";
 import {basicHeader} from "./BasicAuth";
-import {throwOnBadResponse} from './HttpResponseFilter';
-import {recoveryActions} from "./ErrorContext";
+import useHttpError from "./useHttpError";
 
 
 const useApiPut = () => {
 
     const requestHeaders = basicHeader();
     const { addError } = useError();
+    const {throwOnHttpError} = useHttpError();
 
     function put(url, body) {
 
@@ -21,10 +21,8 @@ const useApiPut = () => {
         };
 
         return fetch(url, requestMeta)
-            .then(throwOnBadResponse)
-            .catch(error => {
-                addError("The app encountered an error: " + error.message, recoveryActions.RELOAD);
-            });
+            .then(throwOnHttpError)
+            .catch(error => console.log(error));
     }
 
     return put;
