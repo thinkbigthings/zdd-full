@@ -13,8 +13,6 @@ import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.User;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 
 @RestController
@@ -39,7 +37,9 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value="/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public User login(Principal principal) {
-        return userService.getUser(principal.getName());
+        // Session is not written to database on login until after the user has returned,
+        // so the session is not immediately available on login
+        return userService.getUser(principal.getName()).withIsLoggedIn(true);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

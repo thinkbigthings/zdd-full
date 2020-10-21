@@ -1,7 +1,7 @@
 package org.thinkbigthings.zdd.server.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.thinkbigthings.zdd.server.User;
+import org.thinkbigthings.zdd.server.entity.User;
 
 import static org.springframework.security.core.userdetails.User.builder;
 

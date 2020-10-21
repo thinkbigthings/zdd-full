@@ -1,8 +1,15 @@
 import React, {useState} from 'react';
 
+const recoveryActions = {
+    NONE: 'none',
+    LOGIN: 'login',
+    RELOAD: 'reload'
+}
+
 const noErrors = {
     message: '',
-    hasError: false
+    hasError: false,
+    recoveryAction: recoveryActions.NONE
 }
 
 const ErrorContext = React.createContext([noErrors, (error) => {}]);
@@ -19,4 +26,4 @@ const ErrorProvider = (props) => {
     );
 }
 
-export {ErrorContext, ErrorProvider, noErrors};
+export {ErrorContext, ErrorProvider, noErrors, recoveryActions};

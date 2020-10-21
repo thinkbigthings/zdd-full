@@ -1,13 +1,12 @@
 
-import useError from "./useError";
 import {basicHeader} from "./BasicAuth";
-import {throwOnBadResponse} from './HttpResponseFilter';
+import useHttpError from "./useHttpError";
 
 
 const useApiPost = () => {
 
     const requestHeaders = basicHeader();
-    const { addError } = useError();
+    const {throwOnHttpError} = useHttpError();
 
     function post(url, body) {
 
@@ -20,10 +19,8 @@ const useApiPost = () => {
         };
 
         return fetch(url, requestMeta)
-            .then(throwOnBadResponse)
-            .catch(error => {
-                addError("The app encountered an error: " + error.message);
-            });
+            .then(throwOnHttpError)
+            .catch(error => console.log(error));
     }
 
     return post;

@@ -1,12 +1,13 @@
 import { useContext } from 'react';
-import { ErrorContext, noErrors } from "./ErrorContext";
+import {ErrorContext, noErrors, recoveryActions} from "./ErrorContext";
 
 const useError = () => {
 
     const [error, setError] = useContext(ErrorContext);
 
-    function addError(message) {
-        setError({message, hasError: true});
+    function addError(message, action) {
+        const recovery = action !== undefined ? action : recoveryActions.NONE;
+        setError({message, hasError: true, recoveryAction: recovery});
     }
 
     function clearError() {

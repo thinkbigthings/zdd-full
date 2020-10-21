@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 
-import useError from "./useError";
 import {basicHeader} from "./BasicAuth";
-
-import {throwOnBadResponse} from './HttpResponseFilter';
+import useHttpError from "./useHttpError";
 
 // inspired by https://www.henriksommerfeld.se/error-handling-with-fetch/
 
@@ -17,7 +15,7 @@ const useApiLoader = (initialUrl, initialData) => {
 
     const requestHeaders = basicHeader();
 
-    const { addError } = useError();
+    const { throwOnHttpError } = useHttpError();
 
     const longLoadTimeMs = 1000;
 
@@ -54,10 +52,10 @@ const useApiLoader = (initialUrl, initialData) => {
             // console.log(JSON.stringify(request));
 
             return fetch(url, request)
-                .then(throwOnBadResponse)
+                .then(throwOnHttpError)
                 .then(handleFetchResponse)
                 .catch(error => {
-                    addError("The app encountered an error: " + error.message);
+                    console.log(error);
                     return initialData;
                 });
         };

@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.server.entity.User;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

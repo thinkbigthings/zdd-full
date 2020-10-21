@@ -1,8 +1,11 @@
-package org.thinkbigthings.zdd.server;
+package org.thinkbigthings.zdd.server.entity;
+
+import org.thinkbigthings.zdd.server.Address;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "app_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
-public class User {
+public class User implements Serializable {
 
     public enum Role {
         ADMIN, USER;
@@ -64,6 +67,11 @@ public class User {
 
     @OneToMany(fetch=FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval=true)
     private Set<Address> addresses = new HashSet<>();
+
+    // If we check session status on all user accesses, might as well make it eager too
+    // default cascade is that no operations are cascaded
+    @OneToMany(fetch=FetchType.EAGER, mappedBy = "user")
+    private Set<Session> sessions = new HashSet<>();
 
     protected User() {
 
@@ -173,4 +181,7 @@ public class User {
         this.addresses = addresses;
     }
 
+    public Set<Session> getSessions() {
+        return sessions;
+    }
 }

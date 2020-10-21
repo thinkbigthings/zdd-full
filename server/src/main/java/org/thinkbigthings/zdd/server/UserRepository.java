@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.server;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.thinkbigthings.zdd.server.entity.User;
 
 import java.util.Optional;
 

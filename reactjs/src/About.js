@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Button from "react-bootstrap/Button";
-
-// picks up from .env file in build
-const { REACT_APP_API_VERSION } = process.env;
+import {REACT_APP_API_VERSION} from "./Constants";
 
 const styleByStatus = {
     "UP" : "text-success",

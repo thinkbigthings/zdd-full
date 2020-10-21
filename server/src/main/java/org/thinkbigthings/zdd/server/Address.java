@@ -1,10 +1,9 @@
 package org.thinkbigthings.zdd.server;
 
+import org.thinkbigthings.zdd.server.entity.User;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(name = "address")

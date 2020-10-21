@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.server.entity.User;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
@@ -127,7 +128,8 @@ public class UserService {
         return new org.thinkbigthings.zdd.dto.User( user.getUsername(),
                 user.getRegistrationTime().toString(),
                 roles,
-                toPersonalInfoRecord(user));
+                toPersonalInfoRecord(user),
+                user.getSessions().size() > 0);
     }
 
     public AddressRecord toAddressRecord(Address address) {
