@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public record User(@JsonProperty("username") String username,
@@ -9,6 +10,10 @@ public record User(@JsonProperty("username") String username,
                    @JsonProperty("roles") Set<String> roles,
                    @JsonProperty("personalInfo") PersonalInfo personalInfo,
                    @JsonProperty("isLoggedIn") boolean isLoggedIn) {
+
+    public User() {
+        this("", "", new HashSet<>(), new PersonalInfo(), false);
+    }
 
     public User withIsLoggedIn(boolean newValue) {
         return new User(username(), registrationTime(), roles(), personalInfo(), newValue);

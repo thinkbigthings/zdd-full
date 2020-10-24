@@ -7,15 +7,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.server.entity.User;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,21 +26,6 @@ public class UserServiceTest {
 
         Mockito.when(userRepo.save(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(userRepo.saveAndFlush(ArgumentMatchers.any(User.class))).then(AdditionalAnswers.returnsFirstArg());
-
-    }
-
-    @Test
-    public void testRecordSerialization() throws Exception {
-
-        AddressRecord userInfo = new AddressRecord("a", null,"PA", "12345");
-
-        String serializedRecord = Paths.get("build", "serial.data").toString();
-        try(var oos = new ObjectOutputStream(new FileOutputStream(serializedRecord))) {
-            oos.writeObject(userInfo);
-        }
-        try(var ois = new ObjectInputStream(new FileInputStream(serializedRecord))) {
-            System.out.println(ois.readObject());
-        }
 
     }
 
