@@ -1,5 +1,7 @@
 package org.thinkbigthings.zdd.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -21,6 +23,7 @@ import static java.util.Optional.ofNullable;
 @Component
 public class ApiVersionInterceptor extends HandlerInterceptorAdapter {
 
+    private static Logger LOG = LoggerFactory.getLogger(ApiVersionInterceptor.class);
 
     public static final String API_VERSION  = "X-Version";
 
@@ -50,7 +53,7 @@ public class ApiVersionInterceptor extends HandlerInterceptorAdapter {
         // in theory we could inspect handler annotations for what version it can handle.
         if( ! requestApiVersion.equals(apiVersion)) {
             String message = "Request api " + requestApiVersion + " does not match server api " + apiVersion;
-            System.out.println(message);
+            LOG.error(message);
             throw new IncompatibleClientVersionException(message);
         }
 

@@ -1,5 +1,7 @@
 package org.thinkbigthings.zdd.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -29,6 +31,8 @@ import static java.util.stream.StreamSupport.stream;
 
 @Component
 public class LoggingFilterRps implements Filter {
+
+    private static Logger LOG = LoggerFactory.getLogger(LoggingFilterRps.class);
 
     private final String legend = "[reqs, avg-ms, max-ms]";
     private final Runnable logger = () -> log(getAndResetStatistics());
@@ -87,7 +91,7 @@ public class LoggingFilterRps implements Filter {
 
     private void log(List<RequestDurationCount> histogram) {
 
-        var logTime = formatter.format(now());
+//        var logTime = formatter.format(now());
 
         var maxTimeMs = histogram.stream()
                 .mapToLong(RequestDurationCount::requestDurationMs)
@@ -105,7 +109,8 @@ public class LoggingFilterRps implements Filter {
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
         var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-        System.out.println(logTime + " " + legend + ": " + requestLog);
+        LOG.info(legend + ": " + requestLog);
+//        System.out.println(logTime + " " + legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map

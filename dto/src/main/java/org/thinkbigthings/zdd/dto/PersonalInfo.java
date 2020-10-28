@@ -1,16 +1,13 @@
 package org.thinkbigthings.zdd.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public record PersonalInfo(@JsonProperty("email") String email,
-                           @JsonProperty("displayName") String displayName,
-                           @JsonProperty("phoneNumber") String phoneNumber,
-                           @JsonProperty("heightCm") int heightCm,
-                           @JsonProperty("addresses") Set<AddressRecord> addresses) {
+public record PersonalInfo(String email,
+                           String displayName,
+                           String phoneNumber,
+                           int heightCm,
+                           Set<AddressRecord> addresses) {
 
     public PersonalInfo() {
         this("", "", "", 0, new HashSet<>());

@@ -7,6 +7,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.server.entity.User;
 
@@ -48,7 +49,7 @@ public class UserServiceTest {
 
         RegistrationRequest register = new RegistrationRequest(name, "b", "name@email.com");
 
-        assertThrows(IllegalArgumentException.class, () -> service.saveNewUser(register));
+        assertThrows(ResponseStatusException.class, () -> service.saveNewUser(register));
     }
 
 }
