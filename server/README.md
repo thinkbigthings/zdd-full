@@ -187,7 +187,48 @@ To upgrade versions of Java in IntelliJ:
 
 
 ## Cloud (Heroku)
- 
+
+### Initial setup notes
+
+Getting started docs
+https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html#cloud-deployment-heroku
+https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production-on-heroku
+https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku
+
+Preparation:
+
+Need Procfile, see sample
+Need system.properties file with java.runtime.version=15
+Put properties that don't differ between environments in src/main/resources/application.properties
+
+
+can name app on creation or rename later
+
+add postgres with heroku addons:create heroku-postgresql
+
+Procfile needs to be in the root of the git repo
+`git subtree push --prefix server heroku master`
+
+Heroku local can use environment variables in a local `.env` file 
+It could read something like this:
+
+```
+DATABASE_URL=postgres://localhost:5432/gradle_database_name
+```
+
+
+
+
+
+
+
+
+### Heroku Database Migrations
+
 Heroku requires apps to bind a port in 60s or it's considered crashed
-https://devcenter.heroku.com/changelog-items/364
-migrations can eat into that time, there are ways to move that out
+Migrations can eat into that time, so do that separately from deployment
+
+We can run a migration with a one-off dyno. Would rather not use the release phase
+because it's better to monitor the migration and app.
+
+Flyway is not on the classpath of the server, so it should not run automatically on startup.
