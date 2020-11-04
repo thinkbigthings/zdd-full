@@ -212,7 +212,11 @@ heroku addons:create heroku-postgresql
 heroku config
 heroku pg
 
+TODO not sure this is the right command, does it get the procfile?
 git subtree push --prefix server heroku heroku
+or
+git push heroku heroku
+
 heroku run gradlew flywayMigrate -i
 heroku restart
 heroku open
