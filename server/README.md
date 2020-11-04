@@ -204,7 +204,7 @@ Put properties that don't differ between environments in src/main/resources/appl
 Very First Time commands
 
 heroku create
-heroku apps:rename
+heroku apps:rename zdd-fullstack
 
 heroku addons:create papertrail
 
