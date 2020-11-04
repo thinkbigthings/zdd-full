@@ -197,17 +197,28 @@ https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku
 
 Preparation:
 
-Need Procfile, see sample
+Procfile needs to be in the root of the git repo
 Need system.properties file with java.runtime.version=15
 Put properties that don't differ between environments in src/main/resources/application.properties
 
+Very First Time commands
 
-can name app on creation or rename later
+heroku create
+heroku apps:rename
 
-add postgres with heroku addons:create heroku-postgresql
+heroku addons:create papertrail
 
-Procfile needs to be in the root of the git repo
-`git subtree push --prefix server heroku master`
+heroku addons:create heroku-postgresql
+heroku config
+heroku pg
+
+git subtree push --prefix server heroku heroku
+heroku run gradlew flywayMigrate -i
+heroku restart
+heroku open
+
+
+``
 
 Heroku local can use environment variables in a local `.env` file 
 It could read something like this:
@@ -217,12 +228,6 @@ DATABASE_URL=postgres://localhost:5432/gradle_database_name
 ```
 
 
-
-
-
-
-
-
 ### Heroku Database Migrations
 
 Heroku requires apps to bind a port in 60s or it's considered crashed
@@ -230,5 +235,6 @@ Migrations can eat into that time, so do that separately from deployment
 
 We can run a migration with a one-off dyno. Would rather not use the release phase
 because it's better to monitor the migration and app.
+A one-off dyno needs to finish in 1h unless run:detached which is 24h
 
 Flyway is not on the classpath of the server, so it should not run automatically on startup.
