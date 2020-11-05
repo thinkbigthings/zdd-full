@@ -194,6 +194,7 @@ Getting started docs
 https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html#cloud-deployment-heroku
 https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production-on-heroku
 https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku
+https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku
 
 Preparation:
 
@@ -212,10 +213,25 @@ heroku addons:create heroku-postgresql
 heroku config
 heroku pg
 
+// note: deleted app online and was constantly getting "no such app" on command line
+// resolved with git remote rm heroku
+
+TODO Pushed to branch other than [main, master], skipping build.
+https://stackoverflow.com/questions/14593538/make-heroku-run-non-master-git-branch
+git push heroku heroku-branch:master
+and set back with this (pushes master to heroku)
+git push -f heroku master:master 
+
+
+
 TODO not sure this is the right command, does it get the procfile?
 git subtree push --prefix server heroku heroku
+to push a non-master branch
+git subtree push --prefix path/to/app-subdir heroku heroku-branch:master
+or make a buildpack, see https://jtway.co/deploying-subdirectory-projects-to-heroku-f31ed65f3f2
+
 or
-git push heroku heroku
+git push heroku heroku-branch
 
 heroku run gradlew flywayMigrate -i
 heroku restart

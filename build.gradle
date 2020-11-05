@@ -64,6 +64,9 @@ task build () {
     dependsOn(':server:bootJar')
 }
 
+// for heroku
+task stage(dependsOn: ['build'])
+
 project(':perf') {
     dependencies {
         implementation project(':dto')
