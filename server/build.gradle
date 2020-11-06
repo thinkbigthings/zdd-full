@@ -49,6 +49,10 @@ dependencies {
 
     // JAXB was removed in Java 11 so needs to be included here
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
+    // so flyway runs on startup
+    implementation 'org.flywaydb:flyway-core:6.5.7'
+
 }
  
 // clear the database, rebuild, and run with fresh database

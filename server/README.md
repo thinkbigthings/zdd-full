@@ -196,49 +196,46 @@ https://devcenter.heroku.com/articles/preparing-a-spring-boot-app-for-production
 https://devcenter.heroku.com/articles/deploying-spring-boot-apps-to-heroku
 https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku
 
+
+
+
+SSL files https://devcenter.heroku.com/articles/ssl#manually-uploading-certificates-and-intermediaries
+
+DB customize url (don't depend on their value)
+https://devcenter.heroku.com/articles/heroku-postgresql#spring-java
+
+
+
 Preparation:
 
-Procfile needs to be in the root of the git repo
-Need system.properties file with java.runtime.version=15
+Procfile needs to be there
+Procfile needs to specify the port, port is not picked up automatically as a property override by spring boot
+
+Need system.properties file with java.runtime.version=15 to use something other than the default Java 8
+
 Put properties that don't differ between environments in src/main/resources/application.properties
 
-Very First Time commands
 
-heroku create
-heroku apps:rename zdd-fullstack
+Deploy JAR
 
+https://devcenter.heroku.com/articles/deploying-executable-jar-files
+https://github.com/heroku/heroku-gradle
+
+heroku plugins:install java
+heroku create --no-remote
+heroku apps:rename zdd
 heroku addons:create papertrail
-
-heroku addons:create heroku-postgresql
+heroku addons:create heroku-postgresql --app zdd
 heroku config
 heroku pg
-
-// note: deleted app online and was constantly getting "no such app" on command line
-// resolved with git remote rm heroku
-
-TODO Pushed to branch other than [main, master], skipping build.
-https://stackoverflow.com/questions/14593538/make-heroku-run-non-master-git-branch
-git push heroku heroku-branch:master
-and set back with this (pushes master to heroku)
-git push -f heroku master:master 
-
-
-
-TODO not sure this is the right command, does it get the procfile?
-git subtree push --prefix server heroku heroku
-to push a non-master branch
-git subtree push --prefix path/to/app-subdir heroku heroku-branch:master
-or make a buildpack, see https://jtway.co/deploying-subdirectory-projects-to-heroku-f31ed65f3f2
-
-or
-git push heroku heroku-branch
-
-heroku run gradlew flywayMigrate -i
-heroku restart
+heroku deploy:jar server/build/libs/server-1.0-SNAPSHOT.jar --app boiling-scrubland-75403 --include Procfile system.properties
+heroku run ls  --app zdd
+heroku logs --app zdd
 heroku open
 
+// migration runs automatically, might want to break it out so app doesn't depend on flyway, 
+// and have option of code level customizations
 
-``
 
 Heroku local can use environment variables in a local `.env` file 
 It could read something like this:
@@ -250,8 +247,12 @@ DATABASE_URL=postgres://localhost:5432/gradle_database_name
 
 ### Heroku Database Migrations
 
+See https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps
+
+https://stackoverflow.com/questions/64173564/failed-to-ugrade-a-spring-boot-app-to-flyway-7-0-0
+
 Heroku requires apps to bind a port in 60s or it's considered crashed
-Migrations can eat into that time, so do that separately from deployment
+Migrations can eat into that time (and the free dyno is not super fast), so do that separately from deployment
 
 We can run a migration with a one-off dyno. Would rather not use the release phase
 because it's better to monitor the migration and app.
