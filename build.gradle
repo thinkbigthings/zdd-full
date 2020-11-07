@@ -43,13 +43,41 @@ subprojects {
     }
 }
 
+task clean () {
+    dependsOn('cleanHeroku')
+}
+
+task cleanHeroku {
+    group 'heroku'
+    delete 'heroku/build'
+}
+
+task prepareHeroku() {
+    group 'heroku'
+    dependsOn('copyFilesToHeroku')
+    dependsOn('copyJarToHeroku')
+}
+
+task copyFilesToHeroku(type: Copy) {
+    group 'heroku'
+    description 'copies heroku required files to heroku deployment folder'
+    dependsOn('build')
+    from 'heroku/src'
+    into 'heroku/build'
+}
+
+task copyJarToHeroku(type: Copy) {
+    group 'heroku'
+    description 'copies jar file from server to heroku deployment folder'
+    dependsOn('build')
+    from 'server/build/libs'
+    into 'heroku/build'
+}
+
 task copyWebApp(type: Copy) {
-
     description 'copies built files from reactjs to the server'
-
     dependsOn ':reactjs:build'
     dependsOn ':server:classes'
-
     from 'reactjs/build'
     into 'server/build/resources/main/static'
 }
@@ -63,9 +91,6 @@ task build () {
     dependsOn('copyWebApp')
     dependsOn(':server:bootJar')
 }
-
-// for heroku
-task stage(dependsOn: ['build'])
 
 project(':perf') {
     dependencies {
