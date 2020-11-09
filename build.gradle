@@ -1,4 +1,9 @@
 
+plugins {
+    id "com.heroku.sdk.heroku-gradle" version "2.0.0"
+}
+
+
 // TODO this isn't appropriate for all subprojects, just the Java ones (not React)
 subprojects {
 
@@ -43,35 +48,21 @@ subprojects {
     }
 }
 
-task clean () {
-    dependsOn('cleanHeroku')
-}
+// use heroku gradle plugin
+// https://github.com/heroku/heroku-gradle
+heroku {
 
-task cleanHeroku {
-    group 'heroku'
-    delete 'heroku/build'
-}
+    appName = "zdd-full" // should be configurable so we don't deploy to wrong environment
 
-task prepareHeroku() {
-    group 'heroku'
-    dependsOn('copyFilesToHeroku')
-    dependsOn('copyJarToHeroku')
-}
+    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar"]
+    includeBuildDir = false
 
-task copyFilesToHeroku(type: Copy) {
-    group 'heroku'
-    description 'copies heroku required files to heroku deployment folder'
-    dependsOn('build')
-    from 'heroku/src'
-    into 'heroku/build'
-}
+    jdkVersion = 15
 
-task copyJarToHeroku(type: Copy) {
-    group 'heroku'
-    description 'copies jar file from server to heroku deployment folder'
-    dependsOn('build')
-    from 'server/build/libs'
-    into 'heroku/build'
+    processTypes(
+        // escape the $ for gradle
+        web: "java --enable-preview -Dserver.port=\$PORT -jar server/build/libs/server-1.0-SNAPSHOT.jar"
+    )
 }
 
 task copyWebApp(type: Copy) {
