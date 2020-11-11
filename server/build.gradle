@@ -7,7 +7,6 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '2.3.2.RELEASE'
-    id 'org.flywaydb.flyway' version '6.0.4'
     id 'jacoco' // core plugin provided by gradle
 }
 
@@ -25,18 +24,6 @@ jacocoTestReport {
     }
 }
 
-flyway {
-    
-    // get properties for server and flyway from the same place 
-    def props = new Properties()
-    file("application.properties").withInputStream { props.load(it) }
-    
-    url = props.getProperty("spring.datasource.url") // 'jdbc:postgresql://localhost:5555/app'
-    user = props.getProperty("spring.datasource.username") //'postgres'
-    password = props.getProperty("spring.datasource.password") //'postgres'
-    schemas = ['public']
-}
-
 dependencies {
 
     // implementation 'javax.inject:javax.inject:1'
@@ -49,10 +36,6 @@ dependencies {
 
     // JAXB was removed in Java 11 so needs to be included here
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
-
-    // so flyway runs on startup
-    implementation 'org.flywaydb:flyway-core:6.5.7'
-
 }
  
 // clear the database, rebuild, and run with fresh database

@@ -52,16 +52,16 @@ subprojects {
 // https://github.com/heroku/heroku-gradle
 heroku {
 
-    appName = "zdd-full" // should be configurable so we don't deploy to wrong environment
+    appName = "zdd-full"
 
-    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar"]
+    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar", "migration/build/libs/migration-1.0-SNAPSHOT.jar"]
     includeBuildDir = false
 
     jdkVersion = 15
 
     processTypes(
-        // escape the $ for gradle
-        web: "java --enable-preview -Dserver.port=\$PORT -jar server/build/libs/server-1.0-SNAPSHOT.jar"
+        release: "java -jar migration/build/libs/migration-1.0-SNAPSHOT.jar",
+        web: "java --enable-preview -Dserver.port=\$PORT -jar server/build/libs/server-1.0-SNAPSHOT.jar" // escape $ for gradle
     )
 }
 
@@ -71,11 +71,6 @@ task copyWebApp(type: Copy) {
     dependsOn ':server:classes'
     from 'reactjs/build'
     into 'server/build/resources/main/static'
-}
-
-task runAll () {
-    dependsOn('copyWebApp')
-    dependsOn(':server:bootRun')
 }
 
 task build () {

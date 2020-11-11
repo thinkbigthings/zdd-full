@@ -1,6 +1,4 @@
 
 rootProject.name = 'zdd'
 
-include 'reactjs', 'perf', 'server', 'dto'
-
-
+include 'reactjs', 'perf', 'server', 'dto', 'migration'
