@@ -1,7 +1,5 @@
 package org.thinkbigthings.zdd.server.entity;
 
-import org.thinkbigthings.zdd.server.Address;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -9,7 +7,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
 
