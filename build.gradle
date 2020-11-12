@@ -53,15 +53,13 @@ subprojects {
 heroku {
 
     appName = "zdd-full"
-
+    jdkVersion = 15
     includes = ["server/build/libs/server-1.0-SNAPSHOT.jar", "migration/build/libs/migration-1.0-SNAPSHOT.jar"]
     includeBuildDir = false
 
-    jdkVersion = 15
-
     processTypes(
         release: "java -jar migration/build/libs/migration-1.0-SNAPSHOT.jar",
-        web: "java --enable-preview -Dserver.port=\$PORT -jar server/build/libs/server-1.0-SNAPSHOT.jar" // escape $ for gradle
+        web: "java --enable-preview -Dspring.datasource.url=\${JDBC_DATABASE_URL}&autosave=conservative -Dserver.port=\$PORT -jar server/build/libs/server-1.0-SNAPSHOT.jar" // escape $ for gradle
     )
 }
 
