@@ -11,7 +11,7 @@ plugins {
 
 //flyway {
 //
-//    // get properties for server and flyway from the same place
+//    // get properties for application and flyway plugin from the same place
 //    def props = new Properties()
 //    file("application.properties").withInputStream { props.load(it) }
 //

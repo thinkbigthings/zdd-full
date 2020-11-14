@@ -173,15 +173,43 @@ https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku
 
 https://devcenter.heroku.com/articles/deploying-executable-jar-files
 
-cd heroku/build
+These are commands you can use directly, but really it's simpler to use the gradle plugin
+
+// if heroku java plugin isn't installed locally yet
 heroku plugins:install java
+
+// if you want to blow away an instance and start over
+heroku apps:destroy zdd-full
+
 heroku create --no-remote
-heroku apps:rename --app zdd-full
+heroku apps:rename --app generatedname zdd-full
 heroku addons:create papertrail --app zdd-full
 heroku addons:create heroku-postgresql --app zdd-full
+
+// deploy with gradle
+heroku deployHeroku
+heroku logs --tail --app zdd-full
+
+// or with command line
+heroku deploy:jar server-1.0-SNAPSHOT.jar --app zdd-full --include Procfile system.properties
+
+// other handy commands
 heroku config --app zdd-full
 heroku pg --app zdd-full
-heroku deploy:jar server-1.0-SNAPSHOT.jar --app zdd-full --include Procfile system.properties
 heroku run ls --app zdd-full
-heroku logs --app zdd-full
-heroku open --app zdd-full
+heroku run env --app zdd-full
+
+### Test heroku commands in build.gradle locally
+
+To run these exact commands (the ones that end up in the Procfile) locally, 
+we need to have application.properties and cert file in current folder.
+
+Also, in the local application.properties, add the property  `spring.jpa.database=POSTGRESQL`
+
+And export these properties to simulate the heroku environment
+
+    export JDBC_DATABASE_URL="jdbc:postgresql://localhost:5555/app?password=postgres&&user=postgres"
+    export JDBC_DATABASE_USERNAME=postgres
+    export JDBC_DATABASE_PASSWORD=postgres
+    export PORT=9000
+
