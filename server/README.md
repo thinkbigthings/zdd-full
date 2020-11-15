@@ -99,6 +99,11 @@ To make self-signed keys for dev:
 
 To update HTTPS related files and properties, see the `server.ssl.*` properties used by Spring Boot
 
+We don't include the p12 file when deploying to heroku, 
+but get https by virtue of being a subdomain of herokuapps.com which has a CA cert.
+Http automatically redirects to https on heroku. Locally it always requires https.
+
+
 ## Running
 
 If starting with a new run of docker, need to ensure the migrations have been run

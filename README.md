@@ -182,16 +182,25 @@ heroku plugins:install java
 heroku apps:destroy zdd-full
 
 heroku create --no-remote
-heroku apps:rename --app generatedname zdd-full
-heroku addons:create papertrail --app zdd-full
-heroku addons:create heroku-postgresql --app zdd-full
+heroku apps:rename --app generatedname stage-zdd-full
+heroku addons:create papertrail --app stage-zdd-full
+heroku addons:create heroku-postgresql --app stage-zdd-full
 
-// deploy with gradle
-heroku deployHeroku
-heroku logs --tail --app zdd-full
+// deploy with gradle, specify app name to ensure the correct target environment
 
+    gradlew -Papp=stage-zdd-full deployHeroku
+    
+    
 // or with command line
 heroku deploy:jar server-1.0-SNAPSHOT.jar --app zdd-full --include Procfile system.properties
+
+
+View logs during deployment
+heroku logs --tail --app stage-zdd-full
+
+View logs for the migration (release phase)
+can be viewed from dashboard, or with command
+heroku releases:output --app zdd-full
 
 // other handy commands
 heroku config --app zdd-full
