@@ -1,6 +1,13 @@
 # Database Migrations
 
 
+## Heroku database
+
+Can get a postgres command prompt with
+
+    heroku pg:psql --app stage-zdd-full
+
+
 ## Fitting in with Heroku
 
 Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase) seems to be the intended mechanism for migrations.
