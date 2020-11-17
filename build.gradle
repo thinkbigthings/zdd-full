@@ -1,4 +1,9 @@
 
+plugins {
+    id "com.heroku.sdk.heroku-gradle" version "2.0.0"
+}
+
+
 // TODO this isn't appropriate for all subprojects, just the Java ones (not React)
 subprojects {
 
@@ -43,20 +48,28 @@ subprojects {
     }
 }
 
-task copyWebApp(type: Copy) {
+// use heroku gradle plugin
+// https://github.com/heroku/heroku-gradle
+heroku {
 
-    description 'copies built files from reactjs to the server'
+    appName = project.hasProperty('app') ? project.property('app') : 'stage-zdd-full';
+    jdkVersion = 15
+    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar", "migration/build/libs/migration-1.0-SNAPSHOT.jar"]
+    includeBuildDir = false
 
-    dependsOn ':reactjs:build'
-    dependsOn ':server:classes'
-
-    from 'reactjs/build'
-    into 'server/build/resources/main/static'
+    processTypes(
+        // The \$ is to escape $ for gradle, don't need the slash when running the command locally
+        release: "java --enable-preview -jar migration/build/libs/migration-1.0-SNAPSHOT.jar",
+        web: "java --enable-preview -Dserver.port='\${PORT}' -Dspring.datasource.url='\${JDBC_DATABASE_URL}&autosave=conservative' -jar server/build/libs/server-1.0-SNAPSHOT.jar"
+    )
 }
 
-task runAll () {
-    dependsOn('copyWebApp')
-    dependsOn(':server:bootRun')
+task copyWebApp(type: Copy) {
+    description 'copies built files from reactjs to the server'
+    dependsOn ':reactjs:build'
+    dependsOn ':server:classes'
+    from 'reactjs/build'
+    into 'server/build/resources/main/static'
 }
 
 task build () {

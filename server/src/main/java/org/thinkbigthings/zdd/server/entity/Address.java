@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.server;
+package org.thinkbigthings.zdd.server.entity;
 
 import org.thinkbigthings.zdd.server.entity.User;
 

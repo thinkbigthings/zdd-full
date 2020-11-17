@@ -7,7 +7,6 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '2.3.2.RELEASE'
-    id 'org.flywaydb.flyway' version '6.0.4'
     id 'jacoco' // core plugin provided by gradle
 }
 
@@ -23,18 +22,6 @@ jacocoTestReport {
         csv.enabled false
         html.destination file("${buildDir}/reports/jacoco/html")
     }
-}
-
-flyway {
-    
-    // get properties for server and flyway from the same place 
-    def props = new Properties()
-    file("application.properties").withInputStream { props.load(it) }
-    
-    url = props.getProperty("spring.datasource.url") // 'jdbc:postgresql://localhost:5555/app'
-    user = props.getProperty("spring.datasource.username") //'postgres'
-    password = props.getProperty("spring.datasource.password") //'postgres'
-    schemas = ['public']
 }
 
 dependencies {

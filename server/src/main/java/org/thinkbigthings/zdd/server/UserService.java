@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.server.entity.Address;
 import org.thinkbigthings.zdd.server.entity.User;
 
 import javax.persistence.EntityNotFoundException;
