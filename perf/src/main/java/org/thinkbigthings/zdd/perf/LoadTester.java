@@ -45,7 +45,7 @@ public class LoadTester {
 
     public LoadTester(AppProperties config) {
 
-        baseUrl = "https://" + config.getHost() + ":" + config.getPort();
+        baseUrl = config.getHost();
 
         registration = URI.create(baseUrl + "/registration");
         users = URI.create(baseUrl + "/user");

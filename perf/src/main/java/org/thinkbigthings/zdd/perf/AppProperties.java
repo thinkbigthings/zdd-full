@@ -10,14 +10,12 @@ import java.time.Duration;
 public class AppProperties {
 
     protected String host;
-    protected Integer port;
     protected boolean insertOnly = false;
     protected Integer threads = 2;
     protected Duration testDuration = Duration.ofMinutes(60);
 
-    public AppProperties(String host, Integer port, boolean insertOnly, Integer threads, Duration testDuration) {
+    public AppProperties(String host, boolean insertOnly, Integer threads, Duration testDuration) {
         this.host = host;
-        this.port = port;
         this.insertOnly = insertOnly;
         this.threads = threads;
         this.testDuration = testDuration;
@@ -25,10 +23,6 @@ public class AppProperties {
 
     public String getHost() {
         return host;
-    }
-
-    public Integer getPort() {
-        return port;
     }
 
     public boolean isInsertOnly() {
