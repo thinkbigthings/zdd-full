@@ -1,12 +1,18 @@
 buildscript {
     dependencies {
-        classpath 'org.postgresql:postgresql:42.2.8'
+        classpath 'org.postgresql:postgresql:42.2.18'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.3.2.RELEASE'
-    id 'org.flywaydb.flyway' version '6.0.4'
+    id 'org.springframework.boot' version '2.4.0'
+    id 'org.flywaydb.flyway' version '7.2.1'
+}
+
+dependencies {
+    implementation 'org.postgresql:postgresql:42.2.18'
+    implementation 'org.flywaydb:flyway-core:7.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.4.0'
 }
 
 //flyway {
@@ -20,9 +26,3 @@ plugins {
 //    password = props.getProperty("spring.datasource.password") //'postgres'
 //    schemas = ['public']
 //}
-
-dependencies {
-    implementation 'org.postgresql:postgresql:42.2.8'
-    implementation 'org.flywaydb:flyway-core:6.5.7'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.3.2.RELEASE'
-}
