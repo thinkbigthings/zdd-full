@@ -30,7 +30,17 @@ See the IDE help for more details.
 
 ## Upgrade Dependencies
 
-Run `npm update` and `npm audit fix` from the project folder to automatically update dependency versions.
+Run from the project folder to update dependency versions.
+
+To upgrade React: 
+
+    npm install react@17.0.0 react-dom@17.0.0
+
+To upgrade dependencies:
+
+    npm update
+    npm audit fix
+    
 
 ## Available Scripts
 
