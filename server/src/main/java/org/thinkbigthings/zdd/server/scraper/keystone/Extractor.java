@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -59,9 +60,8 @@ public class Extractor {
                 .collect(toList());
     }
 
-    public String extractStrain(String strain) {
-        Document doc = Jsoup.parseBodyFragment(strain);
-        return doc.body().textNodes().iterator().next().text().trim();
+    public String extractStrain(String strainWithTags) {
+        return Jsoup.clean(strainWithTags, Whitelist.none()).trim();
     }
 
     public Subspecies extractSubspecies(String strain) {
