@@ -24,12 +24,7 @@ On Mac: can install Docker Desktop from docker hub, or use brew
 
 ### Set up Docker PG
 
-Then pull the docker image: `docker pull postgres`
-
-use different host port in case there are other Postgres instances running on the host
-POSTGRES_PASSWORD is the password for the default admin "postgres" user
-`docker run --rm --name pg-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres`
-`docker container ls`
+Then pull the docker image: `docker pull postgres:12`
 
 ### Prepare DB
 
@@ -37,18 +32,20 @@ After starting the container run create-db.sql
 Flyway connects to an existing database in a transaction,
 and creating a database is outside a transaction, so db creation should be part of setup.
 
+use different host port in case there are other Postgres instances running on the host
+POSTGRES_PASSWORD is the password for the default admin "postgres" user
+
 If you have PG on the host, you can just call from the host:
 `psql -h localhost -p 5555 -U postgres -f db/create-db.sql`
 
 If you do NOT have PG on the host, you should be able to access the database from within docker:
-`docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
-
+`docker exec -it pg-12-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
 
 Blow away the whole database and start from scratch
 
-    docker container stop pg-docker
-    docker run --rm --name pg-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres
-    docker exec -it pg-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"
+    docker container stop pg-12-docker
+    docker run --rm --name pg-12-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres:12
+    docker exec -it pg-12-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"
 
 
 ## Migrations
