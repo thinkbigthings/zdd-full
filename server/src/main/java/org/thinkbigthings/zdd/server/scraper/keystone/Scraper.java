@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.thinkbigthings.zdd.server.scraper.keystone.Functional.uncheck;
@@ -26,35 +27,27 @@ public class Scraper {
 
     private Extractor extractor = new Extractor();
 
-    public List<Item> scrape() {
+    // "https://keystoneshops.com/menu/devon"
+    public List<Item> scrape(String keystoneUrl) {
 
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
 
-        URI site = URI.create("https://keystoneshops.com/menu/devon");
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(site)
-                .build();
+        HttpRequest request = HttpRequest.newBuilder(URI.create(keystoneUrl)).build();
 
         try {
 
-            // TODO stream initial page load so it's not all loaded into memory
-            // TODO refactor html parsing / filtering from network call, so can unit test grabbing data urls from html
+            // streams body back as it's received, so can parse html without storing entire page in memory
+            List<String> dataUrls = extractDataUrls(client.send(request, HttpResponse.BodyHandlers.ofLines()).body());
 
-            List<String> dataUrls = client.send(request, HttpResponse.BodyHandlers.ofLines()).body()
-                    .filter(line -> line.trim().startsWith("window['ninja_table_instance_"))
-                    .map(line -> line.substring(line.indexOf("=") + 1))
-                    .map(uncheck((String line) -> reader.readValue(line, HashMap.class)))
-                    .filter(jsonMap -> jsonMap.get("title").equals("new-website-devon-flower"))
-                    .map(jsonMap -> ((Map)jsonMap.get("init_config")).get("data_request_url").toString())
-                    .collect(toList());
+            // TODO could be making data requests while parsing the rest of the html
+            // try CompletableFuture<HttpResponse<Stream<String>>> response = client.sendAsync(...
+            // response.thenAccept(...
 
             return dataUrls.stream()
-                    .map(URI::create)
-                    .map(dataUri -> HttpRequest.newBuilder().uri(dataUri).build())
+                    .map(this::createRequest)
                     .map(uncheck(uri -> client.send(uri, HttpResponse.BodyHandlers.ofString()).body()))
                     .flatMap(dataContent -> extractor.extractItems(dataContent).stream())
                     .collect(toList());
@@ -63,6 +56,34 @@ public class Scraper {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private HttpRequest createRequest(String url) {
+        return HttpRequest.newBuilder().uri(URI.create(url)).build();
+    }
+
+    public List<String> extractDataUrls(Stream<String> htmlLines) {
+        return htmlLines.filter(this::hasScriptData)
+                .map(this::extractScriptData)
+                .filter(scriptData -> scriptData.get("title").equals("new-website-devon-flower")) // flower only
+                .map(scriptData -> extractDataUrl(scriptData))
+                .collect(toList());
+    }
+
+    private String extractDataUrl(Map scriptData) {
+        return ((Map)scriptData.get("init_config")).get("data_request_url").toString();
+    }
+
+    private boolean hasScriptData(String htmlLine) {
+        return htmlLine.trim().startsWith("window['ninja_table_instance_");
+    }
+
+    private Map extractScriptData(String htmlLine) {
+        try {
+            return reader.readValue(htmlLine.substring(htmlLine.indexOf("=") + 1), HashMap.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
