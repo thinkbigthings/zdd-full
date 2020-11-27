@@ -70,10 +70,6 @@ public class User implements Serializable {
     @OneToMany(fetch=FetchType.EAGER, mappedBy = "user")
     private Set<Session> sessions = new HashSet<>();
 
-    protected User() {
-
-    }
-
     public User(String name, String display) {
         username = name;
         displayName = display;
@@ -81,10 +77,6 @@ public class User implements Serializable {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {

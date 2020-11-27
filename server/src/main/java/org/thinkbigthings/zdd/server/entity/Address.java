@@ -39,10 +39,6 @@ public class Address {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getLine1() {
         return line1;
     }
