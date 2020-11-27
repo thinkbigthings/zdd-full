@@ -1,12 +1,12 @@
 
 buildscript {
     dependencies {
-        classpath 'org.postgresql:postgresql:42.2.8'
+        classpath 'org.postgresql:postgresql:42.2.18'
     }
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'org.springframework.boot' version '2.4.0'
     id 'jacoco' // core plugin provided by gradle
 }
 
@@ -26,19 +26,16 @@ jacocoTestReport {
 
 dependencies {
 
-    // implementation 'javax.inject:javax.inject:1'
     implementation 'org.postgresql:postgresql:42.2.8'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.3.2.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.2.6.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.3.2.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.3.2.RELEASE'
-    implementation 'org.springframework.session:spring-session-jdbc:2.3.1.RELEASE'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:2.4.0'
+
+    implementation 'org.springframework.session:spring-session-jdbc:2.4.0'
 
     // JAXB was removed in Java 11 so needs to be included here
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
-}
- 
-// clear the database, rebuild, and run with fresh database
-task cleanRun(type: GradleBuild) {
-    tasks = ['clean', 'flywayClean', 'flywayMigrate', 'bootRun']
 }

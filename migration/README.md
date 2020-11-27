@@ -1,5 +1,74 @@
 # Database Migrations
 
+## Prerequisites
+
+Software that needs to be installed:
+
+* PostgreSQL 12 (via docker, see below)
+
+
+## Database Setup
+
+To make it easy for development, we can use a docker container to run Postgres.
+Some postgres-on-docker steps are here: https://hackernoon.com/dont-install-postgres-docker-pull-postgres-bee20e200198
+
+
+### Install Docker
+
+On Linux: `sudo apt install docker.io`
+Note: On Linux, needed to run docker as sudo.
+docker daemon must run as root, but you can specify that a group other than docker should own the Unix socket with the -G option.
+
+On Mac: can install Docker Desktop from docker hub, or use brew
+
+
+### Set up Docker PG
+
+Then pull the docker image: `docker pull postgres:12`
+
+### Prepare DB
+
+After starting the container run create-db.sql 
+Flyway connects to an existing database in a transaction,
+and creating a database is outside a transaction, so db creation should be part of setup.
+
+use different host port in case there are other Postgres instances running on the host
+POSTGRES_PASSWORD is the password for the default admin "postgres" user
+
+If you have PG on the host, you can just call from the host:
+`psql -h localhost -p 5555 -U postgres -f db/create-db.sql`
+
+If you do NOT have PG on the host, you should be able to access the database from within docker:
+`docker exec -it pg-12-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"`
+
+Blow away the whole database and start from scratch
+
+    docker container stop pg-12-docker
+    docker run --rm --name pg-12-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres:12
+    docker exec -it pg-12-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"
+
+
+## Migrations
+
+We use Flyway: https://flywaydb.org/getstarted/firststeps/gradle
+
+Flyway as run from gradle doesn't by default use the database connection info in the properties file
+It uses the database connection info in the "flyway" block in build.gradle
+But we can load the properties from application.properties so we only have to define them in one place.
+
+Drop all tables on managed schemas: `gradlew flywayClean -i`
+Run all the migrations: `gradlew flywayMigrate -i`
+Drop and run all migrations: `gradlew flywayClean; gradlew flywayMigrate -i`
+
+We run the migration standalone (not on startup of the application)
+So that we have more control over the migration process.
+
+
+
+
+
+
+
 
 ## Heroku database
 

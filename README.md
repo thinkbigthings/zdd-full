@@ -12,12 +12,17 @@ From reactjs folder run `npm start`
 
 ## Setup
 
+[Setup for database project](migration/README.md)
+
 [Setup for server project](server/README.md)
 
 [Setup for web project](reactjs/README.md)
 
 ## Project Structure
 
+### Migration
+
+The Migration project handles database setup and migrations.
 
 ### Web
 
