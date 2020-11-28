@@ -41,3 +41,24 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.0'
 }
+
+// integration test by tags,
+
+// inspired by https://stackoverflow.com/questions/40891867/junit5-tag-specific-gradle-task
+
+def test = tasks.named("test") {
+    useJUnitPlatform {
+        excludeTags "integration"
+    }
+}
+
+def integrationTest = tasks.register("integrationTest", Test) {
+    useJUnitPlatform {
+        includeTags "integration"
+    }
+    shouldRunAfter test
+}
+
+tasks.named("check") {
+    dependsOn integrationTest
+}

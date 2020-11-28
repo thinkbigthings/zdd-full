@@ -47,9 +47,21 @@ Right click the main class and "Debug Application (main)"
 
 ## Testing
 
+
+
 ### Unit test
  
-run `gradlew test`
+    gradlew test
+
+### Integration Test
+
+    gradlew integrationTest
+    
+### Both tests
+
+    gradlew check
+    
+### Code Coverage
 
 Code coverage metrics with Jacoco
 `gradlew test jacocoTestReport`

@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // With Junit 5, we do not need @RunWith(SpringRunner.class) anymore.
-// Spring tests are executed with @ExtendWith(SpringExtension.class)
-// and @SpringBootTest and the other @…Test annotations are already annotated with it.
+// Spring tests are executed with @ExtendWith(SpringExtension.class),
+// and @SpringBootTest, and the other @…Test annotations are already annotated with it.
 
 
 @Tag("integration")
