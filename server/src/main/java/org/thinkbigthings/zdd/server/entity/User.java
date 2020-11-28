@@ -70,6 +70,10 @@ public class User implements Serializable {
     @OneToMany(fetch=FetchType.EAGER, mappedBy = "user")
     private Set<Session> sessions = new HashSet<>();
 
+    protected User() {
+        // no arg constructor is required by JPA
+    }
+
     public User(String name, String display) {
         username = name;
         displayName = display;
