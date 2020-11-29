@@ -47,6 +47,9 @@ Blow away the whole database and start from scratch
     docker run --rm --name pg-12-docker -e POSTGRES_PASSWORD=postgres -d -p 5555:5432 postgres:12
     docker exec -it pg-12-docker psql -U postgres --command="CREATE DATABASE app OWNER postgres ENCODING 'UTF8';"
 
+To log in to the docker postgres
+
+    docker exec -it pg-12-docker  psql -U postgres
 
 ## Migrations
 

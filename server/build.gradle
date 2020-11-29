@@ -40,6 +40,8 @@ dependencies {
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.0'
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+
 }
 
 // integration test by tags,
