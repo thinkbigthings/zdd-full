@@ -61,12 +61,13 @@ public class UserService {
         user.setPhoneNumber(userData.phoneNumber());
         user.setHeightCm(userData.heightCm());
 
-        user.getAddresses().forEach(a -> a.setUser(null));
-        user.getAddresses().clear();
+        List<Address> newAddressEntities = userData.addresses().stream()
+                .map(this::fromRecord)
+                .collect(toList());
 
-        List<Address> newAddressEntities = userData.addresses().stream().map(this::fromRecord).collect(toList());
+        user.getAddresses().clear();
         user.getAddresses().addAll(newAddressEntities);
-        user.getAddresses().forEach(a -> a.setUser(user));
+        newAddressEntities.forEach(a -> a.setUser(user));
 
         try {
             return toRecord(userRepo.save(user));

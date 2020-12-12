@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.client;
+package org.thinkbigthings.zdd.server.test.client;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;

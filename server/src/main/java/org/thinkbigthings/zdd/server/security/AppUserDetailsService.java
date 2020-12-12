@@ -23,10 +23,10 @@ public class AppUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         // if not found, UserDetailsService is supposed to throw UsernameNotFoundException instead of return null
-        UserDetails userDetails = userRepository.findByUsername(username)
+        UserDetails userDetails = userRepository.loadUserWithRoles(username)
                 .map(userDetailsMapper::apply)
                 .filter(user -> ! user.getAuthorities().isEmpty())
-                .orElseThrow(() -> new UsernameNotFoundException("No User with authorities were found: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found or had no authorities: " + username));
 
         return userDetails;
     }

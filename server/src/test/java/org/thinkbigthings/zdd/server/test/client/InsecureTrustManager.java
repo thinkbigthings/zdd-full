@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.client;
+package org.thinkbigthings.zdd.server.test.client;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;

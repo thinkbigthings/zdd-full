@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.client;
+package org.thinkbigthings.zdd.server.test.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

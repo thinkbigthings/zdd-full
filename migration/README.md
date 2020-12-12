@@ -68,11 +68,6 @@ So that we have more control over the migration process.
 
 
 
-
-
-
-
-
 ## Heroku database
 
 Can get a postgres command prompt with
