@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.entity.Address;
 import org.thinkbigthings.zdd.server.entity.User;
 
@@ -108,8 +109,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<org.thinkbigthings.zdd.dto.User> getUsers(Pageable page) {
-        return userRepo.findAll(page).map(this::toRecord);
+    public Page<UserSummary> getUserSummaries(Pageable page) {
+
+        return userRepo.loadSummaries(page);
     }
 
     @Transactional(readOnly = true)

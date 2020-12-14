@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StopWatch;
+import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.test.client.ApiClientStateful;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
@@ -48,6 +51,11 @@ public class WebIntegrationTest extends IntegrationTest {
     @BeforeAll
     public static void createTestData(@Autowired UserService userService, @LocalServerPort int randomServerPort) {
 
+        LOG.info("");
+        LOG.info("=======================================================================================");
+        LOG.info("Creating test data");
+        LOG.info("");
+
         baseUrl = "https://localhost:" + randomServerPort;
         users = URI.create(baseUrl + "/user");
 
@@ -69,10 +77,17 @@ public class WebIntegrationTest extends IntegrationTest {
     @DisplayName("Admin list users")
     public void adminListUsers() throws JsonProcessingException {
 
+        StopWatch s = new StopWatch();
+        s.start();
+        userService.getUserSummaries(PageRequest.of(0, 10));
+        s.stop();
+
+        long time = s.getTotalTimeMillis();
+        LOG.info("time in call was " + time + "ms");
+        assertTrue(time < 100);
+
         String results = adminClient.get(users);
-
-        Page<User> page = mapper.readValue(results, new TypeReference<ParsablePage<User>>() {});
-
+        Page<UserSummary> page = mapper.readValue(results, new TypeReference<ParsablePage<UserSummary>>() {});
         assertTrue(page.isFirst());
     }
 
@@ -82,10 +97,13 @@ public class WebIntegrationTest extends IntegrationTest {
 
         ApiClientStateful userClient = new ApiClientStateful(baseUrl, testUserName, testUserPassword);
 
+        PersonalInfo info = userClient.get(testUserUrl, User.class).personalInfo();
         String newPassword = "password";
         userClient.post(testUserUpdatePasswordUrl, newPassword);
         userClient = new ApiClientStateful(baseUrl, testUserName, newPassword);
-        PersonalInfo retrievedInfo = userClient.get(testUserUrl, User.class).personalInfo();
+
+        PersonalInfo info2 = userClient.get(testUserUrl, User.class).personalInfo();
+        assertEquals(info, info2);
     }
 
     @Test

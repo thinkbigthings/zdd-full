@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.thinkbigthings.zdd.server.entity.Address;
 import org.thinkbigthings.zdd.server.entity.User;
 
 import java.util.List;
@@ -56,6 +57,13 @@ class RepositoryTest extends IntegrationTest {
 
         List<User> recentUsers = userRepository.findRecent(PageRequest.of(0, 10));
 
+
+        // shows all the queries that happen from just a simple entity access
+//        List<Address> addresses = recentUsers.stream()
+//                .flatMap(u -> u.getAddresses().stream())
+//                .collect(toList());
+
+//        assertTrue(addresses.size() > 0);
 //        assertEquals(10, recentUsers.size());
     }
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.User;
+import org.thinkbigthings.zdd.dto.UserSummary;
 
 import java.security.Principal;
 
@@ -45,9 +46,9 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/user", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Page<User> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
+    public Page<UserSummary> getUsers(@PageableDefault(page = 0, size = 10, sort = {"registrationTime"}, direction=Sort.Direction.DESC) Pageable page) {
 
-        return userService.getUsers(page);
+        return userService.getUserSummaries(page);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN') || #username == authentication.name")
