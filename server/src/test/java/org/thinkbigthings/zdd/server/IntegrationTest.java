@@ -11,7 +11,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 @Tag("integration")
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "logging.level.org.hibernate.SQL=DEBUG",
-        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE" })
+        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE",
+        "spring.main.lazy-initialization=true"})
 public class IntegrationTest {
 
     private static Logger LOG = LoggerFactory.getLogger(IntegrationTest.class);
