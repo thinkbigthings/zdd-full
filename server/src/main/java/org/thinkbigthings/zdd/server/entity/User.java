@@ -65,8 +65,6 @@ public class User implements Serializable {
     @OneToMany(fetch=FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval=true)
     private Set<Address> addresses = new HashSet<>();
 
-    // If we check session status on all user accesses, might as well make it eager too
-    // default cascade is that no operations are cascaded
     @OneToMany(fetch=FetchType.LAZY, mappedBy = "user")
     private Set<Session> sessions = new HashSet<>();
 
@@ -77,10 +75,6 @@ public class User implements Serializable {
     public User(String name, String display) {
         username = name;
         displayName = display;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getUsername() {

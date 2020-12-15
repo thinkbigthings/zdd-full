@@ -1,6 +1,6 @@
 package org.thinkbigthings.zdd.server.scraper.keystone;
 
-enum Terpene {
+public enum Terpene {
     BISABOLOL,
     CARYOPHYLLENE,
     HUMULENE,

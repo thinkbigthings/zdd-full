@@ -26,15 +26,6 @@ public class ExtractorTest {
         assertEquals(35, items.size());
         System.out.println(items);
 
-//        Store website and location
-//        User profile: saved searches,
-
-//        - assemble DB
-//        - IT access DB, be able to sort by selection
-
-
     }
-
-
 
 }

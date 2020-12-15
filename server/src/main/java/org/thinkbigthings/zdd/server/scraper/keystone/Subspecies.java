@@ -1,6 +1,6 @@
 package org.thinkbigthings.zdd.server.scraper.keystone;
 
-enum Subspecies {
+public enum Subspecies {
     SATIVA,
     SATIVA_HYBRID,
     HYBRID,
