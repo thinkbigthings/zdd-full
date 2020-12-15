@@ -29,9 +29,9 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @RequestMapping(value="/registration", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public User createUserRegistration(@RequestBody RegistrationRequest newUser) {
+    public void createUserRegistration(@RequestBody RegistrationRequest newUser) {
 
-        return userService.saveNewUser(newUser);
+        userService.saveNewUser(newUser);
     }
 
     // The url /logout is automatically configured by spring security, so it's not mapped in this controller

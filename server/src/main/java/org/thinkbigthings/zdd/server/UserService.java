@@ -79,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public org.thinkbigthings.zdd.dto.User saveNewUser(RegistrationRequest registration) {
+    public void saveNewUser(RegistrationRequest registration) {
 
         String username = registration.username();
 
@@ -92,7 +92,7 @@ public class UserService {
                 throw new IllegalArgumentException("Username already exists " + registration.username());
             }
 
-            return toRecord(userRepo.save(fromRegistration(registration)));
+            userRepo.save(fromRegistration(registration));
         }
         catch(ConstraintViolationException e) {
             String constraintMessage = "User can't be saved: " + e.getMessage();
