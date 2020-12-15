@@ -35,7 +35,7 @@ function UserForm(props) {
             case 'START_ADDRESS_EDIT': {
                 newState.editableAddress.isEditing = true;
                 newState.editableAddress.originatingIndex = action.payload;
-                newState.editableAddress.address = newState.user.addresses[action.payload];
+                newState.editableAddress.address = newState.user.personalInfo.addresses[action.payload];
                 return newState;
             }
             case 'UPDATE_ADDRESS_EDIT': {
@@ -55,7 +55,7 @@ function UserForm(props) {
             }
             case 'ADD_ADDRESS': {
                 newState.editableAddress.isEditing = true;
-                newState.editableAddress.originatingIndex = newState.user.addresses.length;
+                newState.editableAddress.originatingIndex = newState.user.personalInfo.addresses.length;
                 newState.editableAddress.address = blankAddress;
                 return newState;
             }

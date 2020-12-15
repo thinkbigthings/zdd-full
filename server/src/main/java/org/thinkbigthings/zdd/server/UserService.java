@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.entity.Address;
 import org.thinkbigthings.zdd.server.entity.User;
 
@@ -61,12 +62,13 @@ public class UserService {
         user.setPhoneNumber(userData.phoneNumber());
         user.setHeightCm(userData.heightCm());
 
-        user.getAddresses().forEach(a -> a.setUser(null));
-        user.getAddresses().clear();
+        List<Address> newAddressEntities = userData.addresses().stream()
+                .map(this::fromRecord)
+                .collect(toList());
 
-        List<Address> newAddressEntities = userData.addresses().stream().map(this::fromRecord).collect(toList());
+        user.getAddresses().clear();
         user.getAddresses().addAll(newAddressEntities);
-        user.getAddresses().forEach(a -> a.setUser(user));
+        newAddressEntities.forEach(a -> a.setUser(user));
 
         try {
             return toRecord(userRepo.save(user));
@@ -77,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public org.thinkbigthings.zdd.dto.User saveNewUser(RegistrationRequest registration) {
+    public void saveNewUser(RegistrationRequest registration) {
 
         String username = registration.username();
 
@@ -90,7 +92,7 @@ public class UserService {
                 throw new IllegalArgumentException("Username already exists " + registration.username());
             }
 
-            return toRecord(userRepo.save(fromRegistration(registration)));
+            userRepo.save(fromRegistration(registration));
         }
         catch(ConstraintViolationException e) {
             String constraintMessage = "User can't be saved: " + e.getMessage();
@@ -107,8 +109,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<org.thinkbigthings.zdd.dto.User> getUsers(Pageable page) {
-        return userRepo.findAll(page).map(this::toRecord);
+    public Page<UserSummary> getUserSummaries(Pageable page) {
+
+        return userRepo.loadSummaries(page);
     }
 
     @Transactional(readOnly = true)

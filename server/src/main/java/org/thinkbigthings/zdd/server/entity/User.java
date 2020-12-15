@@ -44,12 +44,6 @@ public class User implements Serializable {
     @Basic
     private boolean enabled = false;
 
-    @ElementCollection(targetClass=Role.class)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role_id")
-    @Enumerated(EnumType.ORDINAL)
-    private Set<Role> roles = new HashSet<>();
-
     @Basic
     @NotNull
     private Instant registrationTime;
@@ -62,16 +56,22 @@ public class User implements Serializable {
     @NotNull
     private int heightCm = 0;
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval=true)
+    @ElementCollection(targetClass=Role.class)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role_id")
+    @Enumerated(EnumType.ORDINAL)
+    private Set<Role> roles = new HashSet<>();
+
+    @OneToMany(fetch=FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval=true)
     private Set<Address> addresses = new HashSet<>();
 
     // If we check session status on all user accesses, might as well make it eager too
     // default cascade is that no operations are cascaded
-    @OneToMany(fetch=FetchType.EAGER, mappedBy = "user")
+    @OneToMany(fetch=FetchType.LAZY, mappedBy = "user")
     private Set<Session> sessions = new HashSet<>();
 
     protected User() {
-
+        // no arg constructor is required by JPA
     }
 
     public User(String name, String display) {
@@ -81,10 +81,6 @@ public class User implements Serializable {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {
