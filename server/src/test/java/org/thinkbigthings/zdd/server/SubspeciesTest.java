@@ -1,3 +1,5 @@
+package org.thinkbigthings.zdd.server;
+
 import org.junit.jupiter.api.Test;
 import org.thinkbigthings.zdd.server.scraper.keystone.Subspecies;
 
@@ -12,9 +14,9 @@ public class SubspeciesTest {
 
         assertEquals(0, Subspecies.SATIVA.ordinal(), message);
         assertEquals(1, Subspecies.SATIVA_HYBRID.ordinal(), message);
-        assertEquals(0, Subspecies.HYBRID.ordinal(), message);
-        assertEquals(1, Subspecies.INDICA_HYBRID.ordinal(), message);
-        assertEquals(0, Subspecies.INDICA.ordinal(), message);
-        assertEquals(1, Subspecies.HIGH_CBD.ordinal(), message);
+        assertEquals(2, Subspecies.HYBRID.ordinal(), message);
+        assertEquals(3, Subspecies.INDICA_HYBRID.ordinal(), message);
+        assertEquals(4, Subspecies.INDICA.ordinal(), message);
+        assertEquals(5, Subspecies.HIGH_CBD.ordinal(), message);
     }
 }
