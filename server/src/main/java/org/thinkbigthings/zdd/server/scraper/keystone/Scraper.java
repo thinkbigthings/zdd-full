@@ -17,13 +17,11 @@ import static org.thinkbigthings.zdd.server.scraper.keystone.Functional.uncheck;
 
 public class Scraper {
 
-    // immutable and thread safe
-    public static final ObjectReader reader;
+    // Thread-safe provided if configuration is before ANY read or write calls
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    static {
-        ObjectMapper mapper = new ObjectMapper();
-        reader = mapper.reader();
-    }
+    // immutable and thread safe
+    private final ObjectReader reader = mapper.reader();
 
     private Extractor extractor = new Extractor();
 

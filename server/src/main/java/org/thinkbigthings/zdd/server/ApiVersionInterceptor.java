@@ -3,6 +3,7 @@ package org.thinkbigthings.zdd.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import static java.util.Optional.ofNullable;
  * then you won't see that header in requests for static resources.
  */
 @Component
-public class ApiVersionInterceptor extends HandlerInterceptorAdapter {
+public class ApiVersionInterceptor implements HandlerInterceptor {
 
     private static Logger LOG = LoggerFactory.getLogger(ApiVersionInterceptor.class);
 

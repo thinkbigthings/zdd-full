@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.server.scraper.keystone;
+package org.thinkbigthings.zdd.server.entity;
 
 public enum Subspecies {
     SATIVA,

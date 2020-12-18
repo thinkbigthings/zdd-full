@@ -16,9 +16,9 @@ public class ScraperTest {
     private Scraper scraper = new Scraper();
 
     @Test
-    public void testExtractor() throws IOException {
+    public void testScraper() throws IOException {
 
-        Path path = Paths.get("src", "test", "resources", "keystone-devon-20201119.html");
+        Path path = Paths.get("src", "test", "resources", "keystone-devon-20201218.html");
         Stream<String> content = Files.lines(path);
 
         List<String> dataUrls = scraper.extractDataUrls(content);

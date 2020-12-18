@@ -1,12 +1,15 @@
-package org.thinkbigthings.zdd.server.scraper.keystone;
+package org.thinkbigthings.zdd.server.scraper.keystone.entity;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
+import org.thinkbigthings.zdd.server.entity.StoreItem;
+import org.thinkbigthings.zdd.server.entity.TerpeneAmount;
 import org.thinkbigthings.zdd.server.entity.Subspecies;
 import org.thinkbigthings.zdd.server.entity.Terpene;
+
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -17,14 +20,14 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
-public class Extractor {
+public class EntityExtractor {
 
     // object mapper is thread safe
     private ObjectMapper mapper = new ObjectMapper();
 
     private Map<String, Subspecies> labelToEnum = new HashMap<>();
 
-    public Extractor() {
+    public EntityExtractor() {
         labelToEnum.put("Sativa",        Subspecies.SATIVA);
         labelToEnum.put("Sative-Hybrid", Subspecies.SATIVA_HYBRID);
         labelToEnum.put("Hybrid",        Subspecies.HYBRID);
@@ -58,7 +61,7 @@ public class Extractor {
     public List<TerpeneAmount> extractTerpenes(HashMap<String, String> item) {
         return Arrays.asList(Terpene.values()).stream()
                 .flatMap(terp -> parseTerpeneAmount(terp, item).stream())
-                .sorted(Comparator.comparing(TerpeneAmount::amount).reversed())
+                .sorted(Comparator.comparing(TerpeneAmount::getTerpenePercent).reversed())
                 .collect(toList());
     }
 
@@ -104,18 +107,22 @@ public class Extractor {
         }
     }
 
-    public Optional<Item> extractItem(HashMap<String, String> item) {
+    public Optional<StoreItem> extractItem(HashMap<String, String> item) {
 
         try {
-            Subspecies subspecies = extractSubspeciesFromStrainImg(item.get("strain"));
-            String strain = extractStrainFromStrainImg(item.get("strain"));
-            BigDecimal thc = parsePercentage(item.get("thc")).get();
-            BigDecimal cbd = parsePercentage(item.get("cbd")).get();
-            List<TerpeneAmount> terpenes = extractTerpenes(item);
-            Long priceDollars = parsePrice(item.get("price")).get();
-            String vendor = item.get("vendor");
-            BigDecimal weightGrams = parseGrams(item.get("wt")).get();
-            return Optional.of(new Item(subspecies, strain, thc, cbd, terpenes, weightGrams, priceDollars, vendor));
+            StoreItem storeItem = new StoreItem();
+            storeItem.setSubspecies(extractSubspeciesFromStrainImg(item.get("strain")));
+            storeItem.setStrain(extractStrainFromStrainImg(item.get("strain")));
+            storeItem.setThcPercent(parsePercentage(item.get("thc")).get());
+            storeItem.setCbdPercent(parsePercentage(item.get("cbd")).get());
+            storeItem.getTerpeneAmounts().addAll(extractTerpenes(item));
+            storeItem.setPriceDollars(parsePrice(item.get("price")).get());
+            storeItem.setVendor(item.get("vendor"));
+            storeItem.setWeightGrams(parseGrams(item.get("wt")).get());
+
+            storeItem.getTerpeneAmounts().forEach(t -> t.setStoreItem(storeItem));
+
+            return Optional.of(storeItem);
         }
         catch(Exception e) {
             System.out.println("Couldn't parse item " + item);
@@ -124,16 +131,13 @@ public class Extractor {
 
     }
 
-    public List<Item> extractItems(String unparsedData) {
+    public List<StoreItem> extractItems(String unparsedData) {
 
-        var typeRef = new TypeReference<List<List<HashMap<String, String>>>>() {};
+        var typeRef = new TypeReference<List<HashMap<String, String>>>() {};
 
         try {
             var parser = mapper.createParser(unparsedData);
-            var parsedData = mapper.readValue(parser, typeRef);
-            var items = parsedData.stream()
-                    .flatMap(sublist -> sublist.stream())
-                    .collect(toList());
+            var items = mapper.readValue(parser, typeRef);
 
             return items.stream()
                     .flatMap(item -> extractItem(item).stream())

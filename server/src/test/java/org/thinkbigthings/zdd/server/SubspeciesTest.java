@@ -1,7 +1,7 @@
 package org.thinkbigthings.zdd.server;
 
 import org.junit.jupiter.api.Test;
-import org.thinkbigthings.zdd.server.scraper.keystone.Subspecies;
+import org.thinkbigthings.zdd.server.entity.Subspecies;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

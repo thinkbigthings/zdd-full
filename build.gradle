@@ -38,7 +38,9 @@ subprojects {
     // use preview features
     tasks.withType(JavaCompile) {
         options.compilerArgs += "--enable-preview"
+        // options.compilerArgs += "-Xlint:preview"
         options.compilerArgs += "-Xlint:unchecked"
+        options.compilerArgs += "-Xlint:deprecation"
     }
     tasks.withType(Test) {
         jvmArgs += "--enable-preview"

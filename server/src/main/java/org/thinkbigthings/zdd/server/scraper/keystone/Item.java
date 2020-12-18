@@ -1,5 +1,7 @@
 package org.thinkbigthings.zdd.server.scraper.keystone;
 
+import org.thinkbigthings.zdd.server.entity.Subspecies;
+
 import java.math.BigDecimal;
 import java.util.List;
 

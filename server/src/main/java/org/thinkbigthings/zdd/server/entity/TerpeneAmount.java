@@ -1,7 +1,5 @@
 package org.thinkbigthings.zdd.server.entity;
 
-import org.thinkbigthings.zdd.server.scraper.keystone.Terpene;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -29,6 +27,11 @@ public class TerpeneAmount {
 
     public TerpeneAmount() {
 
+    }
+
+    public TerpeneAmount(Terpene terpene, BigDecimal terpenePercent) {
+        this.terpene = terpene;
+        this.terpenePercent = terpenePercent;
     }
 
     public Terpene getTerpene() {
