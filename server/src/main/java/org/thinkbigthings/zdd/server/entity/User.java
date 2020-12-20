@@ -14,10 +14,6 @@ import static java.util.stream.Collectors.toList;
 @Table(name = "app_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
 public class User implements Serializable {
 
-    public enum Role {
-        ADMIN, USER;
-    }
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, insertable = false, nullable = false)

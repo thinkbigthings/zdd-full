@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScraperTest {
 
-    private Scraper scraper = new Scraper();
+    private Scraper scraper = new Scraper(new EntityExtractor());
 
     @Test
     public void testScraper() throws IOException {

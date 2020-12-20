@@ -1,10 +1,11 @@
-package org.thinkbigthings.zdd.server.scraper.keystone.entity;
+package org.thinkbigthings.zdd.server.scraper.keystone;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
+import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 import org.thinkbigthings.zdd.server.entity.TerpeneAmount;
 import org.thinkbigthings.zdd.server.entity.Subspecies;
@@ -20,6 +21,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
+@Component
 public class EntityExtractor {
 
     // object mapper is thread safe

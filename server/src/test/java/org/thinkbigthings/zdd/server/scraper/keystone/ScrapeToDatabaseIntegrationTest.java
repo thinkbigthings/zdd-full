@@ -6,12 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.thinkbigthings.zdd.server.IntegrationTest;
 import org.thinkbigthings.zdd.server.StoreItemRepository;
-import org.thinkbigthings.zdd.server.UserService;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
-import org.thinkbigthings.zdd.server.scraper.keystone.entity.EntityExtractor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +33,7 @@ public class ScrapeToDatabaseIntegrationTest extends IntegrationTest {
     private StoreItemRepository itemRepository;
 
     @BeforeAll
-    public static void createTestData(@Autowired UserService userService, @LocalServerPort int randomServerPort) throws IOException {
+    public static void createTestData() throws IOException {
 
         LOG.info("");
         LOG.info("=======================================================================================");

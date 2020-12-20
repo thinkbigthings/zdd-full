@@ -11,11 +11,15 @@ import java.util.Set;
 @Table(name = "store_item")
 public class StoreItem {
 
-
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, insertable = false, nullable = false)
     private Long id;
+
+    @NotNull
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "store_item_id", referencedColumnName = "id")
+    private Store store;
 
     @Column(name = "subspecies_id")
     @Enumerated(EnumType.ORDINAL)
@@ -44,6 +48,14 @@ public class StoreItem {
 
     public StoreItem() {
 
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public Subspecies getSubspecies() {

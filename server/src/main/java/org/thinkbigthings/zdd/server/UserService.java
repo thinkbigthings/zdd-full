@@ -14,6 +14,7 @@ import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.entity.Address;
+import org.thinkbigthings.zdd.server.entity.Role;
 import org.thinkbigthings.zdd.server.entity.User;
 
 import javax.persistence.EntityNotFoundException;
@@ -138,7 +139,7 @@ public class UserService {
     public org.thinkbigthings.zdd.dto.User toRecord(User user) {
 
         Set<String> roles = user.getRoles().stream()
-                .map(User.Role::name)
+                .map(Role::name)
                 .collect(toSet());
 
         return new org.thinkbigthings.zdd.dto.User( user.getUsername(),
@@ -164,7 +165,7 @@ public class UserService {
         user.setRegistrationTime(Instant.now());
         user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(registration.plainTextPassword()));
-        user.getRoles().add(User.Role.USER);
+        user.getRoles().add(Role.USER);
 
         return user;
     }

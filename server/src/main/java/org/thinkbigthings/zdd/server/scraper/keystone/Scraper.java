@@ -2,6 +2,8 @@ package org.thinkbigthings.zdd.server.scraper.keystone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.springframework.stereotype.Component;
+import org.thinkbigthings.zdd.server.entity.StoreItem;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.thinkbigthings.zdd.server.scraper.keystone.Functional.uncheck;
 
+@Component
 public class Scraper {
 
     // Thread-safe provided if configuration is before ANY read or write calls
@@ -23,10 +26,13 @@ public class Scraper {
     // immutable and thread safe
     private final ObjectReader reader = mapper.reader();
 
-    private Extractor extractor = new Extractor();
+    private EntityExtractor extractor;
 
-    // "https://keystoneshops.com/menu/devon"
-    public List<Item> scrape(String keystoneUrl) {
+    public Scraper(EntityExtractor extractor) {
+        this.extractor = extractor;
+    }
+
+    public List<StoreItem> scrape(String keystoneUrl) {
 
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(30))

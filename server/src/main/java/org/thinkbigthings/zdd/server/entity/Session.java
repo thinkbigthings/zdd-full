@@ -21,7 +21,7 @@ public class Session implements Serializable {
     private String principalName = "";
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "principal_name", referencedColumnName = "username")
     private User user;
 

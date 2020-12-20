@@ -2,7 +2,6 @@ package org.thinkbigthings.zdd.server.scraper.keystone;
 
 import org.junit.jupiter.api.Test;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
-import org.thinkbigthings.zdd.server.scraper.keystone.entity.EntityExtractor;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

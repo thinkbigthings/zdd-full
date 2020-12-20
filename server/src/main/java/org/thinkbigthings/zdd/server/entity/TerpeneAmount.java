@@ -21,7 +21,7 @@ public class TerpeneAmount {
     private BigDecimal terpenePercent;
 
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "store_item_id", referencedColumnName = "id")
     private StoreItem storeItem;
 

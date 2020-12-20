@@ -66,6 +66,12 @@ Drop and run all migrations: `gradlew flywayClean; gradlew flywayMigrate -i`
 We run the migration standalone (not on startup of the application)
 So that we have more control over the migration process.
 
+## Quick Reset
+
+    gradlew :migration:dockerStop
+    gradlew :migration:dockerStart
+    gradlew :migration:dockerInit
+    gradlew :migration:bootRun
 
 
 ## Heroku database

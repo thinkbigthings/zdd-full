@@ -1,6 +1,15 @@
 
 set search_path TO public;
 
+CREATE TABLE store (
+    id              BIGSERIAL       NOT NULL    PRIMARY KEY,
+    name            VARCHAR(255)    NOT NULL,
+    website         VARCHAR(255)    NOT NULL,
+    updated         TIMESTAMPTZ     NOT NULL
+);
+
+CREATE INDEX store_name_index ON store (name);
+
 CREATE TABLE subspecies (
     id   INT4           NOT NULL PRIMARY KEY,
     name VARCHAR(255)   NOT NULL
@@ -37,7 +46,8 @@ CREATE TABLE store_item (
     cbd_percent     NUMERIC(5, 3)   NOT NULL,
     weight_grams    NUMERIC(3, 1)   NOT NULL,
     price_dollars   INT8            NOT NULL,
-    vendor          VARCHAR(255)    NOT NULL
+    vendor          VARCHAR(255)    NOT NULL,
+    store_item_id   INT8            NOT NULL REFERENCES store (id)
 );
 
 CREATE TABLE terpene_amount (

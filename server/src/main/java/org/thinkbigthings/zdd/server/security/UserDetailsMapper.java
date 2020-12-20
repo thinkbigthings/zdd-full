@@ -1,6 +1,7 @@
 package org.thinkbigthings.zdd.server.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.thinkbigthings.zdd.server.entity.Role;
 import org.thinkbigthings.zdd.server.entity.User;
 
 import static java.util.stream.Collectors.toList;
@@ -25,9 +26,9 @@ public class UserDetailsMapper implements Function<User, UserDetails> {
                 .build();
     }
 
-    public String[] toNames(Set<User.Role> roles) {
+    public String[] toNames(Set<Role> roles) {
         return roles.stream()
-                .map(User.Role::name)
+                .map(Role::name)
                 .collect(toList())
                 .toArray(new String[]{});
     }
