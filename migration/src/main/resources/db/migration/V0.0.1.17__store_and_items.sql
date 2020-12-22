@@ -3,7 +3,7 @@ set search_path TO public;
 
 CREATE TABLE store (
     id              BIGSERIAL       NOT NULL    PRIMARY KEY,
-    name            VARCHAR(255)    NOT NULL,
+    name            VARCHAR(255)    NOT NULL    UNIQUE,
     website         VARCHAR(255)    NOT NULL,
     updated         TIMESTAMPTZ     NOT NULL
 );

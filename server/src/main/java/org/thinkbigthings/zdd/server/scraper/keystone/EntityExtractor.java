@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 import org.thinkbigthings.zdd.server.entity.TerpeneAmount;
@@ -24,10 +26,13 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class EntityExtractor {
 
+    private static Logger LOG = LoggerFactory.getLogger(EntityExtractor.class);
+
     // object mapper is thread safe
     private ObjectMapper mapper = new ObjectMapper();
 
     private Map<String, Subspecies> labelToEnum = new HashMap<>();
+
 
     public EntityExtractor() {
         labelToEnum.put("Sativa",        Subspecies.SATIVA);
@@ -38,12 +43,13 @@ public class EntityExtractor {
         labelToEnum.put("High-CBD",      Subspecies.HIGH_CBD);
     }
 
-
-    public Optional<BigDecimal> parsePercentage(String percentage) {
+    public Optional<BigDecimal> parsePercentageNumber(String percentage) {
         try {
             // DecimalFormat is not thread safe
             DecimalFormat decimalFormat = new DecimalFormat("0.0#%");
             decimalFormat.setParseBigDecimal(true);
+            decimalFormat.setMaximumFractionDigits(3);
+            decimalFormat.setMultiplier(1); // so the number comes out in units of percent
             return Optional.of((BigDecimal) decimalFormat.parse(percentage));
         }
         catch (ParseException e) {
@@ -51,12 +57,12 @@ public class EntityExtractor {
         }
     }
 
-    public Optional<BigDecimal> parsePercentage(String key, HashMap<String, String> item) {
-        return parsePercentage(item.get(key));
+    public Optional<BigDecimal> parsePercentageNumber(String key, HashMap<String, String> item) {
+        return parsePercentageNumber(item.get(key));
     }
 
     public Optional<TerpeneAmount> parseTerpeneAmount(Terpene terp, HashMap<String, String> item) {
-        return parsePercentage(terp.name().toLowerCase(), item)
+        return parsePercentageNumber(terp.name().toLowerCase(), item)
                 .map(parsedPercentage -> new TerpeneAmount(terp, parsedPercentage));
     }
 
@@ -115,8 +121,8 @@ public class EntityExtractor {
             StoreItem storeItem = new StoreItem();
             storeItem.setSubspecies(extractSubspeciesFromStrainImg(item.get("strain")));
             storeItem.setStrain(extractStrainFromStrainImg(item.get("strain")));
-            storeItem.setThcPercent(parsePercentage(item.get("thc")).get());
-            storeItem.setCbdPercent(parsePercentage(item.get("cbd")).get());
+            storeItem.setThcPercent(parsePercentageNumber(item.get("thc")).get());
+            storeItem.setCbdPercent(parsePercentageNumber(item.get("cbd")).get());
             storeItem.getTerpeneAmounts().addAll(extractTerpenes(item));
             storeItem.setPriceDollars(parsePrice(item.get("price")).get());
             storeItem.setVendor(item.get("vendor"));
@@ -134,6 +140,9 @@ public class EntityExtractor {
     }
 
     public List<StoreItem> extractItems(String unparsedData) {
+
+        LOG.info("Parsing data");
+        System.out.println(unparsedData);
 
         var typeRef = new TypeReference<List<HashMap<String, String>>>() {};
 

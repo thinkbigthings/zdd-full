@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.server;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +12,12 @@ import org.thinkbigthings.zdd.dto.StoreRecord;
 import org.thinkbigthings.zdd.server.entity.Store;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 
-import java.util.Set;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.thinkbigthings.zdd.server.test.data.TestData.readItems;
 
 
 public class ScraperIntegrationTest extends IntegrationTest {
@@ -24,35 +28,66 @@ public class ScraperIntegrationTest extends IntegrationTest {
     private static final String storeWebsite = "https://keystoneshops.com/menu/devon";
 
     @Autowired
+    private ItemService itemService;
+
+    @Autowired
     private StoreService storeService;
 
     @BeforeAll
-    public static void createTestData(@Autowired StoreService storeService) {
+    public static void createTestData(@Autowired StoreService storeService) throws IOException {
 
         LOG.info("");
         LOG.info("=======================================================================================");
         LOG.info("Creating test data");
         LOG.info("");
 
-        StoreRecord store = new StoreRecord(storeName, storeWebsite, "");
-        storeService.saveNewStore(store);
-
+        try {
+            storeService.saveNewStore(new StoreRecord(storeName, storeWebsite, ""));
+        }
+        catch(Exception e) {
+            LOG.info("Caught exception " + e);
+            LOG.info("Continuing without store creation");
+        }
     }
 
-    @Disabled("This test is used with caution because it hits the live website")
     @Test
     @Transactional
-    public void testScraper() {
+    @DisplayName("Write items to database without hitting live server")
+    public void testScraperFromDisk() throws IOException {
 
-        storeService.scrapeStore(storeName);
+        String name = "testScraperFromDisk";
+        storeService.saveNewStore(new StoreRecord(name, name, ""));
 
-        Store store = storeService.getStore(storeName);
-        Set<StoreItem> items = store.getItems();
+        Store store = storeService.getStore(name);
+        Instant beforeUpdate = store.getUpdated();
+        int sizeBeforeUpdate = itemService.findItems().size();
 
-        assertFalse(items.isEmpty());
+        List<StoreItem> items = readItems();
+        itemService.updateStoreItems(store, items);
 
+        store = storeService.getStore(name);
+        int sizeAfterUpdate = itemService.findItems().size();
+
+        assertTrue(beforeUpdate.isBefore(store.getUpdated()));
+        assertTrue(sizeBeforeUpdate < sizeAfterUpdate, sizeBeforeUpdate + " vs " + sizeAfterUpdate);
     }
 
+    @Test
+    @Disabled("This test is used with caution because it hits the live website")
+    @DisplayName("Write items to database by hitting a live server")
+    public void testScraper() {
 
+        Store store = storeService.getStore(storeName);
+        Instant beforeUpdate = store.getUpdated();
+        int sizeBeforeUpdate = itemService.findItems().size();
+
+        itemService.scrapeStore(storeName);
+
+        store = storeService.getStore(storeName);
+        int sizeAfterUpdate = itemService.findItems().size();
+
+        assertTrue(beforeUpdate.isBefore(store.getUpdated()));
+        assertTrue(sizeBeforeUpdate < sizeAfterUpdate, sizeBeforeUpdate + " vs " + sizeAfterUpdate);
+    }
 
 }
