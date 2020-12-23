@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.thinkbigthings.zdd.dto.StoreRecord;
 import org.thinkbigthings.zdd.server.entity.Store;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
@@ -15,6 +16,7 @@ import org.thinkbigthings.zdd.server.entity.StoreItem;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.thinkbigthings.zdd.server.test.data.TestData.readItems;
@@ -24,6 +26,7 @@ public class ScraperIntegrationTest extends IntegrationTest {
 
     protected static Logger LOG = LoggerFactory.getLogger(ScraperIntegrationTest.class);
 
+    private Pageable firstPage = PageRequest.of(0, 10);
     private static final String storeName = "Keystone Devon";
     private static final String storeWebsite = "https://keystoneshops.com/menu/devon";
 
@@ -51,25 +54,26 @@ public class ScraperIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("Write items to database without hitting live server")
     public void testScraperFromDisk() throws IOException {
 
-        String name = "testScraperFromDisk";
+        String name = "testScraperFromDisk" + UUID.randomUUID().toString();
+        LOG.info("Using store name " + name);
         storeService.saveNewStore(new StoreRecord(name, name, ""));
 
         Store store = storeService.getStore(name);
-        Instant beforeUpdate = store.getUpdated();
-        int sizeBeforeUpdate = itemService.findItems().size();
+        Instant beforeUpdateTime = store.getUpdated();
+        long beforeUpdateSize = itemService.findItems(firstPage).getTotalElements();
 
         List<StoreItem> items = readItems();
-        itemService.updateStoreItems(store, items);
+        itemService.updateStoreItems(storeName, items);
 
         store = storeService.getStore(name);
-        int sizeAfterUpdate = itemService.findItems().size();
+        Instant afterUpdateTime = store.getUpdated();
+        long afterUpdateSize = itemService.findItems(firstPage).getTotalElements();
 
-        assertTrue(beforeUpdate.isBefore(store.getUpdated()));
-        assertTrue(sizeBeforeUpdate < sizeAfterUpdate, sizeBeforeUpdate + " vs " + sizeAfterUpdate);
+        assertTrue(beforeUpdateTime.isBefore(afterUpdateTime));
+        assertTrue(beforeUpdateSize < afterUpdateSize, beforeUpdateSize + " vs " + afterUpdateSize);
     }
 
     @Test
@@ -79,12 +83,12 @@ public class ScraperIntegrationTest extends IntegrationTest {
 
         Store store = storeService.getStore(storeName);
         Instant beforeUpdate = store.getUpdated();
-        int sizeBeforeUpdate = itemService.findItems().size();
+        long sizeBeforeUpdate = itemService.findItems(firstPage).getTotalElements();
 
         itemService.scrapeStore(storeName);
 
         store = storeService.getStore(storeName);
-        int sizeAfterUpdate = itemService.findItems().size();
+        long sizeAfterUpdate = itemService.findItems(firstPage).getTotalElements();
 
         assertTrue(beforeUpdate.isBefore(store.getUpdated()));
         assertTrue(sizeBeforeUpdate < sizeAfterUpdate, sizeBeforeUpdate + " vs " + sizeAfterUpdate);

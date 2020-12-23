@@ -33,6 +33,7 @@ public class EntityExtractor {
 
     private Map<String, Subspecies> labelToEnum = new HashMap<>();
 
+    private TypeReference<List<HashMap<String, String>>> parseType = new TypeReference<>() {};
 
     public EntityExtractor() {
         labelToEnum.put("Sativa",        Subspecies.SATIVA);
@@ -141,14 +142,11 @@ public class EntityExtractor {
 
     public List<StoreItem> extractItems(String unparsedData) {
 
-        LOG.info("Parsing data");
-        System.out.println(unparsedData);
-
-        var typeRef = new TypeReference<List<HashMap<String, String>>>() {};
+        LOG.info("Parsing data: " + unparsedData);
 
         try {
             var parser = mapper.createParser(unparsedData);
-            var items = mapper.readValue(parser, typeRef);
+            var items = mapper.readValue(parser, parseType);
 
             return items.stream()
                     .flatMap(item -> extractItem(item).stream())

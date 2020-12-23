@@ -2,8 +2,11 @@ package org.thinkbigthings.zdd.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.entity.Store;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 import org.thinkbigthings.zdd.server.mapper.entitytodto.ItemMapper;
@@ -34,31 +37,31 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<Item> findItems() {
-        return itemRepository.findAllWithTerpenes().stream()
-                .map(toItemDto)
-                .collect(toList());
+    public Page<Item> findItems(Pageable page) {
+        return itemRepository.findAllWithTerpenes(page).map(toItemDto);
     }
 
     @Transactional
     public void scrapeStore(String storeName) {
 
-        Store store = storeRepository.findByName(storeName).get();
+        List<StoreItem> items = scraper.scrape(storeName);
 
-        List<StoreItem> items = scraper.scrape(store.getWebsite());
+        updateStoreItems(storeName, items);
 
-        updateStoreItems(store, items);
-
-        storeRepository.save(store);
     }
 
-    public void updateStoreItems(Store store, List<StoreItem> items) {
+    @Transactional
+    public void updateStoreItems(String storeName, List<StoreItem> items) {
+
+        Store store = storeRepository.findByName(storeName).get();
 
         store.getItems().clear();
         store.getItems().addAll(items);
         items.forEach(item -> item.setStore(store));
 
         store.setUpdated(Instant.now());
+
+        storeRepository.save(store);
     }
 
 }

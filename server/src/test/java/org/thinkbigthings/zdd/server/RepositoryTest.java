@@ -53,6 +53,10 @@ class RepositoryTest extends IntegrationTest {
         // TODO this has the N+1 problem since address and session are eager
         // but even lazy associations can trigger N+1 queries when loaded
         // try join fetch in JPQL
+
+        // TODO can we test that Hibernate did NOT issue too many queries?
+
+
 //        List<User> recentUsers = userRepository.findRecentNative();
 
         List<User> recentUsers = userRepository.findRecent(PageRequest.of(0, 10));

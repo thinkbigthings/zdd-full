@@ -2,6 +2,8 @@ package org.thinkbigthings.zdd.server.scraper.keystone;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 
@@ -20,7 +22,9 @@ import static org.thinkbigthings.zdd.server.scraper.keystone.Functional.uncheck;
 @Component
 public class Scraper {
 
-    // Thread-safe provided if configuration is before ANY read or write calls
+    private static Logger LOG = LoggerFactory.getLogger(Scraper.class);
+
+    // Thread-safe if configuration is before ANY read or write calls
     private final ObjectMapper mapper = new ObjectMapper();
 
     // immutable and thread safe
@@ -43,12 +47,9 @@ public class Scraper {
 
         try {
 
-            // streams body back as it's received, so can parse html without storing entire page in memory
             List<String> dataUrls = extractDataUrls(client.send(request, HttpResponse.BodyHandlers.ofLines()).body());
 
-            // TODO could be making data requests while parsing the rest of the html
-            // try CompletableFuture<HttpResponse<Stream<String>>> response = client.sendAsync(...
-            // response.thenAccept(...
+            LOG.info("Scraping site: " + keystoneUrl);
 
             return dataUrls.stream()
                     .map(this::createRequest)
@@ -59,7 +60,6 @@ public class Scraper {
         catch (InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private HttpRequest createRequest(String url) {

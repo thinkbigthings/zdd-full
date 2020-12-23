@@ -1,4 +1,4 @@
-package org.thinkbigthings.zdd.server.security;
+package org.thinkbigthings.zdd.server.mapper.entitytodto;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.thinkbigthings.zdd.server.entity.Role;
@@ -26,7 +26,7 @@ public class UserDetailsMapper implements Function<User, UserDetails> {
                 .build();
     }
 
-    public String[] toNames(Set<Role> roles) {
+    private String[] toNames(Set<Role> roles) {
         return roles.stream()
                 .map(Role::name)
                 .collect(toList())

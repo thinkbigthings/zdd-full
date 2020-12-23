@@ -125,13 +125,6 @@ public class User implements Serializable {
         roles.add(role);
     }
 
-    public String[] mapRoleNames() {
-        return getRoles().stream()
-                .map(Role::name)
-                .collect(toList())
-                .toArray(new String[]{});
-    }
-
     public Instant getRegistrationTime() {
         return registrationTime;
     }

@@ -16,13 +16,13 @@ import org.thinkbigthings.zdd.dto.UserSummary;
 import org.thinkbigthings.zdd.server.entity.Address;
 import org.thinkbigthings.zdd.server.entity.Role;
 import org.thinkbigthings.zdd.server.entity.User;
+import org.thinkbigthings.zdd.server.mapper.entitytodto.UserMapper;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.*;
@@ -32,6 +32,8 @@ import static java.util.stream.Collectors.*;
 public class UserService {
 
     private static Logger LOG = LoggerFactory.getLogger(UserService.class);
+
+    private UserMapper toUserRecord = new UserMapper();
 
     private UserRepository userRepo;
     private PasswordEncoder passwordEncoder;
@@ -72,7 +74,7 @@ public class UserService {
         newAddressEntities.forEach(a -> a.setUser(user));
 
         try {
-            return toRecord(userRepo.save(user));
+            return toUserRecord.apply(userRepo.save(user));
         }
         catch(ConstraintViolationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User can't be saved: " + e.getMessage());
@@ -119,41 +121,8 @@ public class UserService {
     public org.thinkbigthings.zdd.dto.User getUser(String username) {
 
         return userRepo.findByUsername(username)
-                .map(this::toRecord)
+                .map(toUserRecord)
                 .orElseThrow(() -> new EntityNotFoundException("no user found for " + username));
-    }
-
-    public PersonalInfo toPersonalInfoRecord(User user) {
-
-        Set<AddressRecord> addresses = user.getAddresses().stream()
-                .map(this::toAddressRecord)
-                .collect(toSet());
-
-        return new PersonalInfo(user.getEmail(),
-                user.getDisplayName(),
-                user.getPhoneNumber(),
-                user.getHeightCm(),
-                addresses);
-    }
-
-    public org.thinkbigthings.zdd.dto.User toRecord(User user) {
-
-        Set<String> roles = user.getRoles().stream()
-                .map(Role::name)
-                .collect(toSet());
-
-        return new org.thinkbigthings.zdd.dto.User( user.getUsername(),
-                user.getRegistrationTime().toString(),
-                roles,
-                toPersonalInfoRecord(user),
-                user.getSessions().size() > 0);
-    }
-
-    public AddressRecord toAddressRecord(Address address) {
-        return new AddressRecord(address.getLine1(),
-                address.getCity(),
-                address.getState(),
-                address.getZip());
     }
 
     public User fromRegistration(RegistrationRequest registration) {

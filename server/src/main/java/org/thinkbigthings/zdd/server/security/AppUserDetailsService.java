@@ -6,11 +6,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thinkbigthings.zdd.server.UserRepository;
+import org.thinkbigthings.zdd.server.mapper.entitytodto.UserDetailsMapper;
 
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 
-    private UserDetailsMapper userDetailsMapper = new UserDetailsMapper();
+    private UserDetailsMapper toUserDetails = new UserDetailsMapper();
 
     private UserRepository userRepository;
 
@@ -24,7 +25,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
         // if not found, UserDetailsService is supposed to throw UsernameNotFoundException instead of return null
         UserDetails userDetails = userRepository.loadUserWithRoles(username)
-                .map(userDetailsMapper::apply)
+                .map(toUserDetails)
                 .filter(user -> ! user.getAuthorities().isEmpty())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found or had no authorities: " + username));
 
