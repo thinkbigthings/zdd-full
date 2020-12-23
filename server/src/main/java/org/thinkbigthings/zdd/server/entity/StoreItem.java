@@ -18,7 +18,7 @@ public class StoreItem {
 
     @NotNull
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "store_item_id", referencedColumnName = "id")
+    @JoinColumn(name = "store_id", referencedColumnName = "id")
     private Store store;
 
     @Column(name = "subspecies_id")

@@ -1,5 +1,7 @@
 package org.thinkbigthings.zdd.dto;
 
-public record StoreRecord(String name, String website, String updated) {
+import java.time.Instant;
+
+public record StoreRecord(String name, String website, Instant updated) {
 
 }

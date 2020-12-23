@@ -47,7 +47,7 @@ CREATE TABLE store_item (
     weight_grams    NUMERIC(3, 1)   NOT NULL,
     price_dollars   INT8            NOT NULL,
     vendor          VARCHAR(255)    NOT NULL,
-    store_item_id   INT8            NOT NULL REFERENCES store (id)
+    store_id        INT8            NOT NULL REFERENCES store (id)
 );
 
 CREATE TABLE terpene_amount (

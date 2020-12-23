@@ -45,7 +45,7 @@ public class ScraperIntegrationTest extends IntegrationTest {
         LOG.info("");
 
         try {
-            storeService.saveNewStore(new StoreRecord(storeName, storeWebsite, ""));
+            storeService.saveNewStore(new StoreRecord(storeName, storeWebsite, Instant.now()));
         }
         catch(Exception e) {
             LOG.info("Caught exception " + e);
@@ -59,14 +59,14 @@ public class ScraperIntegrationTest extends IntegrationTest {
 
         String name = "testScraperFromDisk" + UUID.randomUUID().toString();
         LOG.info("Using store name " + name);
-        storeService.saveNewStore(new StoreRecord(name, name, ""));
+        storeService.saveNewStore(new StoreRecord(name, name, Instant.now()));
 
         Store store = storeService.getStore(name);
         Instant beforeUpdateTime = store.getUpdated();
         long beforeUpdateSize = itemService.findItems(firstPage).getTotalElements();
 
         List<StoreItem> items = readItems();
-        itemService.updateStoreItems(storeName, items);
+        storeService.updateStoreItems(storeName, items);
 
         store = storeService.getStore(name);
         Instant afterUpdateTime = store.getUpdated();
@@ -85,7 +85,7 @@ public class ScraperIntegrationTest extends IntegrationTest {
         Instant beforeUpdate = store.getUpdated();
         long sizeBeforeUpdate = itemService.findItems(firstPage).getTotalElements();
 
-        itemService.scrapeStore(storeName);
+        storeService.scrapeStore(storeName);
 
         store = storeService.getStore(storeName);
         long sizeAfterUpdate = itemService.findItems(firstPage).getTotalElements();
