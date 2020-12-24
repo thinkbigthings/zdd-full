@@ -9,6 +9,7 @@ import Col          from 'react-bootstrap/Col';
 import copy from './Copier.js';
 import useApiLoader from "./useApiLoader";
 import CenteredSpinner from "./CenteredSpinner";
+import {Table} from "react-bootstrap";
 
 const initialPage = {
     content: [],
@@ -55,21 +56,36 @@ function ItemList() {
             <div className="container mt-3">
                 <h1>Items</h1>
 
-                <Container className="container mt-3">
+                <Table striped bordered hover>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>THC%</th>
+                        <th>CBD%</th>
+                        <th>Weight (g)</th>
+                        <th>Price ($)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
                     {fetchedData.content.map(item =>
-                        <Row key={item.strain + item.weightGrams} className="pt-2 pb-2 border-bottom border-top ">
-                            <Col >{item.strain}</Col>
-                            <Col >{item.subspecies}</Col>
-                            <Col >{item.thc}</Col>
-                            <Col >{item.cbd}</Col>
-
-                            {/*Subspecies subspecies, String strain,*/}
-                            {/*BigDecimal thc, BigDecimal cbd, List<TerpeneAmount> terpeneAmounts,*/}
-                            {/*BigDecimal weightGrams, Long priceDollars, String vendor*/}
-
-                        </Row>
+                        <tr>
+                            <td>{item.strain}</td>
+                            <td>{item.subspecies}</td>
+                            <td>{item.thc}</td>
+                            <td>{item.cbd}</td>
+                            <td>{item.weightGrams}</td>
+                            <td>{item.priceDollars}</td>
+                        </tr>
                     )}
-                </Container>
+                    {/*
+                    List<TerpeneAmount> terpeneAmounts
+                    String vendor
+                    */}
+
+                    </tbody>
+                </Table>
 
                 <ButtonGroup className="mt-2">
                     <Button variant="primary" disabled={fetchedData.first} className={"btn btn-primary "} onClick={ () => movePage(-1) }>
