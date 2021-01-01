@@ -33,6 +33,7 @@ class RepositoryTest extends IntegrationTest {
         assertTrue(admin.isPresent());
     }
 
+    @Disabled("seed data needs to be added in this test, otherwise it depends on other tests running first")
     @Test
     public void testOrphanRemoval() {
 

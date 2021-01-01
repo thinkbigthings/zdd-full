@@ -77,10 +77,10 @@ Can get a postgres command prompt with
 
 ## Fitting in with Heroku
 
-Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase) seems to be the intended mechanism for migrations.
+Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase) is the intended mechanism for migrations.
 Heroku requires apps to bind a port in 60s or it's considered crashed.
 Migrations can eat into that time, so do that separately from deployment.
-The release phse has a 1h timeout and a release can be 
+The release phase has a 1h timeout and a release can be 
 monitored and [stopped](https://help.heroku.com/Z44Q4WW4/how-do-i-stop-a-release-phase). 
 
 Running from a [flyway caller](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps#using-flyway) 
