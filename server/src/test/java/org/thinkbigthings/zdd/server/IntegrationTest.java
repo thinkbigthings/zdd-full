@@ -24,7 +24,8 @@ public class IntegrationTest {
     private static Logger LOG = LoggerFactory.getLogger(IntegrationTest.class);
 
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:12")
-            .withUrlParam("autosave", "conservative");
+            .withUrlParam("autosave", "conservative")
+            .withReuse(true);
 
     @DynamicPropertySource
     static void copyDynamicProperties(DynamicPropertyRegistry registry) {

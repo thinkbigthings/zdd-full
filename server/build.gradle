@@ -50,7 +50,6 @@ dependencies {
 }
 
 // integration test by tags,
-
 // inspired by https://stackoverflow.com/questions/40891867/junit5-tag-specific-gradle-task
 
 def test = tasks.named("test") {
@@ -60,6 +59,17 @@ def test = tasks.named("test") {
 }
 
 def integrationTest = tasks.register("integrationTest", Test) {
+
+    // this lets the container stay up so you can run standalone later with the same container if you want
+    // the flag here merely allows you to use the setting, to actually leave a container up (or not), call
+    // the container's .withReuse() method
+    environment "TESTCONTAINERS_REUSE_ENABLE", "true"
+
+    // It takes a couple of seconds, but if you want to speed up your tests,
+    // you can disable the checks once you have everything configured
+    // TODO I think this overwrites the above? Maybe you can only make one environment call here
+    // environment "TESTCONTAINERS_CHECKS_DISABLE", "true"
+
     useJUnitPlatform {
         includeTags "integration"
     }
