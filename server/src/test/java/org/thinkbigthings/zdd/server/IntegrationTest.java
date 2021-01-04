@@ -11,6 +11,12 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Properties;
 
 @Tag("integration")
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
@@ -27,16 +33,36 @@ public class IntegrationTest {
             .withUrlParam("autosave", "conservative")
             .withReuse(true);
 
-    @DynamicPropertySource
-    static void copyDynamicProperties(DynamicPropertyRegistry registry) {
 
-        // Mapped port can only be obtained after container is started.
+    @DynamicPropertySource
+    static void useDynamicProperties(DynamicPropertyRegistry registry) {
+
         postgres.start();
 
-        // make these properties available to the server before it starts up
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+        // Mapped port can only be obtained after container is started.
+        Map<String, Object> appProps = Map.of("spring.datasource.url", postgres.getJdbcUrl(),
+                                                "spring.datasource.username", postgres.getUsername(),
+                                                "spring.datasource.password", postgres.getPassword());
+
+        // make these properties available to the app server before it starts up
+        appProps.forEach((k,v) -> registry.add(k, ()-> v));
+
+        // save the properties so we can start up later if we want
+        Properties properties = new Properties();
+        appProps.forEach((k,v) -> properties.put(k,v));
+
+        File tcProps = Paths.get("build", "postgres.properties").toFile();
+        saveProperties(properties, "testcontainer properties", tcProps);
+    }
+
+    private static void saveProperties(Properties props, String propsComment, File propsFile) {
+        try (FileOutputStream edgeProps = new FileOutputStream(propsFile)) {
+            propsFile.createNewFile();
+            props.store(edgeProps, propsComment);
+        }
+        catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     @LocalServerPort

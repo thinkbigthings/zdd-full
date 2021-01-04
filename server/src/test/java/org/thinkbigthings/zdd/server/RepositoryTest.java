@@ -17,7 +17,6 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
 class RepositoryTest extends IntegrationTest {
 
     private static Logger LOG = LoggerFactory.getLogger(RepositoryTest.class);

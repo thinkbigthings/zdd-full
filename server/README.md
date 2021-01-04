@@ -7,8 +7,19 @@ This is a project to illustrate zero downtime deployments.
 Software that needs to be installed:
 
 * Java 15
-* PostgreSQL 12 (via docker, see below)
-* Gradle (via gradle wrapper, see below)
+* Docker
+
+
+## Docker Postgres
+
+Running the full build (with the integration tests) will create and populate
+a docker container with a postgres database. The database is normally built and
+destroyed for every build, but to leave it up and running after the tests
+(say, for inspection, or to run the app standalone), find the PostgreSQLContainer
+in the test code, and call its `.withReuse(true)` method with `true` to leave it 
+up and running even after the build finishes.
+
+
 
 ## Threads
 
@@ -36,10 +47,8 @@ Http automatically redirects to https on heroku. Locally it always requires http
 
 ## Running
 
-If starting with a new run of docker, need to ensure the migrations have been run
-since they don't run automatically on app startup. See migration steps.
-
-Run `gradlew bootRun`, or run `gradlew cleanRun` to clear the database and run the server in one step
+Doing a full build and leaving the docker container for postgres running
+will allow us to run standalone.
 
 ## Debugging
 
