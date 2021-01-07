@@ -64,8 +64,8 @@ Then in the browser go to `https://localhost:9000`
 
 ### Showing Blue Green Deployment (Server)
 
-Override the port so we can run multiple servers at once. e.g. 
-`gradlew :server:flywayMigrate -i`
+Override the port so we can run multiple servers at once. e.g.
+`gradlew :server:bootRun --args='--spring.profiles.active=migration'`
 `gradlew :server:bootRun --args='--server.port=9001'`
 `gradlew :perf:bootRun --args='--connect.port=9001'`
 
@@ -206,18 +206,3 @@ heroku config --app zdd-full
 heroku pg --app zdd-full
 heroku run ls --app zdd-full
 heroku run env --app zdd-full
-
-### Test heroku commands in build.gradle locally
-
-To run these exact commands (the ones that end up in the Procfile) locally, 
-we need to have application.properties and cert file in current folder.
-
-Also, in the local application.properties, add the property  `spring.jpa.database=POSTGRESQL`
-
-And export these properties to simulate the heroku environment
-
-    export JDBC_DATABASE_URL="jdbc:postgresql://localhost:5555/app?password=postgres&&user=postgres"
-    export JDBC_DATABASE_USERNAME=postgres
-    export JDBC_DATABASE_PASSWORD=postgres
-    export PORT=9000
-
