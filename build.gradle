@@ -58,9 +58,9 @@ heroku {
     includeBuildDir = false
 
     processTypes(
-        // The \$ is to escape $ for gradle, don't need the slash when running the command locally
-        release: "java --enable-preview -jar migration/build/libs/migration-1.0-SNAPSHOT.jar",
-        web: "java --enable-preview -Dserver.port='\${PORT}' -Dspring.datasource.url='\${JDBC_DATABASE_URL}&autosave=conservative' -jar server/build/libs/server-1.0-SNAPSHOT.jar"
+        // The \$ is to escape $ for build.gradle, don't need the slash when running the command locally
+        release: "java --enable-preview -Dspring.datasource.url='\${JDBC_DATABASE_URL}&autosave=conservative' -Dspring.profiles.active=migration -jar server/build/libs/server-1.0-SNAPSHOT.jar",
+        web:     "java --enable-preview -Dspring.datasource.url='\${JDBC_DATABASE_URL}&autosave=conservative' -Dserver.port='\${PORT}'           -jar server/build/libs/server-1.0-SNAPSHOT.jar"
     )
 }
 

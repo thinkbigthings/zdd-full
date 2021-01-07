@@ -29,10 +29,11 @@ public class IntegrationTest {
 
     private static Logger LOG = LoggerFactory.getLogger(IntegrationTest.class);
 
+    // need "autosave conservative" config, otherwise pg driver has caching issues with blue-green deployment
+    // (org.postgresql.util.PSQLException: ERROR: cached plan must not change result type)
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:12")
             .withUrlParam("autosave", "conservative")
             .withReuse(true);
-
 
     @DynamicPropertySource
     static void useDynamicProperties(DynamicPropertyRegistry registry) {
@@ -47,15 +48,15 @@ public class IntegrationTest {
         // make these properties available to the app server before it starts up
         appProps.forEach((k,v) -> registry.add(k, ()-> v));
 
-        // save the properties so we can start up later if we want
-        Properties properties = new Properties();
-        appProps.forEach((k,v) -> properties.put(k,v));
-
+        // save the properties to a file so we can start up later if we want
         File tcProps = Paths.get("build", "postgres.properties").toFile();
-        saveProperties(properties, "testcontainer properties", tcProps);
+        saveProperties(appProps, "testcontainer properties", tcProps);
     }
 
-    private static void saveProperties(Properties props, String propsComment, File propsFile) {
+    private static void saveProperties(Map<String, Object> appProps, String propsComment, File propsFile) {
+
+        Properties props = new Properties();
+        appProps.forEach((k,v) -> props.put(k,v));
         try (FileOutputStream edgeProps = new FileOutputStream(propsFile)) {
             propsFile.createNewFile();
             props.store(edgeProps, propsComment);

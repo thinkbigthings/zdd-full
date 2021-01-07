@@ -32,39 +32,18 @@ class RepositoryTest extends IntegrationTest {
         assertTrue(admin.isPresent());
     }
 
-    @Disabled("seed data needs to be added in this test, otherwise it depends on other tests running first")
-    @Test
-    public void testOrphanRemoval() {
-
-        LOG.info("findAll");
-        Page<User> userPage = userRepository.findAll(PageRequest.of(0, 10));
-
-        LOG.info("filter");
-        List<User> usersWithAddresses = userPage.getContent().stream()
-                .filter(Predicate.not(user -> user.getAddresses().isEmpty()))
-                .collect(toList());
-
-        assertTrue(usersWithAddresses.size() > 0);
-    }
-
     @Test
     public void testNPlusOne() {
 
-        // TODO this has the N+1 problem since address and session are eager
-        // but even lazy associations can trigger N+1 queries when loaded
-        // try join fetch in JPQL
-//        List<User> recentUsers = userRepository.findRecentNative();
-
+        // even lazy associations can trigger N+1 queries when loaded
+        // demonstrate what happens with .loadSummaries() and .loadUserWithRoles() vs this.
         List<User> recentUsers = userRepository.findRecent(PageRequest.of(0, 10));
 
-
-        // shows all the queries that happen from just a simple entity access
+        // demonstrate all the queries that happen from just a simple entity access
 //        List<Address> addresses = recentUsers.stream()
 //                .flatMap(u -> u.getAddresses().stream())
 //                .collect(toList());
 
-//        assertTrue(addresses.size() > 0);
-//        assertEquals(10, recentUsers.size());
     }
 
     @Test
