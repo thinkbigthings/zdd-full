@@ -37,6 +37,11 @@ destroyed for every build, but to leave it up and running after the tests
 in the test code, and call its `.withReuse(true)` method with `true` instead of `false` to leave it
 up and running even after the build finishes.
 
+Handy Commands:
+
+See running images with `docker ps`
+Stop a container with `docker container stop container_name`
+
 
 
 ## Migrations
@@ -48,6 +53,9 @@ The server is run in a "migration only" mode that does the migrations and then s
 
 e.g.
 
+use `migrate` script that runs the migration profile with gradle,
+
+or 
     cd server
     java --enable-preview -Dspring.profiles.active=migration -jar build/libs/server-1.0-SNAPSHOT.jar
 
@@ -58,22 +66,6 @@ Can get a postgres command prompt with
 
     heroku pg:psql --app stage-zdd-full
 
-
-## Fitting in with Heroku
-
-Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase)
-is one intended mechanism for migrations.
-
-Heroku requires apps to bind a port in 60s or it's considered crashed.
-Migrations can eat into that time, so do that separately from deployment.
-The release phase has a 1h timeout and a release can be
-monitored and [stopped](https://help.heroku.com/Z44Q4WW4/how-do-i-stop-a-release-phase).
-
-Running from a [flyway caller](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps#using-flyway)
-is the best way to do a migration without doing the source code deployment.
-
-Besides the release phase, database migrations can also be run in a 
-[one-off dyno](https://devcenter.heroku.com/articles/one-off-dynos)
 
 ## Environment variables
 
@@ -87,10 +79,7 @@ e.g.
     PORT=38476
 
 
-
-## Heroku Database Migrations
-
-See [Heroku Migrations](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps)
+## Fitting in with Heroku
 
 There are a number of database connection environment variables generated automatically by Heroku.
 They overlap, so you can use them with different technologies (i.e. straight Java vs Spring)
@@ -111,6 +100,26 @@ to add custom database properties to the URL
     SPRING_DATASOURCE_URL=jdbc:postgresql://ec2...compute-1.amazonaws.com:5432/d5oqne55s6np1v?password=23782e...&sslmode=require&user=pafei...
     SPRING_DATASOURCE_USERNAME=pafei...
     SPRING_DATASOURCE_PASSWORD=23782e...
+
+
+
+## Heroku Database Migrations
+
+See [Heroku Migrations](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps)
+
+Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase)
+is one intended mechanism for migrations.
+
+Heroku requires apps to bind a port in 60s or it's considered crashed.
+Migrations can eat into that time, so do that separately from deployment.
+The release phase has a 1h timeout and a release can be
+monitored and [stopped](https://help.heroku.com/Z44Q4WW4/how-do-i-stop-a-release-phase).
+
+Running from a [flyway caller](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps#using-flyway)
+is the best way to do a migration without doing the source code deployment.
+
+Besides the release phase, database migrations can also be run in a
+[one-off dyno](https://devcenter.heroku.com/articles/one-off-dynos)
 
 
 ## Threads

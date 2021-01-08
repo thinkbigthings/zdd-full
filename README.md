@@ -77,19 +77,19 @@ Just put ./commands on your PATH
 
 We assign an API Version to the software at build time, the version should not be a runtime property.
 The API version we're talking about is not the `software` version, it is a `compatibility` version 
-meaning it indicates whether two pieces of software should expect to be able to interact successfully.
+meaning it indicates whether two pieces of software should expect to be able to interact successfully via API.
 
 If a client makes a request, and the compatibility version does not match what's on the server,
-the server will return a 406 and the client is expected to refresh itself and try again with the correct version.
+the server will return an error code and the client is expected to refresh itself and try again with the correct version.
 
 #### Server
 We assign an API Version from application.properties in the server's source main resources,
 but it can be overridden per Spring's property config mechanisms.
-To avoid that we'd have to hard-code the api version in code.
-Having a property seems appropriate though because it is a property.
+To prevent the ability to override it on the command line, we'd have to hard-code the api version in code.
+Having a property seems appropriate though because it is... a property.
 
 #### Client
-To get the client version into UI, put the value in the project's .env file, then it's accessible from React
+To get the client version into UI, put the value in the project's .env file, then it's accessible from React.
 The variable is available in React app from doing a build and also when running from `npm start`
 but .env file is not monitored, so updating that file won't trigger a refresh when running from `npm start`.
 
@@ -142,23 +142,6 @@ We can do this from the base folder with
 
 Do a squash merge so master contains a single commit per issue
 
-## Troubleshooting
-
-### Stack trace about a postgres deadlock
-This has so far only been on the very last step. Have not done a lot of investigation into this.
-MIGHT be able to swap environments again? Or just shutdown and restart server? 
-Or just stop and restart the client? Do we need to restart postgres?
-
-### Client and server are running but client isn't making requests
-At one point a software update for iterm2 on my laptop was messing things up
-Can just restart client and it'll work
-
-### Migration hangs
-A connection can block another connection for the migration, make sure the IntelliJ DB Browser, 
-any psql clients, VisualVM JDBC profilers, or previous servers, are disconnected.
-
-If something goes terribly wrong, you may need to even drop the docker instance and rebuild everything.
-
 ## Deployment
 
 Relevant Documentation
@@ -188,7 +171,7 @@ heroku addons:create heroku-postgresql --app stage-zdd-full
 // deploy with gradle, specify app name to ensure the correct target environment
 
     gradlew -Papp=stage-zdd-full deployHeroku
-    
+      
     
 // or with command line
 heroku deploy:jar server-1.0-SNAPSHOT.jar --app zdd-full --include Procfile system.properties
@@ -206,3 +189,22 @@ heroku config --app zdd-full
 heroku pg --app zdd-full
 heroku run ls --app zdd-full
 heroku run env --app zdd-full
+
+
+
+## Troubleshooting
+
+### Stack trace about a postgres deadlock
+This has so far only been on the very last step. Have not done a lot of investigation into this.
+MIGHT be able to swap environments again? Or just shutdown and restart server?
+Or just stop and restart the client? Do we need to restart postgres?
+
+### Client and server are running but client isn't making requests
+At one point a software update for iterm2 on my laptop was messing things up
+Can just restart client and it'll work
+
+### Migration hangs
+A connection can block another connection for the migration, make sure the IntelliJ DB Browser,
+any psql clients, VisualVM JDBC profilers, or previous servers, are disconnected.
+
+If something goes terribly wrong, you may need to even drop the docker instance and rebuild everything.

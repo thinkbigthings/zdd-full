@@ -54,7 +54,7 @@ heroku {
 
     appName = project.hasProperty('app') ? project.property('app') : 'stage-zdd-full';
     jdkVersion = 15
-    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar", "migration/build/libs/migration-1.0-SNAPSHOT.jar"]
+    includes = ["server/build/libs/server-1.0-SNAPSHOT.jar"]
     includeBuildDir = false
 
     processTypes(
