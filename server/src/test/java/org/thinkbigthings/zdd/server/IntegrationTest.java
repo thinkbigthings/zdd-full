@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -24,7 +25,8 @@ import java.util.Properties;
         "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE",
         "spring.main.lazy-initialization=true",
         "spring.flyway.enabled=true",
-        "spring.datasource.url=jdbc:tc:postgres:12:///"})
+        "spring.datasource.url=jdbc:tc:postgres:12:///"
+})
 public class IntegrationTest {
 
     private static Logger LOG = LoggerFactory.getLogger(IntegrationTest.class);
@@ -33,7 +35,7 @@ public class IntegrationTest {
     // (org.postgresql.util.PSQLException: ERROR: cached plan must not change result type)
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:12")
             .withUrlParam("autosave", "conservative")
-            .withReuse(true);
+            .withReuse(false);
 
     @DynamicPropertySource
     static void useDynamicProperties(DynamicPropertyRegistry registry) {

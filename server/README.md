@@ -30,12 +30,21 @@ On Mac: can install Docker Desktop from docker hub, or use brew
 
 ## Docker Postgres
 
+Docker usage is oriented around [testcontainers](https://www.testcontainers.org)
+Even Docker [recommends it](https://www.docker.com/blog/maintainable-integration-tests-with-docker/).
+"By spinning it up from inside the test itself, you have a lot more control over the orchestration and provisioning, 
+and the test is more stable. You can even check when a container is ready before you start a test"
+
 Running the full build (with the integration tests) will create and populate
 a docker container with a postgres database. The database is normally built and
 destroyed for every build, but to leave it up and running after the tests
 (say, for inspection, or to run the app standalone), find the PostgreSQLContainer
 in the test code, and call its `.withReuse(true)` method with `true` instead of `false` to leave it
 up and running even after the build finishes.
+
+Note that the datasource properties are dynamic and written to `build/postgres.properties`
+Which is referenced by `application.properties` and so available later if necessary.
+
 
 Handy Commands:
 

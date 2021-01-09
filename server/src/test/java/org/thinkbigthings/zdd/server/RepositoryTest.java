@@ -25,6 +25,9 @@ class RepositoryTest extends IntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+
+    // If Transactional annotation is on the test method/class, it rolls back.
+    // Need the test to NOT roll back transactions since if you want populated data
     @Test
     @Transactional
     public void testJoinFetch() {
