@@ -124,23 +124,43 @@ the request handling threads, if they are green they are running.
 If they are both solid orange, the thread is parked and the server is not
 actively handling any requests.
 
-## Branch Procedures
+## Dev Procedures
 
-Define acceptance criteria so we know what is in scope.
-Create branch locally and push to remote
+### Branch 
+
+- [x] Define acceptance criteria for clearly defined scope
+- [x] Create branch locally and push to remote
+
+### Develop
+
+- [x] Must satisfy acceptance criteria
+- [x] Must be covered by automated testing
+- [x] Must verify security / authorization
+- [x] Must verify zero downtime transition
+- [x] Perf test locally
+- [x] UI test locally from full build (requires online)
+
+### Protect the Process
+
+- [x] Can run unit/int tests in IDE
+- [x] Review test coverage, coverage > 40%
+- [x] Can debug front/back end in IDE
+- [x] Full clean build < 30s
+- [x] Docs are up to date
+
+### Stage
+
+- [x] Deploy to stage
+- [x] UI test on stage
+- [x] Perf test directed at stage
+
+### Merge
+
+- [x] Squash merge to master
+- [x] Deploy to Prod
 
 
-## Merge Procedures
 
-Ensure acceptance criteria are met.
-
-Update README docs as necessary.
-
-Always run a full build with test coverage before merging a branch.
-We can do this from the base folder with
-`gradlew clean build :server:jacocoTestReport` 
-
-Do a squash merge so master contains a single commit per issue
 
 ## Deployment
 

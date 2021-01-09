@@ -12,6 +12,7 @@ import org.thinkbigthings.zdd.server.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -25,11 +26,16 @@ class RepositoryTest extends IntegrationTest {
     private UserRepository userRepository;
 
     @Test
+    @Transactional
     public void testJoinFetch() {
 
         // observe the effect in the debugger and the SQL of deleting "JOIN FETCH u.roles"
         Optional<User> admin = userRepository.loadUserWithRoles("admin");
+//        Optional<User> admin = userRepository.findByUsername("admin");
+        Set<User.Role> roles = admin.map(user -> user.getRoles()).get();
+        assertFalse(roles.isEmpty());
         assertTrue(admin.isPresent());
+
     }
 
     @Test
