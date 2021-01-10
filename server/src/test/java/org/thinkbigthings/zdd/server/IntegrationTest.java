@@ -35,7 +35,7 @@ public class IntegrationTest {
     // (org.postgresql.util.PSQLException: ERROR: cached plan must not change result type)
     protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:12")
             .withUrlParam("autosave", "conservative")
-            .withReuse(false);
+            .withReuse(true);
 
     @DynamicPropertySource
     static void useDynamicProperties(DynamicPropertyRegistry registry) {
