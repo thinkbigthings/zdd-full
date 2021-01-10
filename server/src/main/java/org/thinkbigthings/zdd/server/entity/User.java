@@ -56,7 +56,7 @@ public class User implements Serializable {
     @NotNull
     private int heightCm = 0;
 
-    @ElementCollection(targetClass=Role.class)
+    @ElementCollection(fetch=FetchType.LAZY, targetClass=Role.class)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role_id")
     @Enumerated(EnumType.ORDINAL)

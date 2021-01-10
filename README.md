@@ -12,17 +12,11 @@ From reactjs folder run `npm start`
 
 ## Setup
 
-[Setup for database project](migration/README.md)
-
 [Setup for server project](server/README.md)
 
 [Setup for web project](reactjs/README.md)
 
 ## Project Structure
-
-### Migration
-
-The Migration project handles database setup and migrations.
 
 ### Web
 
@@ -70,8 +64,8 @@ Then in the browser go to `https://localhost:9000`
 
 ### Showing Blue Green Deployment (Server)
 
-Override the port so we can run multiple servers at once. e.g. 
-`gradlew :server:flywayMigrate -i`
+Override the port so we can run multiple servers at once. e.g.
+`gradlew :server:bootRun --args='--spring.profiles.active=migration'`
 `gradlew :server:bootRun --args='--server.port=9001'`
 `gradlew :perf:bootRun --args='--connect.port=9001'`
 
@@ -83,19 +77,19 @@ Just put ./commands on your PATH
 
 We assign an API Version to the software at build time, the version should not be a runtime property.
 The API version we're talking about is not the `software` version, it is a `compatibility` version 
-meaning it indicates whether two pieces of software should expect to be able to interact successfully.
+meaning it indicates whether two pieces of software should expect to be able to interact successfully via API.
 
 If a client makes a request, and the compatibility version does not match what's on the server,
-the server will return a 406 and the client is expected to refresh itself and try again with the correct version.
+the server will return an error code and the client is expected to refresh itself and try again with the correct version.
 
 #### Server
 We assign an API Version from application.properties in the server's source main resources,
 but it can be overridden per Spring's property config mechanisms.
-To avoid that we'd have to hard-code the api version in code.
-Having a property seems appropriate though because it is a property.
+To prevent the ability to override it on the command line, we'd have to hard-code the api version in code.
+Having a property seems appropriate though because it is... a property.
 
 #### Client
-To get the client version into UI, put the value in the project's .env file, then it's accessible from React
+To get the client version into UI, put the value in the project's .env file, then it's accessible from React.
 The variable is available in React app from doing a build and also when running from `npm start`
 but .env file is not monitored, so updating that file won't trigger a refresh when running from `npm start`.
 
@@ -130,40 +124,44 @@ the request handling threads, if they are green they are running.
 If they are both solid orange, the thread is parked and the server is not
 actively handling any requests.
 
-## Branch Procedures
+## Dev Procedures
 
-Define acceptance criteria so we know what is in scope.
-Create branch locally and push to remote
+### Branch 
+
+- [x] Define acceptance criteria for clearly defined scope
+- [x] Create branch locally and push to remote
+
+### Develop
+
+- [x] Must satisfy acceptance criteria
+- [x] Must be covered by automated testing
+- [x] Must verify security / authorization
+- [x] Must verify zero downtime transition
+- [x] Perf test locally
+- [x] UI test locally from full build (requires online)
+
+### Protect the Process
+
+- [x] Can run unit/int tests in IDE
+- [x] Review test coverage, coverage > 40%
+- [x] Can debug front/back end in IDE
+- [x] Full clean build < 30s
+- [x] Docs are up to date
+
+### Stage
+
+- [x] Deploy to stage
+- [x] UI test on stage
+- [x] Perf test directed at stage
+
+### Merge
+
+- [x] Create PR
+- [x] Squash merge to master
+- [x] Deploy to Prod
 
 
-## Merge Procedures
 
-Ensure acceptance criteria are met.
-
-Update README docs as necessary.
-
-Always run a full build with test coverage before merging a branch.
-We can do this from the base folder with
-`gradlew clean build :server:jacocoTestReport` 
-
-Do a squash merge so master contains a single commit per issue
-
-## Troubleshooting
-
-### Stack trace about a postgres deadlock
-This has so far only been on the very last step. Have not done a lot of investigation into this.
-MIGHT be able to swap environments again? Or just shutdown and restart server? 
-Or just stop and restart the client? Do we need to restart postgres?
-
-### Client and server are running but client isn't making requests
-At one point a software update for iterm2 on my laptop was messing things up
-Can just restart client and it'll work
-
-### Migration hangs
-A connection can block another connection for the migration, make sure the IntelliJ DB Browser, 
-any psql clients, VisualVM JDBC profilers, or previous servers, are disconnected.
-
-If something goes terribly wrong, you may need to even drop the docker instance and rebuild everything.
 
 ## Deployment
 
@@ -194,7 +192,7 @@ heroku addons:create heroku-postgresql --app stage-zdd-full
 // deploy with gradle, specify app name to ensure the correct target environment
 
     gradlew -Papp=stage-zdd-full deployHeroku
-    
+      
     
 // or with command line
 heroku deploy:jar server-1.0-SNAPSHOT.jar --app zdd-full --include Procfile system.properties
@@ -213,17 +211,21 @@ heroku pg --app zdd-full
 heroku run ls --app zdd-full
 heroku run env --app zdd-full
 
-### Test heroku commands in build.gradle locally
 
-To run these exact commands (the ones that end up in the Procfile) locally, 
-we need to have application.properties and cert file in current folder.
 
-Also, in the local application.properties, add the property  `spring.jpa.database=POSTGRESQL`
+## Troubleshooting
 
-And export these properties to simulate the heroku environment
+### Stack trace about a postgres deadlock
+This has so far only been on the very last step. Have not done a lot of investigation into this.
+MIGHT be able to swap environments again? Or just shutdown and restart server?
+Or just stop and restart the client? Do we need to restart postgres?
 
-    export JDBC_DATABASE_URL="jdbc:postgresql://localhost:5555/app?password=postgres&&user=postgres"
-    export JDBC_DATABASE_USERNAME=postgres
-    export JDBC_DATABASE_PASSWORD=postgres
-    export PORT=9000
+### Client and server are running but client isn't making requests
+At one point a software update for iterm2 on my laptop was messing things up
+Can just restart client and it'll work
 
+### Migration hangs
+A connection can block another connection for the migration, make sure the IntelliJ DB Browser,
+any psql clients, VisualVM JDBC profilers, or previous servers, are disconnected.
+
+If something goes terribly wrong, you may need to even drop the docker instance and rebuild everything.

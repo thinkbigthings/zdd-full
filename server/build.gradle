@@ -8,6 +8,7 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.4.0'
     id 'jacoco' // core plugin provided by gradle
+    id 'org.flywaydb.flyway' version '7.2.1'
 }
 
 // https://docs.gradle.org/current/userguide/jacoco_plugin.html
@@ -38,13 +39,17 @@ dependencies {
     // JAXB was removed in Java 11 so needs to be included here
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
+    implementation 'org.flywaydb:flyway-core:7.2.1'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.0'
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
 
+    testCompile "org.testcontainers:testcontainers:1.15.1"
+    testCompile "org.testcontainers:junit-jupiter:1.15.1"
+    testCompile "org.testcontainers:postgresql:1.15.1"
 }
 
 // integration test by tags,
-
 // inspired by https://stackoverflow.com/questions/40891867/junit5-tag-specific-gradle-task
 
 def test = tasks.named("test") {
@@ -54,6 +59,17 @@ def test = tasks.named("test") {
 }
 
 def integrationTest = tasks.register("integrationTest", Test) {
+
+    // this lets the container stay up so you can run standalone later with the same container if you want
+    // the flag here merely allows you to use the setting, to actually leave a container up (or not), call
+    // the container's .withReuse() method
+    environment "TESTCONTAINERS_REUSE_ENABLE", "true"
+
+    // It takes a couple of seconds, but if you want to speed up your tests,
+    // you can disable the checks once you have everything configured
+    // TODO I think this overwrites the above? Maybe you can only make one environment call here
+    // environment "TESTCONTAINERS_CHECKS_DISABLE", "true"
+
     useJUnitPlatform {
         includeTags "integration"
     }

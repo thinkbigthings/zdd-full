@@ -2,6 +2,7 @@ package org.thinkbigthings.zdd.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -28,7 +29,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
-
+@Profile(" ! migration")
 @Component
 public class LoggingFilterRps implements Filter {
 
@@ -109,7 +110,7 @@ public class LoggingFilterRps implements Filter {
         var avgResponseTime = Math.round((double)totalTime / (double)totalRequests);
         var requestLog = "[" + totalRequests + ", " + avgResponseTime + ", " + maxTimeMs + "]";
 
-        LOG.info(legend + ": " + requestLog);
+//        LOG.info(legend + ": " + requestLog);
     }
 
     // copy and clear values atomically without locking the map

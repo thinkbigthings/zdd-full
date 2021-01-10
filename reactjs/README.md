@@ -25,7 +25,13 @@ such as catching non-200 http responses when fetching data, and displaying an ap
 ## Debugging
 
 IntelliJ supports debugging JS in the IDE. 
-You use a JavaScript Debug configuration (not Debug on NPM Start)
+
+To Debug the UI:
+
+- Start the server from services section
+- Run `npm start`
+- Launch a JavaScript Debug configuration (not Debug on NPM Start)
+
 See the IDE help for more details.
 
 ## Upgrade Dependencies

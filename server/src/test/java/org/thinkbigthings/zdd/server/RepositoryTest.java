@@ -12,12 +12,12 @@ import org.thinkbigthings.zdd.server.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Transactional
 class RepositoryTest extends IntegrationTest {
 
     private static Logger LOG = LoggerFactory.getLogger(RepositoryTest.class);
@@ -25,46 +25,34 @@ class RepositoryTest extends IntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+
+    // If Transactional annotation is on the test method/class, it rolls back.
+    // Need the test to NOT roll back transactions since if you want populated data
     @Test
+    @Transactional
     public void testJoinFetch() {
 
         // observe the effect in the debugger and the SQL of deleting "JOIN FETCH u.roles"
         Optional<User> admin = userRepository.loadUserWithRoles("admin");
+//        Optional<User> admin = userRepository.findByUsername("admin");
+        Set<User.Role> roles = admin.map(user -> user.getRoles()).get();
+        assertFalse(roles.isEmpty());
         assertTrue(admin.isPresent());
-    }
 
-    @Test
-    public void testOrphanRemoval() {
-
-        LOG.info("findAll");
-        Page<User> userPage = userRepository.findAll(PageRequest.of(0, 10));
-
-        LOG.info("filter");
-        List<User> usersWithAddresses = userPage.getContent().stream()
-                .filter(Predicate.not(user -> user.getAddresses().isEmpty()))
-                .collect(toList());
-
-        assertTrue(usersWithAddresses.size() > 0);
     }
 
     @Test
     public void testNPlusOne() {
 
-        // TODO this has the N+1 problem since address and session are eager
-        // but even lazy associations can trigger N+1 queries when loaded
-        // try join fetch in JPQL
-//        List<User> recentUsers = userRepository.findRecentNative();
-
+        // even lazy associations can trigger N+1 queries when loaded
+        // demonstrate what happens with .loadSummaries() and .loadUserWithRoles() vs this.
         List<User> recentUsers = userRepository.findRecent(PageRequest.of(0, 10));
 
-
-        // shows all the queries that happen from just a simple entity access
+        // demonstrate all the queries that happen from just a simple entity access
 //        List<Address> addresses = recentUsers.stream()
 //                .flatMap(u -> u.getAddresses().stream())
 //                .collect(toList());
 
-//        assertTrue(addresses.size() > 0);
-//        assertEquals(10, recentUsers.size());
     }
 
     @Test
