@@ -156,6 +156,7 @@ actively handling any requests.
 
 ### Merge
 
+- [x] Create PR
 - [x] Squash merge to master
 - [x] Deploy to Prod
 
