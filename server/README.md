@@ -7,8 +7,129 @@ This is a project to illustrate zero downtime deployments.
 Software that needs to be installed:
 
 * Java 15
-* PostgreSQL 12 (via docker, see below)
-* Gradle (via gradle wrapper, see below)
+* Docker
+
+
+### Install Java
+
+Download the latest Java from [AdoptOpenJDK](https://adoptopenjdk.net)
+
+
+### Install Docker
+
+On Linux: `sudo apt install docker.io`
+Note: On Linux, needed to run docker as sudo.
+docker daemon must run as root, but you can specify that a group other than docker should own the Unix socket with the -G option.
+
+On Mac: can install Docker Desktop from docker hub, or use brew
+
+
+
+# Database Migrations
+
+
+## Docker Postgres
+
+Docker usage is oriented around [testcontainers](https://www.testcontainers.org)
+Even Docker [recommends it](https://www.docker.com/blog/maintainable-integration-tests-with-docker/).
+"By spinning it up from inside the test itself, you have a lot more control over the orchestration and provisioning, 
+and the test is more stable. You can even check when a container is ready before you start a test"
+
+Running the full build (with the integration tests) will create and populate
+a docker container with a postgres database. The database is normally built and
+destroyed for every build, but to leave it up and running after the tests
+(say, for inspection, or to run the app standalone), find the PostgreSQLContainer
+in the test code, and call its `.withReuse(true)` method with `true` instead of `false` to leave it
+up and running even after the build finishes.
+
+Note that the datasource properties are dynamic and written to `build/postgres.properties`
+Which is referenced by `application.properties` and so available later if necessary.
+
+
+Handy Commands:
+
+See running images with `docker ps`
+Stop a container with `docker container stop container_name`
+
+
+
+## Migrations
+
+We use [Flyway](https://flywaydb.org) and run the migration standalone (not on default startup of the server)
+so that we have more control over the migration process.
+
+The server is run in a "migration only" mode that does the migrations and then shuts down.
+
+e.g.
+
+use `migrate` script that runs the migration profile with gradle,
+
+or 
+    cd server
+    java --enable-preview -Dspring.profiles.active=migration -jar build/libs/server-1.0-SNAPSHOT.jar
+
+
+## Heroku database
+
+Can get a postgres command prompt with
+
+    heroku pg:psql --app stage-zdd-full
+
+
+## Environment variables
+
+Heroku automatically creates environment variables for you. To see all of them, run
+
+    heroku run env --app zdd-full
+
+e.g.
+
+    JAVA_OPTS=-XX:+UseContainerSupport -Xmx300m -Xss512k -XX:CICompilerCount=2 -Dfile.encoding=UTF-8
+    PORT=38476
+
+
+## Fitting in with Heroku
+
+There are a number of database connection environment variables generated automatically by Heroku.
+They overlap, so you can use them with different technologies (i.e. straight Java vs Spring)
+
+SPRING_DATASOURCE_URL to Spring is the same as spring.datasource.url
+given the [properties rules](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-relaxed-binding-from-environment-variables).
+
+command line properties take top priority, so even though SPRING_DATASOURCE_URL is defined as an environment variable
+automatically by Heroku, we can still override it in the command in the Procfile
+to add custom database properties to the URL
+
+    DATABASE_URL=postgres://pafei...:23782e...@ec2-34-236-215-156.compute-1.amazonaws.com:5432/d5oqne55s6np1v
+
+    JDBC_DATABASE_URL=jdbc:postgresql://ec2...compute-1.amazonaws.com:5432/d5oqne55s6np1v?password=23782e...&sslmode=require&user=pafei...
+    JDBC_DATABASE_USERNAME=pafei...
+    JDBC_DATABASE_PASSWORD=23782e2da93a7a8f987949613942f9ff30a530afc640e6e05294a4cd6658c3b4
+
+    SPRING_DATASOURCE_URL=jdbc:postgresql://ec2...compute-1.amazonaws.com:5432/d5oqne55s6np1v?password=23782e...&sslmode=require&user=pafei...
+    SPRING_DATASOURCE_USERNAME=pafei...
+    SPRING_DATASOURCE_PASSWORD=23782e...
+
+
+
+## Heroku Database Migrations
+
+See [Heroku Migrations](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps)
+
+Heroku's [release phase](https://devcenter.heroku.com/articles/release-phase)
+is one intended mechanism for migrations.
+
+Heroku requires apps to bind a port in 60s or it's considered crashed.
+Migrations can eat into that time, so do that separately from deployment.
+The release phase has a 1h timeout and a release can be
+monitored and [stopped](https://help.heroku.com/Z44Q4WW4/how-do-i-stop-a-release-phase).
+
+Running from a [flyway caller](https://devcenter.heroku.com/articles/running-database-migrations-for-java-apps#using-flyway)
+is the best way to do a migration without doing the source code deployment.
+
+Besides the release phase, database migrations can also be run in a
+[one-off dyno](https://devcenter.heroku.com/articles/one-off-dynos)
+
 
 ## Threads
 
@@ -36,10 +157,8 @@ Http automatically redirects to https on heroku. Locally it always requires http
 
 ## Running
 
-If starting with a new run of docker, need to ensure the migrations have been run
-since they don't run automatically on app startup. See migration steps.
-
-Run `gradlew bootRun`, or run `gradlew cleanRun` to clear the database and run the server in one step
+Doing a full build and leaving the docker container for postgres running
+will allow us to run standalone.
 
 ## Debugging
 
