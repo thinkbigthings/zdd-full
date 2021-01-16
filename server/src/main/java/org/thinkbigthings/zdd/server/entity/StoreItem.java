@@ -3,8 +3,8 @@ package org.thinkbigthings.zdd.server.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -45,6 +45,10 @@ public class StoreItem {
 
     @NotNull
     private String vendor = "";
+
+    @Basic
+    @NotNull
+    private Instant added;
 
     public StoreItem() {
 
@@ -121,4 +125,18 @@ public class StoreItem {
     public void setVendor(String vendor) {
         this.vendor = vendor;
     }
+
+    public Instant getAdded() {
+        return added;
+    }
+
+    public void setAdded(Instant updated) {
+        this.added = updated;
+    }
+
+    public StoreItem withAdded(Instant updated) {
+        this.added = updated;
+        return this;
+    }
+
 }

@@ -30,12 +30,16 @@ public class TestData {
     private static Faker faker = new Faker(Locale.US, random);
 
     public static List<StoreItem> readItems() throws IOException  {
+        return readItems("devon-flower-20201218.json");
+    }
 
-        Path path = Paths.get("src", "test", "resources", "devon-flower-20201218.json");
+    public static List<StoreItem> readItems(String filename) throws IOException  {
+
+        Path path = Paths.get("src", "test", "resources", filename);
         String content = Files.readString(path, StandardCharsets.UTF_8);
 
         EntityExtractor extractor = new EntityExtractor();
-         return extractor.extractItems(content);
+        return extractor.extractItems(content);
     }
 
     public static StoreItem randomItem() {

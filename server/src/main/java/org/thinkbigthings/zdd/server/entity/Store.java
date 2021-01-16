@@ -22,10 +22,6 @@ public class Store {
     @NotNull
     private String website = "";
 
-    @Basic
-    @NotNull
-    private Instant updated;
-
     @OneToMany(fetch=FetchType.LAZY, mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval=true)
     private Set<StoreItem> items = new HashSet<>();
 
@@ -34,7 +30,6 @@ public class Store {
     public Store(String name, String website) {
         this.name = name;
         this.website = website;
-        updated = Instant.now();
     }
 
     public String getName() {
@@ -51,14 +46,6 @@ public class Store {
 
     public void setWebsite(String website) {
         this.website = website;
-    }
-
-    public Instant getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Instant updated) {
-        this.updated = updated;
     }
 
     public Set<StoreItem> getItems() {

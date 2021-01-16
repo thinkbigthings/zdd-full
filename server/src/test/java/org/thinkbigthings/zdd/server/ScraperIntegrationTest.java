@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.thinkbigthings.zdd.dto.StoreRecord;
@@ -15,10 +16,11 @@ import org.thinkbigthings.zdd.server.entity.StoreItem;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.platform.commons.util.Preconditions.condition;
 import static org.thinkbigthings.zdd.server.test.data.TestData.readItems;
 
 
@@ -27,72 +29,36 @@ public class ScraperIntegrationTest extends IntegrationTest {
     protected static Logger LOG = LoggerFactory.getLogger(ScraperIntegrationTest.class);
 
     private Pageable firstPage = PageRequest.of(0, 10);
-    private static final String storeName = "Keystone Devon";
-    private static final String storeWebsite = "https://keystoneshops.com/menu/devon";
-
-    @Autowired
-    private ItemService itemService;
 
     @Autowired
     private StoreService storeService;
 
-    @BeforeAll
-    public static void createTestData(@Autowired StoreService storeService) throws IOException {
-
-        LOG.info("");
-        LOG.info("=======================================================================================");
-        LOG.info("Creating test data");
-        LOG.info("");
-
-        try {
-            storeService.saveNewStore(new StoreRecord(storeName, storeWebsite, Instant.now()));
-        }
-        catch(Exception e) {
-            LOG.info("Caught exception " + e);
-            LOG.info("Continuing without store creation");
-        }
-    }
+    @Autowired
+    private StoreItemRepository itemRepository;
 
     @Test
-    @Disabled("This test is broken but the scraping update time is about to be changed anyway")
     @DisplayName("Write items to database without hitting live server")
     public void testScraperFromDisk() throws IOException {
 
         String name = "testScraperFromDisk-" + UUID.randomUUID().toString();
+        Page<StoreItem> items;
+
         LOG.info("Using store name " + name);
-        storeService.saveNewStore(new StoreRecord(name, name, Instant.now()));
 
-        Store store = storeService.getStore(name);
-        Instant beforeUpdateTime = store.getUpdated();
-        long beforeUpdateSize = itemService.findItems(firstPage).getTotalElements();
+        Store store = storeService.saveNewStore(new StoreRecord(name, name));
+        items = itemRepository.findByStoreName(name, firstPage);
+        condition(items.isEmpty(), "Should start with no items");
 
-        List<StoreItem> items = readItems();
-        storeService.updateStoreItems(storeName, items);
+        storeService.updateStoreItems(name, readItems("devon-flower-20201218.json"));
+        items = itemRepository.findByStoreName(name, firstPage);
+        assertFalse(items.isEmpty(), "Should have items");
 
-        store = storeService.getStore(name);
-        Instant afterUpdateTime = store.getUpdated();
-        long afterUpdateSize = itemService.findItems(firstPage).getTotalElements();
+        Instant latestBeforeUpdate = items.stream().findFirst().get().getAdded();
+        storeService.updateStoreItems(name, readItems("devon-flower-20201221.json"));
+        items = itemRepository.findByStoreName(name, firstPage);
+        Instant latestAfterUpdate = items.stream().findFirst().get().getAdded();
+        assertTrue(latestAfterUpdate.isAfter(latestBeforeUpdate));
 
-        assertTrue(beforeUpdateTime.isBefore(afterUpdateTime));
-        assertTrue(beforeUpdateSize < afterUpdateSize, beforeUpdateSize + " vs " + afterUpdateSize);
-    }
-
-    @Test
-    @Disabled("This test is used with caution because it hits the live website")
-    @DisplayName("Write items to database by hitting a live server")
-    public void testScraper() {
-
-        Store store = storeService.getStore(storeName);
-        Instant beforeUpdate = store.getUpdated();
-        long sizeBeforeUpdate = itemService.findItems(firstPage).getTotalElements();
-
-        storeService.scrapeStore(storeName);
-
-        store = storeService.getStore(storeName);
-        long sizeAfterUpdate = itemService.findItems(firstPage).getTotalElements();
-
-        assertTrue(beforeUpdate.isBefore(store.getUpdated()));
-        assertTrue(sizeBeforeUpdate < sizeAfterUpdate, sizeBeforeUpdate + " vs " + sizeAfterUpdate);
     }
 
 }

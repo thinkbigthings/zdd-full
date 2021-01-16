@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -147,7 +148,6 @@ public class EntityExtractor {
         try {
             var parser = mapper.createParser(unparsedData);
             var items = mapper.readValue(parser, parseType);
-
             return items.stream()
                     .flatMap(item -> extractItem(item).stream())
                     .collect(toList());

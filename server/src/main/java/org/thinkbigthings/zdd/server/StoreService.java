@@ -11,7 +11,10 @@ import org.thinkbigthings.zdd.server.entity.*;
 import org.thinkbigthings.zdd.server.scraper.keystone.Scraper;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+
+import static java.util.function.Predicate.not;
 
 @Service
 public class StoreService {
@@ -48,16 +51,42 @@ public class StoreService {
         updateStoreItems(storeName, items);
     }
 
+    public static <T> boolean contains(Collection<T> collection, T element, Comparator<T> comparator) {
+        return collection.stream().anyMatch(e -> comparator.compare(e, element) == 0);
+    }
+
+    public static <T> boolean retainAll(Collection<T> collection, Collection<T> elementsToRetain, Comparator<T> comparator) {
+        return collection.removeIf(not(e -> contains(elementsToRetain, e, comparator)));
+    }
+
+    public static <T> boolean addAll(Collection<T> collection, Collection<T> elementsToAdd, Comparator<T> comparator) {
+        return elementsToAdd.stream()
+                .filter(not(e -> contains(collection, e, comparator)))
+                .map(collection::add)
+                .reduce(false, (b1, b2) -> b1 || b2);
+    }
+
     @Transactional
-    public void updateStoreItems(String storeName, List<StoreItem> items) {
+    public void updateStoreItems(String storeName, List<StoreItem> newItems) {
 
         Store store = storeRepository.findByName(storeName).get();
 
-        store.getItems().clear();
-        store.getItems().addAll(items);
-        items.forEach(item -> item.setStore(store));
+        Set<StoreItem> originalItems = store.getItems();
 
-        store.setUpdated(Instant.now());
+        Comparator<StoreItem> comparator = Comparator.comparing(StoreItem::getStrain)
+                .thenComparing(StoreItem::getSubspecies)
+                .thenComparing(StoreItem::getWeightGrams)
+                .thenComparing(StoreItem::getVendor);
+
+        // remove old items not in new dataset, then add all new items
+        // use comparator instead of .equals() since new items weren't persisted yet
+        // could be made faster if we removed items from the new collection that are already in old collection
+        retainAll(originalItems, newItems, comparator);
+        addAll(originalItems, newItems, comparator);
+
+        Instant added = Instant.now();
+        newItems.forEach(item -> item.setAdded(added));
+        newItems.forEach(item -> item.setStore(store));
 
         storeRepository.save(store);
     }

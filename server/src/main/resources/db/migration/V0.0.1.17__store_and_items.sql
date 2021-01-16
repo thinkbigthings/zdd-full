@@ -4,8 +4,7 @@ set search_path TO public;
 CREATE TABLE store (
     id              BIGSERIAL       NOT NULL    PRIMARY KEY,
     name            VARCHAR(255)    NOT NULL    UNIQUE,
-    website         VARCHAR(255)    NOT NULL,
-    updated         TIMESTAMPTZ     NOT NULL
+    website         VARCHAR(255)    NOT NULL
 );
 
 CREATE INDEX store_name_index ON store (name);
@@ -47,7 +46,8 @@ CREATE TABLE store_item (
     weight_grams    NUMERIC(3, 1)   NOT NULL,
     price_dollars   INT8            NOT NULL,
     vendor          VARCHAR(255)    NOT NULL,
-    store_id        INT8            NOT NULL REFERENCES store (id)
+    store_id        INT8            NOT NULL REFERENCES store (id),
+    added           TIMESTAMPTZ     NOT NULL
 );
 
 CREATE TABLE terpene_amount (

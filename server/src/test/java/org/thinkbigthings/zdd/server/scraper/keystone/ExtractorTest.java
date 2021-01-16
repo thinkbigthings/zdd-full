@@ -37,4 +37,5 @@ public class ExtractorTest {
         assertEquals(28, items.size());
         System.out.println(items);
     }
+
 }
