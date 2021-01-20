@@ -1,10 +1,12 @@
 package org.thinkbigthings.zdd.server.test.data;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Address;
 import com.github.javafaker.Faker;
 import org.thinkbigthings.zdd.dto.AddressRecord;
 import org.thinkbigthings.zdd.dto.PersonalInfo;
 import org.thinkbigthings.zdd.dto.RegistrationRequest;
+import org.thinkbigthings.zdd.dto.SavedSearches;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 import org.thinkbigthings.zdd.server.entity.Subspecies;
 import org.thinkbigthings.zdd.server.entity.Terpene;
@@ -28,6 +30,12 @@ public class TestData {
 
     private static Random random = new Random();
     private static Faker faker = new Faker(Locale.US, random);
+
+    public static SavedSearches readSavedSearch(String filename) throws IOException  {
+        Path path = Paths.get("src", "test", "resources", filename);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(path.toFile(), SavedSearches.class);
+    }
 
     public static List<StoreItem> readItems() throws IOException  {
         return readItems("devon-flower-20201218.json");

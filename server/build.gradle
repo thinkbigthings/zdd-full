@@ -34,6 +34,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security:2.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.4.0'
 
+    compileOnly 'org.hibernate:hibernate-jpamodelgen:5.4.27.Final'
+    annotationProcessor 'org.hibernate:hibernate-jpamodelgen:5.4.27.Final'
+
     implementation 'org.springframework.session:spring-session-jdbc:2.4.0'
 
     implementation 'org.jsoup:jsoup:1.13.1'
@@ -50,6 +53,16 @@ dependencies {
     testCompile "org.testcontainers:junit-jupiter:1.15.1"
     testCompile "org.testcontainers:postgresql:1.15.1"
 }
+
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = ['build/generated/sources']
+        }
+    }
+}
+
 
 // integration test by tags,
 // inspired by https://stackoverflow.com/questions/40891867/junit5-tag-specific-gradle-task
