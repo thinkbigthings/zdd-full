@@ -1,5 +1,6 @@
 {
   "storeNames":["Keystone Devon"],
+  "active": true,
   "searches":[
     {
       "parameters":[
@@ -9,7 +10,7 @@
     {
       "parameters":[
         {"field":"thcPercent","operator":">=","value":"20"},
-        {"field":"weightGrams","operator":"=","value":"1"}
+        {"field":"weightGrams","operator":"=","value":"1.0"}
       ]
     }
   ]

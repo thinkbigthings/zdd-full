@@ -25,6 +25,7 @@ public class SearchParsingTest {
     private String savedSearchJson = """
         {
             "storeNames":["Keystone Devon"],
+            "active": true,
             "searches":[
                 {
                     "parameters":[
@@ -52,7 +53,8 @@ public class SearchParsingTest {
                         new SavedSearch(List.of(
                                 new SearchParameter("thcPercent", ">=", "20"),
                                 new SearchParameter("weightGrams", "=", "1"))
-                ))
+                )),
+                true
         );
 
         String json = mapper.writeValueAsString(userSearches);
