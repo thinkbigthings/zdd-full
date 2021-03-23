@@ -19,13 +19,11 @@ import org.thinkbigthings.zdd.server.test.data.TestData;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.platform.commons.util.Preconditions.condition;
 import static org.thinkbigthings.zdd.server.test.data.TestData.readItems;
 
 
@@ -97,12 +95,24 @@ public class SpecificationIntegrationTest extends IntegrationTest {
 
         // find by vendor
         results = search(baseSearch.withSearch(StoreItem_.VENDOR, "=", "Terrapin"), lastScan);
-        assertEquals(4, results.size());
+        results.forEach(item -> assertEquals("Terrapin", item.getVendor()));
+        results.forEach(item -> assertTrue(item.getAdded().isAfter(lastScan)));
+        assertEquals(9, results.size());
 
-        // TODO terpene amounts (refactor the db first because it affects search)
+        // TODO terpene amounts
+        SavedSearch sleepProfile = new SavedSearch()
+                .withParameter(StoreItem_.MYRCENE_PERCENT, ">=", ".5")
+                .withParameter(StoreItem_.LINALOOL_PERCENT, ">=", ".1");
+//                .withParameter(StoreItem_.TERPINOLENE_PERCENT, ">=", ".4")
 
-        // TODO could have a parameterized test that covers every field and every operator
-        // and asserts the results of the search explicitly (instead of just checking size)
+        SavedSearches sleepTerps = baseSearch.withSearch(sleepProfile);
+        results = search(sleepTerps, lastScan);
+//        results.forEach(item -> assertEquals("Terrapin", item.getVendor()));
+//        results.forEach(item -> assertTrue(item.getAdded().isAfter(lastScan)));
+        assertEquals(9, results.size());
+
+        // select id, strain, bisabolol_percent, caryophyllene_percent, humulene_percent, limonene_percent, pinene_percent, terpinolene_percent from store_item;
+        // select id, strain, caryophyllene_percent, myrcene_percent, linalool_percent, terpinolene_percent from store_item;
 
     }
 

@@ -9,8 +9,6 @@ import org.thinkbigthings.zdd.dto.RegistrationRequest;
 import org.thinkbigthings.zdd.dto.SavedSearches;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
 import org.thinkbigthings.zdd.server.entity.Subspecies;
-import org.thinkbigthings.zdd.server.entity.Terpene;
-import org.thinkbigthings.zdd.server.entity.TerpeneAmount;
 import org.thinkbigthings.zdd.server.scraper.keystone.EntityExtractor;
 
 import java.io.IOException;
@@ -59,16 +57,7 @@ public class TestData {
         item.setPriceDollars(randomLong(100));
         item.setThcPercent(randomBigDecimal(25));
         item.setCbdPercent(randomBigDecimal(25));
-        item.setTerpeneAmounts(randomTerpenes());
         return item;
-    }
-
-    public static Set<TerpeneAmount> randomTerpenes() {
-        return Set.of(new TerpeneAmount(randomTerpene(), randomFraction()));
-    }
-
-    public static Terpene randomTerpene() {
-        return Terpene.values()[random.nextInt(Terpene.values().length)];
     }
 
     public static Subspecies randomSubspecies() {

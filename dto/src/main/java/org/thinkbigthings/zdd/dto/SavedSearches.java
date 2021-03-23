@@ -16,8 +16,12 @@ public record SavedSearches(List<String> storeNames, List<SavedSearch> searches,
     }
 
     public SavedSearches withSearch(String field, String operator, String value) {
+        return withSearch(new SavedSearch(List.of(new SearchParameter(field, operator, value))));
+    }
+
+    public SavedSearches withSearch(SavedSearch newSearch) {
         List<SavedSearch> newSearches = new ArrayList<>(searches);
-        newSearches.add(new SavedSearch(List.of(new SearchParameter(field, operator, value))));
+        newSearches.add(newSearch);
         return new SavedSearches(storeNames, List.copyOf(newSearches), active);
     }
 

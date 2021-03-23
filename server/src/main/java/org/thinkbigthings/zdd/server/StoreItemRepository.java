@@ -12,13 +12,6 @@ import org.thinkbigthings.zdd.server.entity.StoreItem;
 public interface StoreItemRepository extends JpaRepository<StoreItem, Long>, JpaSpecificationExecutor<StoreItem> {
 
     @Query(value = "SELECT t FROM StoreItem t " +
-            "JOIN FETCH t.terpeneAmounts " +
-            "ORDER BY t.added DESC",
-            countQuery = "SELECT COUNT(t) FROM StoreItem t")
-    Page<StoreItem> findAllWithTerpenes(Pageable page);
-
-    @Query(value = "SELECT t FROM StoreItem t " +
-            "JOIN FETCH t.terpeneAmounts " +
             "WHERE t.store.name=:storename " +
             "ORDER BY t.added DESC",
             countQuery = "SELECT COUNT(t) FROM StoreItem t WHERE t.store.name=:storename")

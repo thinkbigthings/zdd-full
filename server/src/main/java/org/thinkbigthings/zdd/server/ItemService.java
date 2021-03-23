@@ -24,8 +24,7 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public Page<Item> findItems(Pageable page) {
-        return itemRepository.findAllWithTerpenes(page).map(toItemDto);
+        return itemRepository.findAll(page).map(toItemDto);
     }
-
 
 }

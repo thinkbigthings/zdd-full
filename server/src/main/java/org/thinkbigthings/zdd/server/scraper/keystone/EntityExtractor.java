@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.thinkbigthings.zdd.server.entity.StoreItem;
-import org.thinkbigthings.zdd.server.entity.TerpeneAmount;
 import org.thinkbigthings.zdd.server.entity.Subspecies;
-import org.thinkbigthings.zdd.server.entity.Terpene;
 
 
 import java.io.IOException;
@@ -59,20 +57,8 @@ public class EntityExtractor {
         }
     }
 
-    public Optional<BigDecimal> parsePercentageNumber(String key, HashMap<String, String> item) {
-        return parsePercentageNumber(item.get(key));
-    }
-
-    public Optional<TerpeneAmount> parseTerpeneAmount(Terpene terp, HashMap<String, String> item) {
-        return parsePercentageNumber(terp.name().toLowerCase(), item)
-                .map(parsedPercentage -> new TerpeneAmount(terp, parsedPercentage));
-    }
-
-    public List<TerpeneAmount> extractTerpenes(HashMap<String, String> item) {
-        return Arrays.asList(Terpene.values()).stream()
-                .flatMap(terp -> parseTerpeneAmount(terp, item).stream())
-                .sorted(Comparator.comparing(TerpeneAmount::getTerpenePercent).reversed())
-                .collect(toList());
+    public BigDecimal extractPercent(String key, HashMap<String, String> item) {
+        return parsePercentageNumber(item.get(key)).orElse(BigDecimal.ZERO);
     }
 
     public String extractStrainFromStrainImg(String strainWithTags) {
@@ -125,12 +111,17 @@ public class EntityExtractor {
             storeItem.setStrain(extractStrainFromStrainImg(item.get("strain")));
             storeItem.setThcPercent(parsePercentageNumber(item.get("thc")).get());
             storeItem.setCbdPercent(parsePercentageNumber(item.get("cbd")).get());
-            storeItem.getTerpeneAmounts().addAll(extractTerpenes(item));
+            storeItem.setBisabololPercent(extractPercent("bisabolol", item));
+            storeItem.setCaryophyllenePercent(extractPercent("caryophyllene", item));
+            storeItem.setHumulenePercent(extractPercent("humulene", item));
+            storeItem.setLimonenePercent(extractPercent("limonene", item));
+            storeItem.setLinaloolPercent(extractPercent("linalool", item));
+            storeItem.setMyrcenePercent(extractPercent("myrcene", item));
+            storeItem.setPinenePercent(extractPercent("pinene", item));
+            storeItem.setTerpinolenePercent(extractPercent("terpinolene", item));
             storeItem.setPriceDollars(parsePrice(item.get("price")).get());
             storeItem.setVendor(item.get("vendor"));
             storeItem.setWeightGrams(parseGrams(item.get("wt")).get());
-
-            storeItem.getTerpeneAmounts().forEach(t -> t.setStoreItem(storeItem));
 
             return Optional.of(storeItem);
         }

@@ -46,7 +46,7 @@ Note that the datasource properties are dynamic and written to `build/postgres.p
 Which is referenced by `application.properties` and so available later if necessary.
 
 Connect to postgres from command line if docker was left running:
-use port from postgres.properties like so: `psql -U test -p 55049`
+use port from build/postgres.properties like so: `psql -U test -p 55049`
 
 or through docker directly: `docker exec -it [container_name] bash`
 then : `psql -U test`

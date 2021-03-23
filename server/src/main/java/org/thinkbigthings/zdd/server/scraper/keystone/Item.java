@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record Item(Subspecies subspecies, String strain,
-                   BigDecimal thc, BigDecimal cbd, List<TerpeneAmount> terpeneAmounts,
+                   BigDecimal thc, BigDecimal cbd,
                    BigDecimal weightGrams, Long priceDollars, String vendor) {
 
 }

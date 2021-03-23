@@ -34,8 +34,23 @@ public class StoreItem {
     @NotNull
     private BigDecimal cbdPercent;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy = "storeItem", cascade = CascadeType.ALL, orphanRemoval=true)
-    private Set<TerpeneAmount> terpeneAmounts = new HashSet<>();
+
+    @NotNull private BigDecimal bisabololPercent;
+
+    @NotNull private BigDecimal caryophyllenePercent;
+
+    @NotNull private BigDecimal humulenePercent;
+
+    @NotNull private BigDecimal limonenePercent;
+
+    @NotNull private BigDecimal linaloolPercent;
+
+    @NotNull private BigDecimal myrcenePercent;
+
+    @NotNull private BigDecimal pinenePercent;
+
+    @NotNull private BigDecimal terpinolenePercent;
+
 
     @NotNull
     private BigDecimal weightGrams;
@@ -94,14 +109,6 @@ public class StoreItem {
         this.cbdPercent = cbdPercent;
     }
 
-    public Set<TerpeneAmount> getTerpeneAmounts() {
-        return terpeneAmounts;
-    }
-
-    public void setTerpeneAmounts(Set<TerpeneAmount> terpeneAmounts) {
-        this.terpeneAmounts = terpeneAmounts;
-    }
-
     public BigDecimal getWeightGrams() {
         return weightGrams;
     }
@@ -134,9 +141,67 @@ public class StoreItem {
         this.added = updated;
     }
 
-    public StoreItem withAdded(Instant updated) {
-        this.added = updated;
-        return this;
+    public BigDecimal getBisabololPercent() {
+        return bisabololPercent;
     }
 
+    public void setBisabololPercent(BigDecimal bisabololPercent) {
+        this.bisabololPercent = bisabololPercent;
+    }
+
+    public BigDecimal getCaryophyllenePercent() {
+        return caryophyllenePercent;
+    }
+
+    public void setCaryophyllenePercent(BigDecimal caryophyllenePercent) {
+        this.caryophyllenePercent = caryophyllenePercent;
+    }
+
+    public BigDecimal getHumulenePercent() {
+        return humulenePercent;
+    }
+
+    public void setHumulenePercent(BigDecimal humulenePercent) {
+        this.humulenePercent = humulenePercent;
+    }
+
+    public BigDecimal getLimonenePercent() {
+        return limonenePercent;
+    }
+
+    public void setLimonenePercent(BigDecimal limonenePercent) {
+        this.limonenePercent = limonenePercent;
+    }
+
+    public BigDecimal getLinaloolPercent() {
+        return linaloolPercent;
+    }
+
+    public void setLinaloolPercent(BigDecimal linaloolPercent) {
+        this.linaloolPercent = linaloolPercent;
+    }
+
+    public BigDecimal getMyrcenePercent() {
+        return myrcenePercent;
+    }
+
+    public void setMyrcenePercent(BigDecimal myrcenePercent) {
+        this.myrcenePercent = myrcenePercent;
+    }
+
+    public BigDecimal getPinenePercent() {
+        return pinenePercent;
+    }
+
+    public void setPinenePercent(BigDecimal pinenePercent) {
+        this.pinenePercent = pinenePercent;
+    }
+
+    public BigDecimal getTerpinolenePercent() {
+        return terpinolenePercent;
+    }
+
+    public void setTerpinolenePercent(BigDecimal terpinolenePercent) {
+        this.terpinolenePercent = terpinolenePercent;
+    }
 }
