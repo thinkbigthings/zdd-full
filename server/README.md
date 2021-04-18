@@ -36,14 +36,16 @@ Even Docker [recommends it](https://www.docker.com/blog/maintainable-integration
 and the test is more stable. You can even check when a container is ready before you start a test"
 
 Running the full build (with the integration tests) will create and populate
-a docker container with a postgres database. The database is normally built and
-destroyed for every build, but to leave it up and running after the tests
-(say, for inspection, or to run the app standalone), find the PostgreSQLContainer
-in the test code, and call its `.withReuse(true)` method with `true` instead of `false` to leave it
-up and running even after the build finishes.
+a docker container with a postgres database. 
 
+By default the database is left up and running after the build.
 Note that the datasource properties are dynamic and written to `build/postgres.properties`
 Which is referenced by `application.properties` and so available later if necessary.
+For details, find the PostgreSQLContainer in the test code and note use of `.withReuse(true)`
+and the Flyway calls to clean the database.
+
+So after a full build, the database should be in a state consistent with the data populated from the integration tests.
+This can be useful for bringing up the application e.g. for UI development.
 
 Connect to postgres from command line if docker was left running:
 use port from build/postgres.properties like so: `psql -U test -p 55049`
