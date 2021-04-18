@@ -16,9 +16,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SearchService {
+public class SpecificationBuilder {
 
-
+    /**
+     * Within SavedSearches, each individual search's parameters are ANDed together.
+     * Then at this level, each individual SavedSearch are ORed together,
+     * so results of those searches are all added together.
+     */
+    public Specification<StoreItem> toSpec(SavedSearches userSearches, Instant lastScanTime) {
+        return toSpecs(userSearches, lastScanTime).stream()
+                .reduce(Specification::or)
+                .orElse(Specification.where(null));
+    }
 
     /**
      * If the list of searches is empty, returns an empty List.
@@ -28,7 +37,7 @@ public class SearchService {
      * @param lastScanTime
      * @return
      */
-    public List<Specification<StoreItem>> toSpec(SavedSearches userSearches, Instant lastScanTime) {
+    public List<Specification<StoreItem>> toSpecs(SavedSearches userSearches, Instant lastScanTime) {
 
         // CriteriaBuilder.and() by itself returns an always true predicate, and
         // CriteriaBuilder.or() returns an always false predicate
@@ -39,7 +48,7 @@ public class SearchService {
             Specification<StoreItem> sinceLastScan = byRecent(lastScanTime);
 
             return userSearches.searches().stream()
-                    .map(this::toSpec)
+                    .map(this::toSpecs)
                     .flatMap(Optional::stream)
                     .map(spec -> spec.and(byStore))
                     .map(spec -> spec.and(sinceLastScan))
@@ -64,13 +73,13 @@ public class SearchService {
     }
 
     // at this level, all parameters must be true to be a match
-    private Optional<Specification<StoreItem>> toSpec(SavedSearch search) {
+    private Optional<Specification<StoreItem>> toSpecs(SavedSearch search) {
         return search.parameters().stream()
-                .map(this::toSpec)
+                .map(this::toSpecs)
                 .reduce(Specification::and);
     }
 
-    private Specification<StoreItem> toSpec(SearchParameter search) {
+    private Specification<StoreItem> toSpecs(SearchParameter search) {
 
         return (root, query, criteria) -> {
 

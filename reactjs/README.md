@@ -3,7 +3,9 @@
 
 ## Prerequisites
 
-This project was built with Node 12.14.0
+Software that needs to be installed:
+
+* Node 14.16.1
 
 
 ## Intro
